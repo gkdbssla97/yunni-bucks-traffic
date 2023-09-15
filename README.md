@@ -36,7 +36,7 @@
 
 ### Architecture
 
-<img width="757" alt="image" src="https://github.com/gkdbssla97/yunni-bucks/assets/55674664/4881409d-6661-4591-91f0-896ed3c48029">
+<img width="808" alt="image" src="https://github.com/gkdbssla97/yunni-bucks/assets/55674664/5340c5dc-103c-471b-b9bf-61919f35ab9b">
 
 ### Flow Chart
 
