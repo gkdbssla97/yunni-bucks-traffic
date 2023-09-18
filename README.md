@@ -47,7 +47,7 @@
 <img width="757" alt="image" src="https://github.com/gkdbssla97/yunni-bucks/assets/55674664/37452648-0c1b-4b6f-aa0a-42a53cbcc9ce">
 
 ### Domain Model
-<img width="757" alt="image" src="https://github.com/yungwangoh/yunni-bucks/assets/37898720/35e060e7-dd72-46c7-90f0-b28fc55b36d7">
+<img width="757" alt="image" src="https://github.com/gkdbssla97/yunni-bucks/assets/55674664/3f782d5f-0a01-4336-86da-55e0b13f373a">
 
 ### 프로젝트 구조
 
