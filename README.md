@@ -55,7 +55,7 @@
 
 ### 1.SRP
 주문, 결제, 할인, 배달은 각각의 기능만 가지며 책임을 수행한다.
-<img width="757" alt="image" src="https://github.com/gkdbssla97/yunni-bucks/assets/55674664/8f1e577a-843f-461a-a356-d1a4c3c46c49">
+[Domain Model](Domain-Model)
 
 ### 2.OCP
 기존 구성요소는 수정이 일어나지 말아야 하며, 쉽게 확장해서 재사용을 할 수 있어야 하므로 구현보다는 인터페이스에 의존하도록 설계한다.
