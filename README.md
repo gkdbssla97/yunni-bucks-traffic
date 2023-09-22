@@ -125,6 +125,7 @@ TestPayContainer 클래스에 FakePayRepository, FakeCardRepository 는실제 DB
 현재 요청 정보(HttpServletRequest)를 가져오기 위해 RequestContextHolder와 ServletRequestAttributes를 사용
 threadPoolExecutor에서 비동기적으로 sendSlackMessage() 메서드를 실행
 proceedingJoinPoint.proceed()를 호출하여 원래의 메서드 실행을 계속하고 결과값을 반환
+
 <img width="500" alt="image" src="https://github.com/gkdbssla97/yunni-bucks/assets/55674664/4d2a1711-ef3f-4d35-8702-62adccc03e13">
 <img width="500" alt="image" src="https://github.com/gkdbssla97/yunni-bucks/assets/55674664/01f7eace-f3ac-4ce6-81c2-a329387c6e45">
 
@@ -134,6 +135,7 @@ proceedingJoinPoint.proceed()를 호출하여 원래의 메서드 실행을 계�
 <img width="310" alt="image" src="https://github.com/gkdbssla97/yunni-bucks/assets/55674664/11f5dd23-20ba-4be5-840f-d95638fca8d1">
 <img width="279" alt="image" src="https://github.com/gkdbssla97/yunni-bucks/assets/55674664/de35a375-b086-4a64-a505-89105a735892">
 <img width="411" alt="image" src="https://github.com/gkdbssla97/yunni-bucks/assets/55674664/a0ff145a-c7d8-4907-92d4-e94f1a9ce285">
+
 mockMvc.perform() 메서드가 반환하는 객체로, 이후의 검증과 문서화 작업을 위한 연산들을 체인 방식으로 호출
 응답 결과를 기반으로 API 문서 스니펫을 생성 "card-create"는 생성될 스니펫 파일명
 요청 헤더 중 'Authorization' 헤더에 대한 설명을 추가
