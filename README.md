@@ -120,7 +120,7 @@ TestPayContainer 클래스에 FakePayRepository, FakeCardRepository 는실제 DB
 <img width="289" alt="image" src="https://github.com/gkdbssla97/yunni-bucks/assets/55674664/99eb62cb-8e7c-48dc-bed8-388e4bbbe688">
 <img width="438" alt="image" src="https://github.com/gkdbssla97/yunni-bucks/assets/55674664/fd2265c2-ea12-42c2-9ae0-d42c7240c2f6">
 
-- 동기식 / 비동기식 속도 비교
+- 동기식 / 비동기식 속도 비교 (동기 대비 비동기 3 ~ 9배 단축)
 
 현재 요청 정보(HttpServletRequest)를 가져오기 위해 RequestContextHolder와 ServletRequestAttributes를 사용
 threadPoolExecutor에서 비동기적으로 sendSlackMessage() 메서드를 실행
