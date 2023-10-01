@@ -14,12 +14,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @RestControllerAdvice(annotations = RestController.class)
 @RequiredArgsConstructor
 public class ErrorDetectAdvisor extends GlobalExceptionHandler {
 
     private final SlackApi slackApi;
+    private final ThreadPoolExecutor threadPoolExecutor;
 
     @ExceptionHandler(Exception.class)
     public void handleException(HttpServletRequest req, Exception e) {
@@ -44,7 +46,7 @@ public class ErrorDetectAdvisor extends GlobalExceptionHandler {
         slackMessage.setText("긴급 상황");
         slackMessage.setUsername("Error Bot");
 
-        slackApi.call(slackMessage);
+        threadPoolExecutor.execute(() -> slackApi.call(slackMessage));
         throw new RuntimeException(e);
     }
 }
