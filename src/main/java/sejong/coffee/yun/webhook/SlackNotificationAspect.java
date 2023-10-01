@@ -55,6 +55,8 @@ public class SlackNotificationAspect {
         slackMessage.setText(String.format("%s Request", req.getMethod()));
         slackMessage.setUsername("Method Bot");
 
-        slackApi.call(slackMessage);
+        synchronized (this) {
+            slackApi.call(slackMessage);
+        }
     }
 }

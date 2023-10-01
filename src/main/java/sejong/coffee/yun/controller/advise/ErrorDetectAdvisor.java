@@ -46,7 +46,12 @@ public class ErrorDetectAdvisor extends GlobalExceptionHandler {
         slackMessage.setText("긴급 상황");
         slackMessage.setUsername("Error Bot");
 
-        threadPoolExecutor.execute(() -> slackApi.call(slackMessage));
+        threadPoolExecutor.execute(() -> {
+            synchronized (slackApi) {
+                slackApi.call(slackMessage);
+            }
+        });
+
         throw new RuntimeException(e);
     }
 }
