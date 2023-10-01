@@ -29,22 +29,21 @@ public class SlackNotificationAspect {
     private final ThreadPoolExecutor threadPoolExecutor;
 
     @Around("@annotation(sejong.coffee.yun.custom.annotation.SlackNotification)")
-    public void slackNotification(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-        proceedingJoinPoint.proceed();
-//        threadPoolExecutor.execute(() -> sendSlackMessage(proceedingJoinPoint));
-        sendSlackMessage(proceedingJoinPoint);
+    public Object slackNotification(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+
+        HttpServletRequest request = ((ServletRequestAttributes)
+                RequestContextHolder.currentRequestAttributes()).getRequest();
+
+        threadPoolExecutor.execute(() -> sendSlackMessage(proceedingJoinPoint, request));
+
+        return proceedingJoinPoint.proceed();
     }
 
-    private void sendSlackMessage(ProceedingJoinPoint proceedingJoinPoint) {
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-        HttpServletRequest request = attributes.getRequest();
-        String httpMethod = request.getMethod();
+    private void sendSlackMessage(ProceedingJoinPoint proceedingJoinPoint, HttpServletRequest req) {
         SlackAttachment slackAttachment = new SlackAttachment();
-        slackAttachment.setFallback(httpMethod);
-//        slackAttachment.setFallback("test");
+        slackAttachment.setFallback(req.getMethod());
         slackAttachment.setColor("good");
-        slackAttachment.setTitle(String.format("Data %s detected", httpMethod));
-//        slackAttachment.setTitle("test");
+        slackAttachment.setTitle(String.format("Data %s detected", req.getMethod()));
         slackAttachment.setFields(List.of(
                 new SlackField().setTitle("Arguments").setValue(Arrays.toString(proceedingJoinPoint.getArgs())),
                 new SlackField().setTitle("method").setValue(proceedingJoinPoint.getSignature().getName())
@@ -53,8 +52,7 @@ public class SlackNotificationAspect {
         SlackMessage slackMessage = new SlackMessage();
         slackMessage.setAttachments(Collections.singletonList(slackAttachment));
         slackMessage.setIcon(":gear:");
-        slackMessage.setText(String.format("%s Request", httpMethod));
-//        slackMessage.setText("text");
+        slackMessage.setText(String.format("%s Request", req.getMethod()));
         slackMessage.setUsername("Method Bot");
 
         slackApi.call(slackMessage);
