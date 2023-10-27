@@ -62,5 +62,6 @@ public class CardController {
     public ResponseEntity<Boolean> test1() {
 //        throw new Exception();
         return ResponseEntity.ok(true);
+
     }
 }
