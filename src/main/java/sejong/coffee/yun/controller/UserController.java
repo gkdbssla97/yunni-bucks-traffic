@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import sejong.coffee.yun.custom.annotation.MemberId;
+import sejong.coffee.yun.custom.annotation.SlackNotification;
 import sejong.coffee.yun.domain.user.Member;
 import sejong.coffee.yun.dto.user.UserDto;
 import sejong.coffee.yun.mapper.CustomMapper;
@@ -29,6 +30,7 @@ public class UserController {
     private final CustomMapper customMapper;
 
     @PostMapping("")
+    @SlackNotification
     ResponseEntity<UserDto.Response> signUp(@RequestBody @Valid UserDto.Sign.Up.Request request) {
 
         log.info("request = {}", request.email());
@@ -49,6 +51,7 @@ public class UserController {
     }
 
     @PostMapping("/sign-in")
+    @SlackNotification
     ResponseEntity<Void> signIn(@RequestBody @Valid UserDto.Sign.In.Request request) {
         String accessToken = userService.signIn(request.email(), request.password());
 

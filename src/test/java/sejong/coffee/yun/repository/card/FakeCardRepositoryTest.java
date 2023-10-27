@@ -2,14 +2,16 @@ package sejong.coffee.yun.repository.card;
 
 
 import org.junit.jupiter.api.Test;
+import sejong.coffee.yun.domain.exception.ExceptionControl;
 import sejong.coffee.yun.domain.pay.BeforeCreatedData;
 import sejong.coffee.yun.domain.user.Card;
 import sejong.coffee.yun.domain.user.Member;
-import sejong.coffee.yun.mock.repository.FakeUserRepository;
 import sejong.coffee.yun.mock.repository.FakeCardRepository;
+import sejong.coffee.yun.mock.repository.FakeUserRepository;
 import sejong.coffee.yun.repository.user.UserRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class FakeCardRepositoryTest extends BeforeCreatedData {
 
@@ -52,5 +54,19 @@ public class FakeCardRepositoryTest extends BeforeCreatedData {
         assertThat(buildCard.getMember().getName()).isEqualTo(findCard.getMember().getName());
         assertThat(buildCard.getNumber()).isEqualTo(findCard.getNumber());
         assertThat(buildCard.getCardPassword()).isEqualTo(findCard.getCardPassword());
+    }
+
+    @Test
+    void 카드를_삭제한다() {
+        //given
+        Card save = cardRepository.save(this.card);
+
+        //when
+        cardRepository.delete(save);
+
+        //then
+        assertThatThrownBy(() -> cardRepository.findById(save.getId()))
+                .isInstanceOf(ExceptionControl.NOT_FOUND_REGISTER_CARD.cardException().getClass())
+                .hasMessageContaining("등록된 카드가 존재하지 않습니다.");
     }
 }

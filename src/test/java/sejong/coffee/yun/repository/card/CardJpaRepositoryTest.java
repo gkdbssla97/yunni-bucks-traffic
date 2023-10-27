@@ -42,4 +42,17 @@ public class CardJpaRepositoryTest extends BeforeCreatedData {
         //then
         assertThat(card).isEqualTo(byMemberId.get());
     }
+
+    @Test
+    void 카드를_삭제한다() {
+        //given
+        Card save = jpaCardRepository.save(this.card);
+
+        //when
+        jpaCardRepository.delete(save);
+        Optional<Card> byId = jpaCardRepository.findById(save.getId());
+
+        //then
+        assertThat(byId).isEmpty();
+    }
 }

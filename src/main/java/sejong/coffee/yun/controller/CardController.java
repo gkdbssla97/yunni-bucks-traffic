@@ -48,4 +48,20 @@ public class CardController {
         cardService.removeCard(memberId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/card-number-valid")
+    @SlackNotification
+    public ResponseEntity<Boolean> test() throws Exception {
+        throw new Exception();
+//        return ResponseEntity.ok(true);
+
+    }
+
+    @GetMapping("/hi1")
+    @SlackNotification
+    public ResponseEntity<Boolean> test1() {
+//        throw new Exception();
+        return ResponseEntity.ok(true);
+
+    }
 }
