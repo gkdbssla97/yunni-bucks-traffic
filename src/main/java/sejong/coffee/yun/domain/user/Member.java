@@ -34,6 +34,9 @@ public class Member extends DateTimeEntity {
     @JoinColumn(name = "coupon_id")
     private Coupon coupon;
 
+    @Version
+    private int version;
+
     @Builder
     public Member(Long id, String name, String password, String email, UserRank userRank, Address address, Money money, Integer orderCount, Coupon coupon) {
         this.id = id;
