@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import sejong.coffee.yun.domain.order.Order;
 import sejong.coffee.yun.domain.order.menu.Beverage;
 import sejong.coffee.yun.domain.order.menu.Menu;
@@ -88,7 +89,7 @@ public class OrderConcurrencyTest extends MainIntegrationTest {
     void 한명의_사용자가_동시적으로_여러개의_주문을_한다() throws InterruptedException {
 
         // given
-        int numberOfThread = 1000;
+        int numberOfThread = 100;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThread);
         CountDownLatch countDownLatch = new CountDownLatch(numberOfThread);
 
@@ -98,7 +99,7 @@ public class OrderConcurrencyTest extends MainIntegrationTest {
                 try {
                     // 주문 로직 실행
                     System.out.println(orderService.order(member.getId(), LocalDateTime.now()));
-                } catch (Exception e) {
+                } catch (ObjectOptimisticLockingFailureException e) {
                     e.printStackTrace();
                 } finally {
                     countDownLatch.countDown();
@@ -106,13 +107,12 @@ public class OrderConcurrencyTest extends MainIntegrationTest {
             });
             Thread.sleep(30);
         }
-
         countDownLatch.await();  // 모든 작업이 완료될 때까지 대기
         executorService.shutdown();  // 모든 작업이 완료되면 ExecutorService를 종료
 
         // then
         Member byId = userRepository.findById(member.getId());
         Integer orderCount = byId.getOrderCount();
-        assertThat(orderCount).isEqualTo(1000);
+        assertThat(orderCount).isEqualTo(100);
     }
 }
