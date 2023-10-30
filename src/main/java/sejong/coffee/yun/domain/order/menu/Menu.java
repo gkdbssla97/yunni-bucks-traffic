@@ -3,6 +3,7 @@ package sejong.coffee.yun.domain.order.menu;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import sejong.coffee.yun.domain.exception.ExceptionControl;
 import sejong.coffee.yun.domain.user.Money;
 
 import javax.persistence.*;
@@ -67,10 +68,10 @@ public abstract class Menu {
         this.updateAt = now;
     }
 
-    public void decrease(int qty) {
-        if(this.stock - qty < 0 ){
-            throw new RuntimeException();
+    public void decrease(int quantity) {
+        if (this.stock - quantity < 0) {
+            throw ExceptionControl.INSUFFICIENT_STOCK_QUANTITY.menuException();
         }
-        this.stock -= qty;
+        this.stock -= quantity;
     }
 }
