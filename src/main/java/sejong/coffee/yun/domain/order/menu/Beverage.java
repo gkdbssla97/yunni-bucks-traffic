@@ -17,8 +17,13 @@ import java.time.LocalDateTime;
 public class Beverage extends Menu {
 
     @Builder
-    public Beverage(Long id, String title, String description, Money price, Nutrients nutrients, MenuSize menuSize, LocalDateTime now) {
-        super(id, title, description, price, nutrients, menuSize, now);
+    public Beverage(Long id, String title, String description, Money price, Nutrients nutrients, MenuSize menuSize, LocalDateTime now, int stock) {
+        super(id, title, description, price, nutrients, menuSize, now, stock);
+    }
+
+    @Builder
+    public Beverage(String title, String description, Money price, Nutrients nutrients, MenuSize menuSize, LocalDateTime now, int stock) {
+        super(title, description, price, nutrients, menuSize, now, stock);
     }
 
     public static Beverage from(Long id, Beverage beverage) {
@@ -30,6 +35,7 @@ public class Beverage extends Menu {
                 .nutrients(beverage.getNutrients())
                 .menuSize(beverage.getMenuSize())
                 .now(beverage.getCreateAt())
+                .stock(beverage.getStock())
                 .build();
     }
 }
