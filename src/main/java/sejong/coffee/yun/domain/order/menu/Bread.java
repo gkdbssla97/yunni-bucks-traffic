@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 public class Bread extends Menu {
 
     @Builder
-    public Bread(Long id, String title, String description, Money price, Nutrients nutrients, MenuSize menuSize, LocalDateTime now) {
-        super(id, title, description, price, nutrients, menuSize, now);
+    public Bread(Long id, String title, String description, Money price, Nutrients nutrients, MenuSize menuSize, LocalDateTime now, int stock) {
+        super(id, title, description, price, nutrients, menuSize, now, stock);
     }
 
     public static Bread from(Long id, Bread bread) {
