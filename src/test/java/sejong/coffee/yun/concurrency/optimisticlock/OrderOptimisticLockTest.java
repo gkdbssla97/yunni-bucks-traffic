@@ -1,6 +1,7 @@
 package sejong.coffee.yun.concurrency.optimisticlock;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -86,7 +87,8 @@ public class OrderOptimisticLockTest extends MainIntegrationTest {
     }
 
     @Test
-    void 한명의_사용자가_동시적으로_여러개의_주문을_한다() throws InterruptedException {
+    @DisplayName("한명의_사용자가_동시적으로_여러개의_주문을_한다")
+    void concurrencyOrdersByOneCustomer() throws InterruptedException {
 
         // given
         int numberOfThread = 100;

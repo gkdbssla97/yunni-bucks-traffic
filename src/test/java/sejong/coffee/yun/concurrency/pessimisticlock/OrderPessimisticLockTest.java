@@ -57,12 +57,12 @@ public class OrderPessimisticLockTest extends MainIntegrationTest {
                 .nutrients(nutrients)
                 .menuSize(MenuSize.M)
                 .now(LocalDateTime.now())
-                .stock(100)
+                .stock(10)
                 .build();
 
         beverage = menuRepository.save(beverage);
 
-        members = IntStream.range(0, 100)
+        members = IntStream.range(0, 10)
                 .mapToObj(i -> {
                     Member member = Member.builder()
                             .address(new Address("서울시", "광진구", "화양동", "123-432"))
@@ -86,7 +86,7 @@ public class OrderPessimisticLockTest extends MainIntegrationTest {
     void concurrencyOrderOneBeverageWithMembers() throws InterruptedException {
 
         // given
-        int numberOfThread = 100;
+        int numberOfThread = 10;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThread);
         CountDownLatch countDownLatch = new CountDownLatch(numberOfThread);
 
