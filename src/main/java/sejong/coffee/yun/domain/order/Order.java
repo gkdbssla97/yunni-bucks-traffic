@@ -1,6 +1,9 @@
 package sejong.coffee.yun.domain.order;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import sejong.coffee.yun.domain.user.Cart;
 import sejong.coffee.yun.domain.user.CartItem;
 import sejong.coffee.yun.domain.user.Member;
