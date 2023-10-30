@@ -27,8 +27,10 @@ public abstract class Menu {
     private LocalDateTime createAt;
     @Column(name = "update_at")
     private LocalDateTime updateAt;
+    @Column(name = "stock")
+    private int stock;
 
-    protected Menu(Long id, String title, String description, Money price, Nutrients nutrients, MenuSize menuSize, LocalDateTime now) {
+    protected Menu(Long id, String title, String description, Money price, Nutrients nutrients, MenuSize menuSize, LocalDateTime now, int stock) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -37,6 +39,7 @@ public abstract class Menu {
         this.menuSize = menuSize;
         this.createAt = now;
         this.updateAt = now;
+        this.stock = stock;
     }
 
     protected Menu(String title, String description, Money price, Nutrients nutrients, MenuSize menuSize, LocalDateTime now) {
@@ -49,7 +52,25 @@ public abstract class Menu {
         this.updateAt = now;
     }
 
+    protected Menu(String title, String description, Money price, Nutrients nutrients, MenuSize menuSize, LocalDateTime now, int stock) {
+        this.title = title;
+        this.description = description;
+        this.price = price;
+        this.nutrients = nutrients;
+        this.menuSize = menuSize;
+        this.createAt = now;
+        this.updateAt = now;
+        this.stock = stock;
+    }
+
     public void setUpdateAt(LocalDateTime now) {
         this.updateAt = now;
+    }
+
+    public void decrease(int qty) {
+        if(this.stock - qty < 0 ){
+            throw new RuntimeException();
+        }
+        this.stock -= qty;
     }
 }
