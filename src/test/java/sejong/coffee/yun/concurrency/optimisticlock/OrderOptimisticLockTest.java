@@ -1,4 +1,4 @@
-package sejong.coffee.yun.concurrency;
+package sejong.coffee.yun.concurrency.optimisticlock;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ import java.util.concurrent.Executors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-public class OrderConcurrencyTest extends MainIntegrationTest {
+public class OrderOptimisticLockTest extends MainIntegrationTest {
 
     @Autowired
     private OrderService orderService;
