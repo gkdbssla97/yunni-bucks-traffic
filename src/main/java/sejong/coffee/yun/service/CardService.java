@@ -20,6 +20,7 @@ public class CardService {
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public Card create(Long memberId, CardDto.Request request) {
         Member findMember = userRepository.findById(memberId);
         Card card = createCard(request.number(), request.validThru(), request.cardPassword(), findMember);
