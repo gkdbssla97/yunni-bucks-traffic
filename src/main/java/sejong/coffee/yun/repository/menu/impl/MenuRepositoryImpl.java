@@ -1,7 +1,12 @@
 package sejong.coffee.yun.repository.menu.impl;
 
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import sejong.coffee.yun.domain.order.menu.Menu;
@@ -11,6 +16,7 @@ import sejong.coffee.yun.repository.menu.jpa.JpaMenuRepository;
 import java.util.List;
 
 import static sejong.coffee.yun.domain.exception.ExceptionControl.NOT_FOUND_MENU;
+import static sejong.coffee.yun.domain.order.menu.QMenu.menu;
 
 @Repository
 @Primary
@@ -18,6 +24,7 @@ import static sejong.coffee.yun.domain.exception.ExceptionControl.NOT_FOUND_MENU
 public class MenuRepositoryImpl implements MenuRepository {
 
     private final JpaMenuRepository jpaMenuRepository;
+    private final JPAQueryFactory jpaQueryFactory;
 
     @Override
     @Transactional
@@ -34,6 +41,20 @@ public class MenuRepositoryImpl implements MenuRepository {
     @Override
     public List<Menu> findAll() {
         return jpaMenuRepository.findAll();
+    }
+
+    @Override
+    public Page<Menu> findAllMenusPaged(Pageable pageable) {
+        List<Menu> menus = jpaQueryFactory.selectFrom(menu)
+                .orderBy(menu.createAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> jpaQuery = jpaQueryFactory.select(menu.count())
+                .from(menu);
+
+        return PageableExecutionUtils.getPage(menus, pageable, jpaQuery::fetchOne);
     }
 
     @Override
