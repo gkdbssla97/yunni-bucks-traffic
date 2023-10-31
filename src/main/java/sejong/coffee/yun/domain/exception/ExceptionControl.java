@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public enum ExceptionControl {
 
-    // Order, member, menuList, menu
+    // Order, member, menuList
     DUPLICATE("중복되었습니다."),
     DUPLICATE_USER_NAME("이름이 중복되었습니다."),
     DUPLICATE_USER_EMAIL("이메일이 중복되었습니다."),
@@ -26,9 +26,12 @@ public enum ExceptionControl {
     DELIVERY_EXCEPTION("배송할 수 없습니다."),
     DELIVERY_COMPLETE_EXCEPTION("배송 완료를 할 수 없습니다."),
     NOT_FOUND_MENU_REVIEW("메뉴 리뷰를 찾을 수 없습니다."),
+
+    // Menu
     NOT_FOUND_MENU_THUMBNAIL("메뉴 썸네일을 찾을 수 없습니다."),
     QUANTITY_INDEX_OF_BOUND_ERROR("수량은 0 미만으로 내릴 수 없습니다."),
     INSUFFICIENT_STOCK_QUANTITY("재고가 부족해 주문을 할 수 없습니다."),
+    INVALID_MENU_TYPE("해당 메뉴 종류는 없습니다."),
 
     // Card
     INVALID_CARD_EXPIRATION_DATE("카드 유효기간이 올바르지 않습니다."),
