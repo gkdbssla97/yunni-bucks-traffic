@@ -2,11 +2,24 @@ package sejong.coffee.yun.dto.menu;
 
 import sejong.coffee.yun.domain.order.menu.Menu;
 import sejong.coffee.yun.domain.order.menu.MenuSize;
+import sejong.coffee.yun.domain.order.menu.MenuType;
 import sejong.coffee.yun.domain.order.menu.Nutrients;
 import sejong.coffee.yun.domain.user.Money;
 
 public class MenuDto {
-    public record Response(Long menuId, String title, String description, Money price, Nutrients nutrients, MenuSize menuSize) {
+
+    public record Request(
+            String title,
+            String description,
+            Money price,
+            Nutrients nutrients,
+            MenuSize menuSize,
+            int stock,
+            MenuType menuType
+    ){}
+
+    public record Response(Long menuId, String title, String description, Money price, Nutrients nutrients,
+                           MenuSize menuSize) {
         public Response(Menu menu) {
             this(menu.getId(), menu.getTitle(), menu.getDescription(), menu.getPrice().mapBigDecimalToInt(), menu.getNutrients(), menu.getMenuSize());
         }
