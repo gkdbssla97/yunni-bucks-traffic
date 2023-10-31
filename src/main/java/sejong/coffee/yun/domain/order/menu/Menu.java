@@ -30,8 +30,10 @@ public abstract class Menu {
     private LocalDateTime updateAt;
     @Column(name = "stock")
     private int stock;
+    @Enumerated(value = EnumType.STRING)
+    private MenuType menuType;
 
-    protected Menu(Long id, String title, String description, Money price, Nutrients nutrients, MenuSize menuSize, LocalDateTime now, int stock) {
+    protected Menu(Long id, String title, String description, Money price, Nutrients nutrients, MenuSize menuSize, LocalDateTime now, int stock, MenuType menuType) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -41,6 +43,7 @@ public abstract class Menu {
         this.createAt = now;
         this.updateAt = now;
         this.stock = stock;
+        this.menuType = menuType;
     }
 
     protected Menu(String title, String description, Money price, Nutrients nutrients, MenuSize menuSize, LocalDateTime now) {
@@ -53,7 +56,7 @@ public abstract class Menu {
         this.updateAt = now;
     }
 
-    protected Menu(String title, String description, Money price, Nutrients nutrients, MenuSize menuSize, LocalDateTime now, int stock) {
+    protected Menu(String title, String description, Money price, Nutrients nutrients, MenuSize menuSize, LocalDateTime now, int stock, MenuType menuType) {
         this.title = title;
         this.description = description;
         this.price = price;
@@ -62,6 +65,7 @@ public abstract class Menu {
         this.createAt = now;
         this.updateAt = now;
         this.stock = stock;
+        this.menuType = menuType;
     }
 
     public void setUpdateAt(LocalDateTime now) {
