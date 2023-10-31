@@ -10,6 +10,8 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import java.time.LocalDateTime;
 
+import static sejong.coffee.yun.domain.order.menu.MenuType.*;
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -18,7 +20,7 @@ public class Bread extends Menu {
 
     @Builder
     public Bread(Long id, String title, String description, Money price, Nutrients nutrients, MenuSize menuSize, LocalDateTime now, int stock) {
-        super(id, title, description, price, nutrients, menuSize, now, stock);
+        super(id, title, description, price, nutrients, menuSize, now, stock, BREAD);
     }
 
     public static Bread from(Long id, Bread bread) {
