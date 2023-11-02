@@ -99,8 +99,8 @@
 | 레디스 캐싱 전략 사용 후 | 2494.0     | 184.26  |
 | 속도 개선 증가       | 2.0배 (TPS) | 2.83배   |
 
- - caching miss 했을 때 응답시간이 193ms 이었고, caching hit 했을 때 응답시간이 175ms
- - caching hit 시 응답시간이 약 9.3% 정도 단축
+ - caching miss 했을 때 응답시간 193ms, caching hit 했을 때 응답시간 175ms
+ - caching hit 시 응답시간이 약 9.3% 단축
 
 #### 2. 사용자가 인기 메뉴를 조회한다.
 - Redis zSet 활용
