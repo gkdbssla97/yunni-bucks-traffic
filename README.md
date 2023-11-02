@@ -91,13 +91,15 @@
 <img src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/4f547d8a-2e8c-482c-a081-f02d71273be0" width="500" height="300">
 <img src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/e5d4887e-4cd3-439b-bd86-c69859c9a99b" width="500" height="300">
 
+*아래 값은 작업 시작 시간 에서 종료 시간까지의 평균 값으로 산출*
+
 | 구분             | TPS        | 응답시간(ms) |
 |----------------|------------|---------|
 | 레디스 캐싱 전략 사용 전 | 1247.75	   | 520.58  |
 | 레디스 캐싱 전략 사용 후 | 2494.0     | 184.26  |
-| 속도 개선 증가율       | 2.0배 (TPS) | 2.83배   |
-
-DB 조회와 레디스 캐싱 조회 시 TPS 상승 및 응답시간이 DB 사용 대비 레디스 사용시 응답 시간은 약 2.83배 개선  
+| 속도 개선 증가       | 2.0배 (TPS) | 2.83배   |
+ - caching miss 했을 때 응답시간이 193ms 이었고, caching hit 했을 때 응답시간이 175ms
+ - caching hit 시 응답시간이 약 9.3% 정도 단축
 
 #### 2. 사용자가 인기 메뉴를 조회한다.
 - Redis zSet 활용
