@@ -88,14 +88,14 @@
   - 단순히 데이터를 조회하는 경우 (예: 메뉴 조회)와 같이 데이터의 변경이 없는 상황에서는 DB Lock 없이 Redis Caching만으로도 충분히 빠른 응답 시간과 효율적인 서버 운영
 
 #### 적용 결과
-<img src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/4f547d8a-2e8c-482c-a081-f02d71273be0" width="500" height="300">
-<img src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/e5d4887e-4cd3-439b-bd86-c69859c9a99b" width="500" height="300">
+<img src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/4f547d8a-2e8c-482c-a081-f02d71273be0" width="500" height="320">
+<img src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/e5d4887e-4cd3-439b-bd86-c69859c9a99b" width="500" height="320">
 
 | 구분             | TPS        | 응답시간(ms) |
 |----------------|------------|---------|
 | 레디스 캐싱 전략 사용 전 | 1247.75	   | 520.58  |
 | 레디스 캐싱 전략 사용 후 | 2494.0     | 184.26  |
-| 속도 개선 증가율       | 2.0배 (TPS) | 2.83배   |
+| 속도 개선 비율       | 2.0배 (TPS) | 2.83배   |
 
 DB 조회와 레디스 캐싱 조회 시 TPS 상승 및 응답시간이 DB 사용 대비 레디스 사용시 응답 시간은 약 2.83배 개선  
 
