@@ -32,6 +32,7 @@ public class RedisCacheConfig {
         objectMapper.activateDefaultTyping(validator, ObjectMapper.DefaultTyping.EVERYTHING);
 
         RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+                .prefixCacheNameWith("yourPrefix")
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer(objectMapper)))
                 .entryTtl(Duration.ofMinutes(30L));
