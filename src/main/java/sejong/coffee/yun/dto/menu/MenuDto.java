@@ -19,9 +19,17 @@ public class MenuDto {
     ){}
 
     public record Response(Long menuId, String title, String description, Money price, Nutrients nutrients,
-                           MenuSize menuSize) {
+                           MenuSize menuSize, int stock, int viewCount, int orderCount) {
         public Response(Menu menu) {
-            this(menu.getId(), menu.getTitle(), menu.getDescription(), menu.getPrice().mapBigDecimalToInt(), menu.getNutrients(), menu.getMenuSize());
+            this(menu.getId(), menu.getTitle(), menu.getDescription(),
+                    menu.getPrice().mapBigDecimalToInt(), menu.getNutrients(), menu.getMenuSize(),
+                    menu.getStock(), menu.getViewCount(), menu.getOrderCount());
+        }
+
+        public static Response fromMenu(Menu menu) {
+            return new Response(menu.getId(), menu.getTitle(), menu.getDescription(),
+                    menu.getPrice().mapBigDecimalToInt(), menu.getNutrients(), menu.getMenuSize(),
+                    menu.getStock(), menu.getViewCount(), menu.getOrderCount());
         }
     }
 }
