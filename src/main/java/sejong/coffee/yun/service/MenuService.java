@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sejong.coffee.yun.domain.exception.ExceptionControl;
@@ -16,12 +18,20 @@ import sejong.coffee.yun.dto.menu.MenuDto;
 import sejong.coffee.yun.repository.menu.MenuRepository;
 import sejong.coffee.yun.util.wrapper.RestPage;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
+import static sejong.coffee.yun.dto.menu.MenuRankingDto.Response;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class MenuService {
 
     private final MenuRepository menuRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 
     public Menu create(MenuDto.Request request) {
         Menu menu = createMenu(request);
@@ -54,7 +64,7 @@ public class MenuService {
     }
 
     @Transactional
-    @Cacheable(value = "Contents", cacheManager = "cacheManager")
+    @Cacheable(value = "Menu", cacheManager = "cacheManager")
     public RestPage<MenuDto.Response> findAllByCaching(Pageable pageable) {
         Page<Menu> allMenusPaged = menuRepository.findAllMenusPaged(pageable);
         return new RestPage<>(allMenusPaged.map(MenuDto.Response::new));
@@ -63,5 +73,37 @@ public class MenuService {
     public Page<MenuDto.Response> findAll(Pageable pageable) {
         Page<Menu> allMenusPaged = menuRepository.findAllMenusPaged(pageable);
         return allMenusPaged.map(MenuDto.Response::new);
+    }
+
+    @Transactional
+    public MenuDto.Response menuSearch(String menuTitle) {
+        Menu findMenu = menuRepository.findByTitle(menuTitle);
+        double score = 0.0;
+        try {
+            findMenu.increaseViewCount();
+            redisTemplate.opsForZSet().incrementScore("ranking", menuTitle, 1);
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+        redisTemplate.opsForZSet().incrementScore("ranking", menuTitle, score);
+
+        return MenuDto.Response.fromMenu(findMenu);
+    }
+
+    public List<Response> searchRankList() {
+        String key = "ranking";
+        ZSetOperations<String, String> zSetOperations = redisTemplate.opsForZSet();
+        Set<ZSetOperations.TypedTuple<String>> typedTupleSet = zSetOperations.reverseRangeWithScores(key, 0, 2);
+
+        return Objects.requireNonNull(typedTupleSet).stream()
+                .map(typedTuple -> {
+                    String menuTitle = typedTuple.getValue();
+                    Menu menu = menuRepository.findByTitle(menuTitle);
+                    return Response.convertToResponseRankingDto(typedTuple, menu);
+                })
+                .sorted(Comparator.comparing(Response::viewCount).reversed()
+                        .thenComparing(Response::orderCount, Comparator.reverseOrder())
+                        .thenComparing(Response::menuTitle))
+                .toList();
     }
 }
