@@ -16,4 +16,6 @@ public interface JpaMenuRepository extends JpaRepository<Menu, Long> {
     @Lock(value = LockModeType.PESSIMISTIC_WRITE)
     @Query("select m from Menu m where m.id = :id")
     Optional<Menu> findById(@NotNull @Param("id") Long id);
+
+    Optional<Menu> findByTitle(@Param("title") String title);
 }
