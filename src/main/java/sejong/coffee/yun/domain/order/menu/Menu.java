@@ -32,6 +32,11 @@ public abstract class Menu {
     private int stock;
     @Enumerated(value = EnumType.STRING)
     private MenuType menuType;
+    private int orderCount;
+    private int viewCount;
+
+    @Transient
+    private final int MAX_STOCK = 100;
 
     protected Menu(Long id, String title, String description, Money price, Nutrients nutrients, MenuSize menuSize, LocalDateTime now, int stock, MenuType menuType) {
         this.id = id;
@@ -74,8 +79,20 @@ public abstract class Menu {
 
     public void decrease(int quantity) {
         if (this.stock - quantity < 0) {
+            refillStock();
             throw ExceptionControl.INSUFFICIENT_STOCK_QUANTITY.menuException();
         }
         this.stock -= quantity;
+    }
+
+    public void increaseOrderCount(int quantity) {
+        this.orderCount += quantity;
+    }
+    public void increaseViewCount() {
+        this.viewCount += 1;
+    }
+
+    public void refillStock() {
+        this.stock = MAX_STOCK;
     }
 }
