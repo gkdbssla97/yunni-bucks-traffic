@@ -67,4 +67,10 @@ public class MenuRepositoryImpl implements MenuRepository {
     public void clear() {
         jpaMenuRepository.deleteAll();
     }
+
+    @Override
+    public Menu findByTitle(String menuTitle) {
+        return jpaMenuRepository.findByTitle(menuTitle)
+                .orElseThrow(NOT_FOUND_MENU::notFoundException);
+    }
 }
