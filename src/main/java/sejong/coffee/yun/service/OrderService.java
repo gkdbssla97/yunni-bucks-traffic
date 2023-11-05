@@ -38,7 +38,11 @@ public class OrderService {
         List<CartItem> cartItems = cart.getCartItems();
         cartItems.stream()
                 .map(CartItem::getMenu)
-                .forEach(menu -> decreaseStock(menu.getId(), 1));
+                .forEach(menu -> {
+                    decreaseStock(menu.getId(), 1);
+                    increaseMenuOrderCount(menu.getId(), 1);
+                });
+
 
         Money money = calculator.calculateMenus(cart.getMember(), cart.convertToMenus());
 
@@ -50,6 +54,11 @@ public class OrderService {
     public void decreaseStock(Long menuId, int quantity) {
         Menu menu = menuRepository.findById(menuId);
         menu.decrease(quantity);
+    }
+
+    public void increaseMenuOrderCount(Long menuId, int quantity) {
+        Menu menu = menuRepository.findById(menuId);
+        menu.increaseOrderCount(quantity);
     }
 
     @Transactional
