@@ -14,4 +14,6 @@ public interface MenuRepository {
     Page<Menu> findAllMenusPaged(Pageable pageable);
     void delete(Long id);
     void clear();
+
+    Menu findByTitle(String menuTitle);
 }
