@@ -36,6 +36,7 @@ public class OrderService {
         Cart cart = cartRepository.findByMember(memberId);
 
         List<CartItem> cartItems = cart.getCartItems();
+
         cartItems.stream()
                 .map(CartItem::getMenu)
                 .forEach(menu -> {

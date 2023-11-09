@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import sejong.coffee.yun.domain.exception.MenuException;
 import sejong.coffee.yun.domain.order.Order;
 import sejong.coffee.yun.domain.order.menu.Beverage;
 import sejong.coffee.yun.domain.order.menu.Menu;
@@ -51,8 +51,8 @@ public class OrderOptimisticLockTest extends MainIntegrationTest {
 
     private Member member;
     private Order order;
-    private List<CartItem> menuList = new ArrayList<>();
-    private Menu menu1;
+    private List<CartItem> cartItems = new ArrayList<>();
+    private Menu menu;
     private Cart cart;
     private Coupon coupon;
 
@@ -70,20 +70,21 @@ public class OrderOptimisticLockTest extends MainIntegrationTest {
 
         Nutrients nutrients = new Nutrients(80, 80, 80, 80);
 
-        menu1 = Beverage.builder()
+        menu = Beverage.builder()
                 .description("에티오피아산 커피")
                 .title("커피")
                 .price(Money.initialPrice(new BigDecimal(1000)))
                 .nutrients(nutrients)
                 .menuSize(MenuSize.M)
                 .now(LocalDateTime.now())
+                .stock(10)
                 .build();
 
         member = userRepository.save(member);
-        Menu saveMenu = menuRepository.save(menu1);
+        menu = menuRepository.save(menu);
 
         cartService.createCart(member.getId());
-        cartService.addMenu(member.getId(), saveMenu.getId());
+        cart = cartService.addMenu(member.getId(), menu.getId());
     }
 
     @Test
@@ -100,14 +101,14 @@ public class OrderOptimisticLockTest extends MainIntegrationTest {
             executorService.submit(() -> {
                 try {
                     // 주문 로직 실행
-                    System.out.println(orderService.order(member.getId(), LocalDateTime.now()));
-                } catch (ObjectOptimisticLockingFailureException e) {
+                    orderService.order(member.getId(), LocalDateTime.now());
+                } catch (MenuException e) {
                     e.printStackTrace();
                 } finally {
                     countDownLatch.countDown();
                 }
             });
-            Thread.sleep(30);
+            Thread.sleep(50);
         }
         countDownLatch.await();  // 모든 작업이 완료될 때까지 대기
         executorService.shutdown();  // 모든 작업이 완료되면 ExecutorService를 종료
@@ -115,6 +116,37 @@ public class OrderOptimisticLockTest extends MainIntegrationTest {
         // then
         Member byId = userRepository.findById(member.getId());
         Integer orderCount = byId.getOrderCount();
-        assertThat(orderCount).isEqualTo(100);
+        assertThat(orderCount).isEqualTo(10);
+    }
+
+    @Test
+    @DisplayName("1개의 카트에 동시적으로 여러개 메뉴를 담는다")
+    void concurrencyCartByMultipleMenu() throws InterruptedException {
+
+        // given
+        int numberOfThread = 100;
+        ExecutorService executorService = Executors.newFixedThreadPool(100);
+        CountDownLatch countDownLatch = new CountDownLatch(numberOfThread);
+
+        // when
+        for (int i = 0; i < numberOfThread; i++) {
+            executorService.submit(() -> {
+                try {
+                    // 주문 로직 실행
+                    cartService.addMenu(member.getId(), menu.getId());
+                } catch (MenuException e) {
+                    e.printStackTrace();
+                } finally {
+                    countDownLatch.countDown();
+                }
+            });
+//            Thread.sleep(50);
+        }
+        countDownLatch.await();  // 모든 작업이 완료될 때까지 대기
+        executorService.shutdown();  // 모든 작업이 완료되면 ExecutorService를 종료
+
+        // then
+        List<CartItem> cartItemList = cartItemRepository.findAll();
+        assertThat(cartItemList.size()).isEqualTo(100);
     }
 }
