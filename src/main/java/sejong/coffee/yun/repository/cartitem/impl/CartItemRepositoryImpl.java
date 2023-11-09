@@ -8,6 +8,8 @@ import sejong.coffee.yun.domain.user.CartItem;
 import sejong.coffee.yun.repository.cartitem.CartItemRepository;
 import sejong.coffee.yun.repository.cartitem.jpa.JpaCartItemRepository;
 
+import java.util.List;
+
 @Repository
 @Primary
 @RequiredArgsConstructor
@@ -20,6 +22,12 @@ public class CartItemRepositoryImpl implements CartItemRepository {
     public CartItem save(CartItem cartItem) {
         return jpaCartItemRepository.save(cartItem);
     }
+
+    @Override
+    public List<CartItem> findAll() {
+        return jpaCartItemRepository.findAll();
+    }
+
     @Override
     public void clear() {
         jpaCartItemRepository.deleteAll();
