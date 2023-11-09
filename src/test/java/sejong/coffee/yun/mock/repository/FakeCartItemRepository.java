@@ -30,6 +30,11 @@ public class FakeCartItemRepository implements CartItemRepository {
     }
 
     @Override
+    public List<CartItem> findAll() {
+        return cartItems;
+    }
+
+    @Override
     public void clear() {
         cartItems.clear();
     }

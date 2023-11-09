@@ -1,5 +1,8 @@
 package sejong.coffee.yun.mock.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import sejong.coffee.yun.domain.order.menu.Beverage;
 import sejong.coffee.yun.domain.order.menu.Bread;
@@ -54,6 +57,17 @@ public class FakeMenuRepository implements MenuRepository {
     }
 
     @Override
+    public Page<Menu> findAllMenusPaged(Pageable pageable) {
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), menuList.size());
+
+        List<Menu> menuPageList = new ArrayList<>(menuList.subList(start, end));
+
+        return new PageImpl<>(menuPageList, pageable, menuList.size());
+    }
+
+
+    @Override
     public void delete(Long id) {
         menuList.remove(Math.toIntExact(id));
     }
@@ -61,5 +75,13 @@ public class FakeMenuRepository implements MenuRepository {
     @Override
     public void clear() {
         menuList.clear();
+    }
+
+    @Override
+    public Menu findByTitle(String menuTitle) {
+        return menuList.stream()
+                .filter(menu -> Objects.equals(menu.getTitle(), menuTitle))
+                .findAny()
+                .orElseThrow(NOT_FOUND_MENU::notFoundException);
     }
 }
