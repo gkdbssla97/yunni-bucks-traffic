@@ -9,7 +9,6 @@ import javax.persistence.*;
 import java.util.List;
 
 import static sejong.coffee.yun.domain.exception.ExceptionControl.NOT_FOUND_MENU;
-import static sejong.coffee.yun.domain.user.CartControl.SIZE;
 
 @Entity
 @Getter
@@ -23,6 +22,9 @@ public class Cart {
     private Member member;
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems;
+
+//    @Version
+//    private Long version;
 
     @Builder
     public Cart(Long id, Member member, List<CartItem> cartItems) {
@@ -40,7 +42,9 @@ public class Cart {
     }
 
     public void addMenu(CartItem cartItem) {
-        if(this.cartItems.size() >= SIZE.getSize()) throw new RuntimeException("카트는 메뉴를 " + SIZE.getSize() + "개만 담을 수 있습니다.");
+//        if(this.cartItems.size() > SIZE.getSize() - 1) {
+//            throw new RuntimeException("카트는 메뉴를 " + SIZE.getSize() + "개만 담을 수 있습니다.");
+//        }
 
         this.cartItems.add(cartItem);
         cartItem.setCart(this);

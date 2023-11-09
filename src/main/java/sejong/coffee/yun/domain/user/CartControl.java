@@ -4,8 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum CartControl {
-    SIZE(10),
-    ;
+    SIZE(10);
 
     private final int size;
     CartControl(int size) {
