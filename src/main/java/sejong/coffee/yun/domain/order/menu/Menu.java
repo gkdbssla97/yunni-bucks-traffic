@@ -9,6 +9,9 @@ import sejong.coffee.yun.domain.user.Money;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static sejong.coffee.yun.domain.order.menu.MenuStatus.ON_SALE;
+import static sejong.coffee.yun.domain.order.menu.MenuStatus.SOLD_OUT;
+
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -16,7 +19,8 @@ import java.time.LocalDateTime;
 @DiscriminatorColumn
 public abstract class Menu {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Long id;
     private String title;
     private String description;
@@ -32,8 +36,13 @@ public abstract class Menu {
     private int stock;
     @Enumerated(value = EnumType.STRING)
     private MenuType menuType;
+    @Enumerated(value = EnumType.STRING)
+    private MenuStatus menuStatus;
     private int orderCount;
     private int viewCount;
+
+    @Version
+    private Long version;
 
     @Transient
     private final int MAX_STOCK = 100;
@@ -49,6 +58,7 @@ public abstract class Menu {
         this.updateAt = now;
         this.stock = stock;
         this.menuType = menuType;
+        this.menuStatus = ON_SALE;
     }
 
     protected Menu(String title, String description, Money price, Nutrients nutrients, MenuSize menuSize, LocalDateTime now) {
@@ -71,6 +81,7 @@ public abstract class Menu {
         this.updateAt = now;
         this.stock = stock;
         this.menuType = menuType;
+        this.menuStatus = ON_SALE;
     }
 
     public void setUpdateAt(LocalDateTime now) {
@@ -78,8 +89,10 @@ public abstract class Menu {
     }
 
     public void decrease(int quantity) {
+        if(this.stock - quantity == 0) {
+            soldOut();
+        }
         if (this.stock - quantity < 0) {
-            refillStock();
             throw ExceptionControl.INSUFFICIENT_STOCK_QUANTITY.menuException();
         }
         this.stock -= quantity;
@@ -88,11 +101,17 @@ public abstract class Menu {
     public void increaseOrderCount(int quantity) {
         this.orderCount += quantity;
     }
+
     public void increaseViewCount() {
         this.viewCount += 1;
     }
 
     public void refillStock() {
         this.stock = MAX_STOCK;
+        this.menuStatus = ON_SALE;
+    }
+
+    public void soldOut() {
+        this.menuStatus = SOLD_OUT;
     }
 }
