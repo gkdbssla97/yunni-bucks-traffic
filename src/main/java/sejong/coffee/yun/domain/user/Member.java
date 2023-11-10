@@ -17,7 +17,8 @@ import static sejong.coffee.yun.domain.exception.ExceptionControl.NOT_MATCH_USER
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends DateTimeEntity {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Long id;
     @Column(name = "user_name")
     private String name;
@@ -87,12 +88,14 @@ public class Member extends DateTimeEntity {
     public BigDecimal fetchTotalPrice() {
         return this.money.getTotalPrice();
     }
+
     public boolean hasCoupon() {
         return this.coupon != null && this.coupon.hasAvailableCoupon();
     }
+
     public void checkPasswordMatch(String checkPassword) {
         boolean match = PasswordUtil.match(this.password, checkPassword);
 
-        if(!match) throw NOT_MATCH_USER.notMatchUserException();
+        if (!match) throw NOT_MATCH_USER.notMatchUserException();
     }
 }

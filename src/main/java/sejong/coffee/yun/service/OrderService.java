@@ -13,8 +13,10 @@ import sejong.coffee.yun.domain.order.OrderStatus;
 import sejong.coffee.yun.domain.order.menu.Menu;
 import sejong.coffee.yun.domain.user.Cart;
 import sejong.coffee.yun.domain.user.CartItem;
+import sejong.coffee.yun.domain.user.Coupon;
 import sejong.coffee.yun.domain.user.Money;
 import sejong.coffee.yun.repository.cart.CartRepository;
+import sejong.coffee.yun.repository.coupon.CouponRepository;
 import sejong.coffee.yun.repository.menu.MenuRepository;
 import sejong.coffee.yun.repository.order.OrderRepository;
 
@@ -29,6 +31,7 @@ public class OrderService {
     private final Calculator calculator;
     private final CartRepository cartRepository;
     private final MenuRepository menuRepository;
+    private final CouponRepository couponRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Order order(Long memberId, LocalDateTime now) {
@@ -65,7 +68,8 @@ public class OrderService {
     @Transactional
     public void cancel(Long orderId) {
         Order order = orderRepository.findById(orderId);
-
+        Coupon coupon = couponRepository.findByOrderId(orderId);
+        coupon.isAvailableCoupon();
         order.cancel();
     }
 
