@@ -50,7 +50,11 @@ public enum ExceptionControl {
 
     // OCR
     NOT_FOUND_OCR_RESPONSE_BODY("올바른 OCR 응답을 받을 수 없습니다."),
-    INVALID_FILE_EXTENSION_FORMAT("올바른 파일 경로가 아닙니다.");
+    INVALID_FILE_EXTENSION_FORMAT("올바른 파일 경로가 아닙니다."),
+
+    // Coupon
+    NOT_FOUND_COUPON("해당 쿠폰을 찾을 수 없습니다.");
+
 
     private final String message;
 
