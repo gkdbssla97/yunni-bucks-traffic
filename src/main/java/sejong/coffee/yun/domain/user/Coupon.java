@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sejong.coffee.yun.domain.discount.type.DiscountType;
+import sejong.coffee.yun.domain.exception.ExceptionControl;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -31,6 +32,9 @@ public class Coupon implements DiscountType {
     private double discountRate;
     @Enumerated(EnumType.STRING)
     private CouponUse couponUse;
+
+    @Version
+    private Long version;
 
     @Builder
     public Coupon(Long id, String name, String identityNumber, LocalDateTime createAt, LocalDateTime expireAt, double discountRate, CouponUse couponUse) {
@@ -73,7 +77,11 @@ public class Coupon implements DiscountType {
     public boolean hasAvailableCoupon() {
         return this.getCouponUse() == NO;
     }
-
+    public void isAvailableCoupon() {
+        if(this.couponUse == YES) {
+            this.couponUse = NO;
+        } throw ExceptionControl.NOT_FOUND_COUPON.notMatchUserException();
+    }
     private String checkValidatedCouponIdentityNumber(String identityNumber) {
         boolean matches = identityNumber.matches("^\\d{4}-\\d{4}-\\d{4}-\\d{4}$");
 
