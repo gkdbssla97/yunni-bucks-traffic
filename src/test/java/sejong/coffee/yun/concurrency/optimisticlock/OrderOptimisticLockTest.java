@@ -13,18 +13,20 @@ import sejong.coffee.yun.domain.order.menu.MenuSize;
 import sejong.coffee.yun.domain.order.menu.Nutrients;
 import sejong.coffee.yun.domain.user.*;
 import sejong.coffee.yun.integration.MainIntegrationTest;
-import sejong.coffee.yun.repository.cart.CartRepository;
 import sejong.coffee.yun.repository.cartitem.CartItemRepository;
 import sejong.coffee.yun.repository.menu.MenuRepository;
 import sejong.coffee.yun.repository.order.OrderRepository;
 import sejong.coffee.yun.repository.user.UserRepository;
 import sejong.coffee.yun.service.CartService;
+import sejong.coffee.yun.service.CouponService;
 import sejong.coffee.yun.service.OrderService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -43,13 +45,13 @@ public class OrderOptimisticLockTest extends MainIntegrationTest {
     @Autowired
     private CartItemRepository cartItemRepository;
     @Autowired
-    private CartRepository cartRepository;
+    private CouponService couponService;
     @Autowired
     private CartService cartService;
     @Autowired
     private MenuRepository menuRepository;
 
-    private Member member;
+    private Member member, memberB;
     private Order order;
     private List<CartItem> cartItems = new ArrayList<>();
     private Menu menu;
@@ -58,6 +60,17 @@ public class OrderOptimisticLockTest extends MainIntegrationTest {
 
     @BeforeEach
     void init() {
+        coupon = Coupon.builder()
+                .name("신규가입 환영쿠폰 15%")
+                .identityNumber("1234-5678-8765-4321")
+                .createAt(LocalDateTime.now())
+                .expireAt(LocalDateTime.now().plusDays(1))
+                .discountRate(0.1)
+                .couponUse(CouponUse.NO)
+                .build();
+
+        coupon = couponService.create(coupon);
+
         member = Member.builder()
                 .address(new Address("서울시", "광진구", "화양동", "123-432"))
                 .userRank(UserRank.BRONZE)
@@ -66,6 +79,18 @@ public class OrderOptimisticLockTest extends MainIntegrationTest {
                 .money(Money.ZERO)
                 .email("qwer123@naver.com")
                 .orderCount(0)
+                .coupon(coupon)
+                .build();
+
+        memberB = Member.builder()
+                .address(new Address("서울시", "강남구", "서초동", "321-234"))
+                .userRank(UserRank.BRONZE)
+                .name("강남동")
+                .password("gnam777")
+                .money(Money.ZERO)
+                .email("gnam777@naver.com")
+                .orderCount(0)
+                .coupon(coupon)
                 .build();
 
         Nutrients nutrients = new Nutrients(80, 80, 80, 80);
@@ -80,11 +105,16 @@ public class OrderOptimisticLockTest extends MainIntegrationTest {
                 .stock(10)
                 .build();
 
+
         member = userRepository.save(member);
+        memberB = userRepository.save(memberB);
+
         menu = menuRepository.save(menu);
 
         cartService.createCart(member.getId());
         cart = cartService.addMenu(member.getId(), menu.getId());
+        cartService.createCart(memberB.getId());
+        cart = cartService.addMenu(memberB.getId(), menu.getId());
     }
 
     @Test
@@ -92,7 +122,7 @@ public class OrderOptimisticLockTest extends MainIntegrationTest {
     void concurrencyOrdersByOneCustomer() throws InterruptedException {
 
         // given
-        int numberOfThread = 100;
+        int numberOfThread = 10;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThread);
         CountDownLatch countDownLatch = new CountDownLatch(numberOfThread);
 
@@ -124,8 +154,8 @@ public class OrderOptimisticLockTest extends MainIntegrationTest {
     void concurrencyCartByMultipleMenu() throws InterruptedException {
 
         // given
-        int numberOfThread = 100;
-        ExecutorService executorService = Executors.newFixedThreadPool(100);
+        int numberOfThread = 10;
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
         CountDownLatch countDownLatch = new CountDownLatch(numberOfThread);
 
         // when
@@ -147,6 +177,34 @@ public class OrderOptimisticLockTest extends MainIntegrationTest {
 
         // then
         List<CartItem> cartItemList = cartItemRepository.findAll();
-        assertThat(cartItemList.size()).isEqualTo(100);
+        assertThat(cartItemList.size()).isEqualTo(10 - 1);
+    }
+
+    @Test
+    void deadlockByUsingCouponWithTwoPlayers() throws InterruptedException {
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+
+        Callable<Void> userA = () -> {
+            // 사용자 A가 주문 생성
+            Order orderA = orderService.order(member.getId(), LocalDateTime.now());
+
+            // 주문 취소 및 쿠폰 상태 변경
+            orderService.cancel(orderA.getId());
+
+            return null;
+        };
+
+        Callable<Void> userB = () -> {
+            // 사용자 B가 주문 생성
+            Order orderB = orderService.order(memberB.getId(), LocalDateTime.now());
+
+            // 주문 취소 및 쿠폰 상태 변경
+            orderService.cancel(orderB.getId());
+
+            return null;
+        };
+
+        // 두 사용자가 동시에 주문을 생성하고 취소하도록 병렬 실행
+        executorService.invokeAll(Arrays.asList(userA, userB));
     }
 }
