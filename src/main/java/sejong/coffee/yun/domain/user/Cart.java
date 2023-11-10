@@ -23,8 +23,8 @@ public class Cart {
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems;
 
-//    @Version
-//    private Long version;
+    @Version
+    private Long version;
 
     @Builder
     public Cart(Long id, Member member, List<CartItem> cartItems) {
