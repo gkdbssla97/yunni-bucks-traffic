@@ -159,7 +159,7 @@ redis-cli → ranking 이름의 Sorted Set(ZSET)에서, Score(조회수)가 0에
 2. 오늘이 끝날 때에 RDB에 write back 값 저장
 3. Redis 비우기 `redisTemplate.delete("menu::*");`
 
-> 당일(00시 00분)이 됐을 때  RDB, Redis 순차적 업데이트 과정
+> 스케쥴러를 사용해 당일(00시 00분)이 됐을 때  RDB, Redis 순차적 업데이트 과정
 ```java
   @Scheduled(cron = "0 0 0 * * *") // 매일 00시 00분에 실행
   @Transactional
@@ -167,7 +167,7 @@ redis-cli → ranking 이름의 Sorted Set(ZSET)에서, Score(조회수)가 0에
   ```
   
 #### RDB
-1. 매일 자정이 되면, Redis에서 `menu::`로 시작하는 모든 키를 찾습니다. 이 키들은 인기 메뉴 데이터를 나타낸다.
+1. 매일 자정이 되면, Redis에서 `menu::`로 시작하는 모든 키를 찾는다. 이 키들은 인기 메뉴 데이터를 나타낸다.
 2. 이 키들을 찾은 후, 각 키에 해당하는 값을 가져온다. 값은 메뉴 score로, 인기 메뉴의 정보를 담고 있다.
 3. 각 인기 메뉴에 대해 해당 메뉴의 제목을 기반으로 RDB에서 같은 메뉴를 찾는다. 동시에, Redis의 Sorted Set에서 해당 메뉴의 인기 점수(score)를 가져온다.
 4. 만약 RDB에서 메뉴를 찾고, 그 메뉴의 인기 점수를 Redis에서 성공적으로 가져왔다면, RDB의 메뉴 정보에 업데이트한다.
