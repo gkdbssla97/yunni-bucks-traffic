@@ -40,6 +40,7 @@ public abstract class Menu {
     private MenuStatus menuStatus;
     private int orderCount;
     private int viewCount;
+    private double score;
 
     @Version
     private Long version;
@@ -88,8 +89,14 @@ public abstract class Menu {
         this.updateAt = now;
     }
 
+    public void updatePopularScoreByWritingBack(int orderCount, int viewCount, double score) {
+        this.orderCount = orderCount;
+        this.viewCount = viewCount;
+        this.score = score;
+    }
+
     public void decrease(int quantity) {
-        if(this.stock - quantity == 0) {
+        if (this.stock - quantity == 0) {
             soldOut();
         }
         if (this.stock - quantity < 0) {
