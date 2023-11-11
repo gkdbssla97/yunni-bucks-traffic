@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sejong.coffee.yun.domain.exception.ExceptionControl;
@@ -18,10 +19,7 @@ import sejong.coffee.yun.dto.menu.MenuDto;
 import sejong.coffee.yun.repository.menu.MenuRepository;
 import sejong.coffee.yun.util.wrapper.RestPage;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static sejong.coffee.yun.dto.menu.MenuRankingDto.Response;
 
@@ -32,6 +30,7 @@ public class MenuService {
 
     private final MenuRepository menuRepository;
     private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, Object> objectRedisTemplate;
 
     public Menu create(MenuDto.Request request) {
         Menu menu = createMenu(request);
@@ -105,5 +104,32 @@ public class MenuService {
                         .thenComparing(Response::orderCount, Comparator.reverseOrder())
                         .thenComparing(Response::menuTitle))
                 .toList();
+    }
+
+    @Scheduled(cron = "0 0 0 * * *") // 매일 00시 00분에 실행
+    @Transactional
+    public void refreshPopularMenusInRedis() {
+        Optional.ofNullable(redisTemplate.keys("menu::"))
+                .ifPresent(keys -> keys.stream()
+                        .map(key -> (Menu) objectRedisTemplate.opsForValue().get(key))
+                        .filter(Objects::nonNull)
+                        .forEach(popularMenu -> {
+                            Menu findMenu = menuRepository.findByTitle(popularMenu.getTitle());
+                            Double score = redisTemplate.opsForZSet().score("ranking", popularMenu.getTitle());
+                            if (score != null && findMenu != null) {
+                                findMenu.updatePopularScoreByWritingBack(popularMenu.getOrderCount(), popularMenu.getViewCount(), score);
+                            } else {
+                                menuRepository.save(popularMenu);
+                            }
+                        })
+                );
+
+        redisTemplate.delete("menu::*");
+
+//        List<Menu> popularMenus = menuRepository.findAll();
+//
+//        for (Menu menu : popularMenus) {
+//            redisTemplate.opsForZSet().incrementScore("ranking", menu.getTitle(), menu.getScore());
+//        }
     }
 }
