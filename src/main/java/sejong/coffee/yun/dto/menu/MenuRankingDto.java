@@ -19,6 +19,9 @@ public class MenuRankingDto {
         public static Response convertToResponseRankingDto(ZSetOperations.TypedTuple<String> typedTuple, Menu menu) {
             return new Response(typedTuple.getValue(), typedTuple.getScore(), menu.getViewCount(), menu.getOrderCount());
         }
-    }
 
+        public static Response from(String menuTitle, Double score, int viewCount, int orderCount) {
+            return new Response(menuTitle, score, viewCount, orderCount);
+        }
+    }
 }
