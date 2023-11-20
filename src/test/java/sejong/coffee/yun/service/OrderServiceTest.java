@@ -96,7 +96,7 @@ class OrderServiceTest {
         given(userRepository.findById(any())).willReturn(member);
 
         // when
-        Order saveOrder = orderService.order(1L, LocalDateTime.now());
+        Order saveOrder = orderService.orderWithPessimisticLock(1L, LocalDateTime.now());
 
         // then
         assertThat(saveOrder).isEqualTo(order);
@@ -112,7 +112,7 @@ class OrderServiceTest {
         given(userRepository.findById(any())).willReturn(member);
 
         // when
-        Order order2 = orderService.order(1L, LocalDateTime.of(2023, 8, 11, 5, 11));
+        Order order2 = orderService.orderWithPessimisticLock(1L, LocalDateTime.of(2023, 8, 11, 5, 11));
 
         // then
         assertThat(order2.getCreateAt()).isEqualTo(order1.getCreateAt());
@@ -150,7 +150,7 @@ class OrderServiceTest {
         given(calculator.calculateMenus(any(), any())).willReturn(Money.initialPrice(new BigDecimal("10000")));
 
         // when
-        Order saveOrder = orderService.order(1L, LocalDateTime.now());
+        Order saveOrder = orderService.orderWithPessimisticLock(1L, LocalDateTime.now());
 
         // then
         assertThat(saveOrder.fetchTotalOrderPrice()).isEqualTo(new BigDecimal("10000"));
@@ -163,7 +163,7 @@ class OrderServiceTest {
         given(userRepository.findById(any())).willReturn(member);
 
         // when
-        Order saveOrder = orderService.order(1L, LocalDateTime.now());
+        Order saveOrder = orderService.orderWithPessimisticLock(1L, LocalDateTime.now());
 
         // then
         assertThat(saveOrder.getName()).isEqualTo("커피 외 1개");
@@ -176,7 +176,7 @@ class OrderServiceTest {
         given(userRepository.findById(any())).willReturn(member);
 
         // when
-        Order saveOrder = orderService.order(1L, LocalDateTime.now());
+        Order saveOrder = orderService.orderWithPessimisticLock(1L, LocalDateTime.now());
 
         // then
         assertThat(saveOrder.getMember().getOrderCount()).isEqualTo(1);

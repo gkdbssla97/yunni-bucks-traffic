@@ -29,7 +29,7 @@ public class OrderController {
     @PostMapping("")
     ResponseEntity<OrderDto.Response> order(@MemberId Long memberId) {
 
-        Order order = orderService.order(memberId, LocalDateTime.now());
+        Order order = orderService.orderWithPessimisticLock(memberId, LocalDateTime.now());
 
         OrderDto.Response response = customMapper.map(order, OrderDto.Response.class);
 

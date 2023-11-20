@@ -34,7 +34,7 @@ public class OrderService {
     private final CouponRepository couponRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Order order(Long memberId, LocalDateTime now) {
+    public Order orderWithPessimisticLock(Long memberId, LocalDateTime now) {
 
         Cart cart = cartRepository.findByMember(memberId);
 
@@ -43,8 +43,8 @@ public class OrderService {
         cartItems.stream()
                 .map(CartItem::getMenu)
                 .forEach(menu -> {
-                    decreaseStock(menu.getId(), 1);
-                    increaseMenuOrderCount(menu.getId(), 1);
+                    decreaseStockWithPessimisticLock(menu.getId(), 1);
+                    increaseMenuOrderCountWithPessimisticLock(menu.getId(), 1);
                 });
 
 
@@ -55,13 +55,44 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    public void decreaseStock(Long menuId, int quantity) {
-        Menu menu = menuRepository.findById(menuId);
+    public void decreaseStockWithPessimisticLock(Long menuId, int quantity) {
+        Menu menu = menuRepository.findByIdForPessimisticLock(menuId);
         menu.decrease(quantity);
     }
 
-    public void increaseMenuOrderCount(Long menuId, int quantity) {
-        Menu menu = menuRepository.findById(menuId);
+    public void increaseMenuOrderCountWithPessimisticLock(Long menuId, int quantity) {
+        Menu menu = menuRepository.findByIdForPessimisticLock(menuId);
+        menu.increaseOrderCount(quantity);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Order orderWithOptimisticLock(Long memberId, LocalDateTime now) {
+
+        Cart cart = cartRepository.findByMember(memberId);
+
+        List<CartItem> cartItems = cart.getCartItems();
+
+        cartItems.stream()
+                .map(CartItem::getMenu)
+                .forEach(menu -> {
+                    decreaseStockWithOptimisticLock(menu.getId(), 1);
+                    increaseMenuOrderCountWithOptimisticLock(menu.getId(), 1);
+                });
+
+        Money money = calculator.calculateMenus(cart.getMember(), cart.convertToMenus());
+
+        Order order = Order.createOrder(cart, money, now);
+
+        return orderRepository.save(order);
+    }
+
+    public void decreaseStockWithOptimisticLock(Long menuId, int quantity) {
+        Menu menu = menuRepository.findByIdForOptimisticLock(menuId);
+        menu.decrease(quantity);
+    }
+
+    public void increaseMenuOrderCountWithOptimisticLock(Long menuId, int quantity) {
+        Menu menu = menuRepository.findByIdForOptimisticLock(menuId);
         menu.increaseOrderCount(quantity);
     }
 

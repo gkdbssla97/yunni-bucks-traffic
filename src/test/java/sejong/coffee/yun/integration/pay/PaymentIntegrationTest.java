@@ -91,7 +91,7 @@ class PaymentIntegrationTest extends SubIntegrationTest {
             // given
             cartService.createCart(1L);
             cartService.addMenu(1L, 1L);
-            Order order = orderService.order(1L, LocalDateTime.now());
+            Order order = orderService.orderWithPessimisticLock(1L, LocalDateTime.now());
 
             // when
             ResultActions resultActions = mockMvc.perform(post(PAY_API_PATH + "/{orderId}", order.getId())
@@ -131,7 +131,7 @@ class PaymentIntegrationTest extends SubIntegrationTest {
             // given
             cartService.createCart(1L);
             cartService.addMenu(1L, 1L);
-            Order order = orderService.order(1L, LocalDateTime.now());
+            Order order = orderService.orderWithPessimisticLock(1L, LocalDateTime.now());
 
             // when
             ResultActions resultActions = mockMvc.perform(post(PAY_API_PATH + "/{orderId}", 2)

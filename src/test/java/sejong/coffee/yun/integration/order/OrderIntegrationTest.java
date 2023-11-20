@@ -443,7 +443,7 @@ public class OrderIntegrationTest extends MainIntegrationTest {
             // given
             cartService.createCart(1L);
             cartService.addMenu(1L, 1L);
-            Order order = orderService.order(1L, LocalDateTime.now());
+            Order order = orderService.orderWithPessimisticLock(1L, LocalDateTime.now());
 
             // when
             ResultActions resultActions = mockMvc.perform(get(ORDER_API_PATH + "/cancel")

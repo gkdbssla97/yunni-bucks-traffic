@@ -79,7 +79,7 @@ public class PayServiceIntegrateTest extends MainIntegrationTest {
             cartService.addMenu(1L, 1L);
             cartService.addMenu(1L, 2L);
             cartService.addMenu(1L, 3L);
-            order = orderService.order(1L, LocalDateTime.now());
+            order = orderService.orderWithPessimisticLock(1L, LocalDateTime.now());
         }
 
         @Test

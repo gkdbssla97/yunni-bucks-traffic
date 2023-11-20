@@ -133,7 +133,7 @@ public class OrderServiceTest {
         cartRepository.save(Cart.builder().member(save).cartItems(menuList).build());
 
         // when
-        Order order = orderService.order(save.getId(), LocalDateTime.now());
+        Order order = orderService.orderWithPessimisticLock(save.getId(), LocalDateTime.now());
 
         int sum = menuList.stream().mapToInt(menu -> menu.getMenu().getPrice().getTotalPrice().intValue()).sum();
 
@@ -152,7 +152,7 @@ public class OrderServiceTest {
         LocalDateTime orderTime = LocalDateTime.of(2022, 11, 20, 11, 20);
 
         // when
-        Order order = orderService.order(save.getId(), orderTime);
+        Order order = orderService.orderWithPessimisticLock(save.getId(), orderTime);
 
         // then
         assertThat(order.getCreateAt()).isEqualTo(orderTime);
@@ -164,7 +164,7 @@ public class OrderServiceTest {
         Member save = userRepository.save(member);
         cartRepository.save(Cart.builder().member(save).cartItems(menuList).build());
 
-        Order order = orderService.order(save.getId(), LocalDateTime.now());
+        Order order = orderService.orderWithPessimisticLock(save.getId(), LocalDateTime.now());
 
         // when
         Order findOrder = orderService.findOrder(order.getId());
@@ -180,7 +180,7 @@ public class OrderServiceTest {
         Member save = userRepository.save(member);
         cartRepository.save(Cart.builder().member(save).cartItems(menuList).build());
 
-        IntStream.range(0, size).forEach(i -> orderService.order(save.getId(), LocalDateTime.now()));
+        IntStream.range(0, size).forEach(i -> orderService.orderWithPessimisticLock(save.getId(), LocalDateTime.now()));
 
         // when
         List<Order> orders = orderService.findAll();
@@ -196,7 +196,7 @@ public class OrderServiceTest {
         cartRepository.save(Cart.builder().member(save).cartItems(menuList).build());
 
         LocalDateTime initTime = LocalDateTime.now();
-        Order order = orderService.order(save.getId(), initTime);
+        Order order = orderService.orderWithPessimisticLock(save.getId(), initTime);
 
         LocalDateTime updateTime = LocalDateTime.of(2022, 11, 20, 11, 20);
 
@@ -214,7 +214,7 @@ public class OrderServiceTest {
         cartRepository.save(Cart.builder().member(save).cartItems(menuList).build());
 
         // when
-        Order order = orderService.order(save.getId(), LocalDateTime.now());
+        Order order = orderService.orderWithPessimisticLock(save.getId(), LocalDateTime.now());
 
         // then
         assertThat(order.fetchTotalOrderPrice()).isEqualTo(menuList.get(0).getMenu().getPrice().getTotalPrice());
@@ -227,7 +227,7 @@ public class OrderServiceTest {
         cartRepository.save(Cart.builder().member(save).cartItems(menuList).build());
 
         // when
-        Order order = orderService.order(save.getId(), LocalDateTime.now());
+        Order order = orderService.orderWithPessimisticLock(save.getId(), LocalDateTime.now());
 
         // then
         assertThat(order.getName()).isEqualTo(menuList.get(0).getMenu().getTitle() + " 외 " + menuList.size() + "개");
@@ -240,7 +240,7 @@ public class OrderServiceTest {
         cartRepository.save(Cart.builder().member(save).cartItems(menuList).build());
 
         // when
-        orderService.order(save.getId(), LocalDateTime.now());
+        orderService.orderWithPessimisticLock(save.getId(), LocalDateTime.now());
 
         // then
         assertThat(save.getOrderCount()).isEqualTo(1);
@@ -252,7 +252,7 @@ public class OrderServiceTest {
         Member save = userRepository.save(member);
         cartRepository.save(Cart.builder().member(save).cartItems(menuList).build());
 
-        orderService.order(save.getId(), LocalDateTime.now());
+        orderService.orderWithPessimisticLock(save.getId(), LocalDateTime.now());
 
         PageRequest pr = PageRequest.of(0,10);
 
@@ -274,13 +274,13 @@ public class OrderServiceTest {
         cartRepository.save(Cart.builder().member(save).cartItems(menuList).build());
 
         IntStream.range(0, statusCount).forEach(i -> {
-            Order order = orderService.order(save.getId(), LocalDateTime.now());
+            Order order = orderService.orderWithPessimisticLock(save.getId(), LocalDateTime.now());
 
             order.cancel();
         });
 
         IntStream.range(0, statusCount).forEach(i -> {
-            orderService.order(save.getId(), LocalDateTime.now());
+            orderService.orderWithPessimisticLock(save.getId(), LocalDateTime.now());
         });
 
         PageRequest pr = PageRequest.of(0, 10);
@@ -301,13 +301,13 @@ public class OrderServiceTest {
         cartRepository.save(Cart.builder().member(save).cartItems(menuList).build());
 
         IntStream.range(0, statusCount).forEach(i -> {
-            Order order = orderService.order(save.getId(), LocalDateTime.now());
+            Order order = orderService.orderWithPessimisticLock(save.getId(), LocalDateTime.now());
 
             order.completePayment();
         });
 
         IntStream.range(0, statusCount).forEach(i -> {
-            orderService.order(save.getId(), LocalDateTime.now());
+            orderService.orderWithPessimisticLock(save.getId(), LocalDateTime.now());
         });
 
         PageRequest pr = PageRequest.of(0, 10);

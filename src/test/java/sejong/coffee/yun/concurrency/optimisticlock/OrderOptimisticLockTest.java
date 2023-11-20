@@ -131,7 +131,7 @@ public class OrderOptimisticLockTest extends MainIntegrationTest {
             executorService.submit(() -> {
                 try {
                     // 주문 로직 실행
-                    orderService.order(member.getId(), LocalDateTime.now());
+                    orderService.orderWithPessimisticLock(member.getId(), LocalDateTime.now());
                 } catch (MenuException e) {
                     e.printStackTrace();
                 } finally {
@@ -186,7 +186,7 @@ public class OrderOptimisticLockTest extends MainIntegrationTest {
 
         Callable<Void> userA = () -> {
             // 사용자 A가 주문 생성
-            Order orderA = orderService.order(member.getId(), LocalDateTime.now());
+            Order orderA = orderService.orderWithPessimisticLock(member.getId(), LocalDateTime.now());
 
             // 주문 취소 및 쿠폰 상태 변경
             orderService.cancel(orderA.getId());
@@ -196,7 +196,7 @@ public class OrderOptimisticLockTest extends MainIntegrationTest {
 
         Callable<Void> userB = () -> {
             // 사용자 B가 주문 생성
-            Order orderB = orderService.order(memberB.getId(), LocalDateTime.now());
+            Order orderB = orderService.orderWithPessimisticLock(memberB.getId(), LocalDateTime.now());
 
             // 주문 취소 및 쿠폰 상태 변경
             orderService.cancel(orderB.getId());
