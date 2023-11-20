@@ -52,6 +52,22 @@ public class FakeMenuRepository implements MenuRepository {
     }
 
     @Override
+    public Menu findByIdForPessimisticLock(Long id) {
+        return menuList.stream()
+                .filter(menu -> Objects.equals(menu.getId(), id))
+                .findAny()
+                .orElseThrow(NOT_FOUND_MENU::notFoundException);
+    }
+
+    @Override
+    public Menu findByIdForOptimisticLock(Long id) {
+        return menuList.stream()
+                .filter(menu -> Objects.equals(menu.getId(), id))
+                .findAny()
+                .orElseThrow(NOT_FOUND_MENU::notFoundException);
+    }
+
+    @Override
     public List<Menu> findAll() {
         return menuList;
     }
