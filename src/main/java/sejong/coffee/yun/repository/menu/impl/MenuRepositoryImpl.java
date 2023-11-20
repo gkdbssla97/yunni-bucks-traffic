@@ -39,6 +39,18 @@ public class MenuRepositoryImpl implements MenuRepository {
     }
 
     @Override
+    public Menu findByIdForPessimisticLock(Long id) {
+        return jpaMenuRepository.findByIdForPessimisticLock(id)
+                .orElseThrow(NOT_FOUND_MENU::notFoundException);
+    }
+
+    @Override
+    public Menu findByIdForOptimisticLock(Long id) {
+        return jpaMenuRepository.findByIdForOptimisticLock(id)
+                .orElseThrow(NOT_FOUND_MENU::notFoundException);
+    }
+
+    @Override
     public List<Menu> findAll() {
         return jpaMenuRepository.findAll();
     }

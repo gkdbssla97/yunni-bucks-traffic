@@ -10,6 +10,8 @@ public interface MenuRepository {
 
     Menu save(Menu menu);
     Menu findById(Long id);
+    Menu findByIdForPessimisticLock(Long id);
+    Menu findByIdForOptimisticLock(Long id);
     List<Menu> findAll();
     Page<Menu> findAllMenusPaged(Pageable pageable);
     void delete(Long id);
