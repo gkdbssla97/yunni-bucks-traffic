@@ -1,7 +1,7 @@
 package sejong.coffee.yun.concurrency.pessimisticlock;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +16,7 @@ import sejong.coffee.yun.repository.user.UserRepository;
 import sejong.coffee.yun.service.CartService;
 import sejong.coffee.yun.service.OrderService;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,8 +46,9 @@ public class OrderPessimisticLockTest extends MainIntegrationTest {
     private Menu beverage;
     private Cart cart;
     private Coupon coupon;
+    private final int parameter = 100;
 
-    @BeforeEach
+    @PostConstruct
     void init() {
         Nutrients nutrients = new Nutrients(80, 80, 80, 80);
 
@@ -57,12 +59,12 @@ public class OrderPessimisticLockTest extends MainIntegrationTest {
                 .nutrients(nutrients)
                 .menuSize(MenuSize.M)
                 .now(LocalDateTime.now())
-                .stock(10)
+                .stock(parameter)
                 .build();
 
         beverage = menuRepository.save(beverage);
 
-        members = IntStream.range(0, 10)
+        members = IntStream.range(0, parameter)
                 .mapToObj(i -> {
                     Member member = Member.builder()
                             .address(new Address("서울시", "광진구", "화양동", "123-432"))
@@ -81,28 +83,58 @@ public class OrderPessimisticLockTest extends MainIntegrationTest {
                 .collect(toList());
     }
 
-    @Test
-    @DisplayName("여러명의 사용자가 동시적으로 음료 A를 주문한다.")
-    void concurrencyOrderOneBeverageWithMembers() throws InterruptedException {
+    @Nested
+    @DisplayName("DB Lock 동시성 테스트")
+    class ConcurrencyTest {
+        @Test
+        @DisplayName("여러명의 사용자가 동시적으로 음료 A를 주문한다. (비관적 락 기법)")
+        void concurrencyOrderForPessimisticLock() throws InterruptedException {
 
-        // given
-        int numberOfThread = 10;
-        ExecutorService executorService = Executors.newFixedThreadPool(numberOfThread);
-        CountDownLatch countDownLatch = new CountDownLatch(numberOfThread);
+            // given
+            int numberOfThread = parameter;
+            ExecutorService executorService = Executors.newFixedThreadPool(numberOfThread);
+            CountDownLatch countDownLatch = new CountDownLatch(numberOfThread);
 
-        // when
-        for (Member member : members) {
-            executorService.submit(() -> {
-                orderService.order(member.getId(), LocalDateTime.now());
-                countDownLatch.countDown();
-            });
+            // when
+            for (Member member : members) {
+                executorService.submit(() -> {
+                    orderService.orderWithPessimisticLock(member.getId(), LocalDateTime.now());
+                    countDownLatch.countDown();
+                });
+            }
+
+            countDownLatch.await();  // 모든 주문이 완료될 때까지 대기합니다.
+            executorService.shutdown();
+
+            // then
+            Menu findMenu = menuRepository.findById(beverage.getId());
+            assertThat(findMenu.getStock()).isEqualTo(0);
         }
 
-        countDownLatch.await();  // 모든 주문이 완료될 때까지 대기합니다.
-        executorService.shutdown();
+        @Test
+        @DisplayName("여러명의 사용자가 동시적으로 음료 A를 주문한다. (낙관적 락 기법)")
+        void concurrencyOrderForOptimisticLock() throws InterruptedException {
 
-        // then
-        Menu findMenu = menuRepository.findById(beverage.getId());
-        assertThat(findMenu.getStock()).isEqualTo(0);
+            // given
+            int numberOfThread = parameter;
+            ExecutorService executorService = Executors.newFixedThreadPool(numberOfThread);
+            CountDownLatch countDownLatch = new CountDownLatch(numberOfThread);
+
+            // when
+            for (Member member : members) {
+                executorService.submit(() -> {
+                    orderService.orderWithOptimisticLock(member.getId(), LocalDateTime.now());
+                    countDownLatch.countDown();
+                });
+                Thread.sleep(50);
+            }
+
+            countDownLatch.await();  // 모든 주문이 완료될 때까지 대기합니다.
+            executorService.shutdown();
+
+            // then
+            Menu findMenu = menuRepository.findById(beverage.getId());
+            assertThat(findMenu.getStock()).isEqualTo(0);
+        }
     }
 }
