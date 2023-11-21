@@ -9,10 +9,12 @@ secrets:
 
 spring:
   datasource:
-    url: jdbc:h2:tcp://localhost/~/food
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/yunni_bucks_traffic?transactionIsolation=READ_COMMITTED
+    username: root
+    password: 1234
+    hikari:
+      maximum-pool-size: 40
 
   jpa:
     hibernate:
