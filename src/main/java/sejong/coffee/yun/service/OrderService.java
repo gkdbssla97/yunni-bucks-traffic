@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import sejong.coffee.yun.domain.order.Calculator;
 import sejong.coffee.yun.domain.order.Order;
@@ -33,7 +32,7 @@ public class OrderService {
     private final MenuRepository menuRepository;
     private final CouponRepository couponRepository;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public Order orderWithPessimisticLock(Long memberId, LocalDateTime now) {
 
         Cart cart = cartRepository.findByMember(memberId);
@@ -65,7 +64,7 @@ public class OrderService {
         menu.increaseOrderCount(quantity);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public Order orderWithOptimisticLock(Long memberId, LocalDateTime now) {
 
         Cart cart = cartRepository.findByMember(memberId);

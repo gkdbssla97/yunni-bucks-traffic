@@ -13,6 +13,7 @@ import sejong.coffee.yun.domain.order.OrderPayStatus;
 import sejong.coffee.yun.domain.order.OrderStatus;
 import sejong.coffee.yun.dto.order.OrderDto;
 import sejong.coffee.yun.dto.order.OrderPageDto;
+import sejong.coffee.yun.facade.OptimisticLockStockFacade;
 import sejong.coffee.yun.mapper.CustomMapper;
 import sejong.coffee.yun.service.OrderService;
 
@@ -25,11 +26,22 @@ import java.time.LocalDateTime;
 public class OrderController {
     private final OrderService orderService;
     private final CustomMapper customMapper;
+    private final OptimisticLockStockFacade optimisticLockStockFacade;
 
     @PostMapping("")
     ResponseEntity<OrderDto.Response> order(@MemberId Long memberId) {
 
         Order order = orderService.orderWithPessimisticLock(memberId, LocalDateTime.now());
+
+        OrderDto.Response response = customMapper.map(order, OrderDto.Response.class);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/optimistic")
+    ResponseEntity<OrderDto.Response> orderForOptimisticLock(@MemberId Long memberId) throws InterruptedException {
+
+        Order order = optimisticLockStockFacade.order(memberId, LocalDateTime.now());
 
         OrderDto.Response response = customMapper.map(order, OrderDto.Response.class);
 
