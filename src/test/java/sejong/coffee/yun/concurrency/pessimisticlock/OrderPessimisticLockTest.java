@@ -10,6 +10,7 @@ import sejong.coffee.yun.domain.order.menu.Menu;
 import sejong.coffee.yun.domain.order.menu.MenuSize;
 import sejong.coffee.yun.domain.order.menu.Nutrients;
 import sejong.coffee.yun.domain.user.*;
+import sejong.coffee.yun.facade.OptimisticLockStockFacade;
 import sejong.coffee.yun.integration.MainIntegrationTest;
 import sejong.coffee.yun.repository.menu.MenuRepository;
 import sejong.coffee.yun.repository.user.UserRepository;
@@ -40,6 +41,8 @@ public class OrderPessimisticLockTest extends MainIntegrationTest {
     private CartService cartService;
     @Autowired
     private MenuRepository menuRepository;
+    @Autowired
+    private OptimisticLockStockFacade optimisticLockStockFacade;
 
     private List<Member> members = new ArrayList<>();
     private List<CartItem> menuList = new ArrayList<>();
@@ -92,14 +95,17 @@ public class OrderPessimisticLockTest extends MainIntegrationTest {
 
             // given
             int numberOfThread = parameter;
-            ExecutorService executorService = Executors.newFixedThreadPool(numberOfThread);
+            ExecutorService executorService = Executors.newFixedThreadPool(32);
             CountDownLatch countDownLatch = new CountDownLatch(numberOfThread);
 
             // when
             for (Member member : members) {
                 executorService.submit(() -> {
-                    orderService.orderWithPessimisticLock(member.getId(), LocalDateTime.now());
-                    countDownLatch.countDown();
+                    try {
+                        orderService.orderWithPessimisticLock(member.getId(), LocalDateTime.now());
+                    } finally {
+                        countDownLatch.countDown();
+                    }
                 });
             }
 
@@ -117,16 +123,21 @@ public class OrderPessimisticLockTest extends MainIntegrationTest {
 
             // given
             int numberOfThread = parameter;
-            ExecutorService executorService = Executors.newFixedThreadPool(numberOfThread);
+            ExecutorService executorService = Executors.newFixedThreadPool(32);
             CountDownLatch countDownLatch = new CountDownLatch(numberOfThread);
 
             // when
             for (Member member : members) {
                 executorService.submit(() -> {
-                    orderService.orderWithOptimisticLock(member.getId(), LocalDateTime.now());
-                    countDownLatch.countDown();
+                    try {
+                        optimisticLockStockFacade.order(member.getId(), LocalDateTime.now());
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    } finally {
+                        countDownLatch.countDown();
+                    }
                 });
-                Thread.sleep(50);
+//                Thread.sleep(50);
             }
 
             countDownLatch.await();  // 모든 주문이 완료될 때까지 대기합니다.
