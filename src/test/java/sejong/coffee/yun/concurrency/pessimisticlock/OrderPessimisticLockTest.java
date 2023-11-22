@@ -49,7 +49,7 @@ public class OrderPessimisticLockTest extends MainIntegrationTest {
     private Menu beverage;
     private Cart cart;
     private Coupon coupon;
-    private final int parameter = 100;
+    private final int parameter = 1000;
 
     @PostConstruct
     void init() {
@@ -137,7 +137,6 @@ public class OrderPessimisticLockTest extends MainIntegrationTest {
                         countDownLatch.countDown();
                     }
                 });
-//                Thread.sleep(50);
             }
 
             countDownLatch.await();  // 모든 주문이 완료될 때까지 대기합니다.
