@@ -1,9 +1,6 @@
 package sejong.coffee.yun.domain.user;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import sejong.coffee.yun.domain.order.menu.Menu;
 
 import javax.persistence.*;
@@ -19,7 +16,7 @@ public class CartItem {
     @JoinColumn(name = "cart_id")
     private Cart cart;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "manu_id")
+    @JoinColumn(name = "menu_id")
     private Menu menu;
 
     @Builder

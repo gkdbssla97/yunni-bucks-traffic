@@ -58,7 +58,6 @@ public class CartService {
 
         cart.addMenu(saveCartItem);
 
-
         cart.getCartItems().forEach(CartItem::getId);
 
         return cart;

@@ -10,7 +10,7 @@ secrets:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/yunni_bucks_traffic?transactionIsolation=READ_COMMITTED
+    url: jdbc:mysql://127.0.0.1:3306/yunni_bucks_traffic
     username: root
     password: 1234
     hikari:

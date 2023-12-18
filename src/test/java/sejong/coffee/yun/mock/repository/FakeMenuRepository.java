@@ -100,4 +100,8 @@ public class FakeMenuRepository implements MenuRepository {
                 .findAny()
                 .orElseThrow(NOT_FOUND_MENU::notFoundException);
     }
+
+    @Override
+    public void saveAndFlush(Menu menu) {
+    }
 }
