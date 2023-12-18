@@ -29,9 +29,7 @@ public class RedissonLockStockFacade {
 
     public Order order(Long id, LocalDateTime localDateTime) {
         Cart cart = cartRepository.findByMember(id);
-        System.out.println("카트1: " + cart.toString());
         List<CartItem> cartItems = cart.getCartItems();
-//        System.out.println("카트:" + cartItems);
 
         cartItems.stream()
                 .map(CartItem::getMenu)
@@ -62,9 +60,9 @@ public class RedissonLockStockFacade {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
-//            if (lock.isHeldByCurrentThread()) {
-            lock.unlock();
-//            }
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
         }
     }
 
@@ -79,7 +77,7 @@ public class RedissonLockStockFacade {
                 System.out.println("lock 획득 실패");
                 return;
             }
-
+            orderService.increaseMenuOrderCountWithRedissonLock(menuId, quantity);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {

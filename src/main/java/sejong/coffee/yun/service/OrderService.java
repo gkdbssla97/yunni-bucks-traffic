@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import sejong.coffee.yun.domain.order.Calculator;
 import sejong.coffee.yun.domain.order.Order;
@@ -94,6 +95,21 @@ public class OrderService {
         Menu menu = menuRepository.findByIdForOptimisticLock(menuId);
         menu.increaseOrderCount(quantity);
     }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void decreaseStockWithRedissonLock(Long menuId, int quantity) {
+        Menu menu = menuRepository.findById(menuId);
+        menu.decrease(quantity);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void increaseMenuOrderCountWithRedissonLock(Long menuId, int quantity) {
+        Menu menu = menuRepository.findById(menuId);
+        menu.increaseOrderCount(quantity);
+    }
+
+
+
 
     @Transactional
     public void cancel(Long orderId) {
