@@ -10,7 +10,7 @@
 - 멀티 쓰레드 동작 중 발생 가능 문제점 해결 방안
   - 낙관 락(Optimistic Lock)
   - 비관 락(Pessimistic Lock)
-  - 분산 락(Redisson, Distributed Lock) (예정)
+  - 분산 락(Redisson, Distributed Lock)
 #### 성능 개선
 - Redis Caching
   - Write-Behind Caching
@@ -19,8 +19,9 @@
 ---
 ### 기능 개선 및 정합성 관리
 - 메뉴 주문
-  - Optimistic Lock 활용
-  - Pessimistic Lock 활용
+  - Optimistic Lock
+  - Pessimistic Lock
+  - Distributed Lock
 - 선착순 쿠폰 발급
   - .
 - 조회
@@ -48,12 +49,15 @@
 - Pessimistic Lock 활용
   - Optimistic Lock과 성능 비교 시 비관적 락 우위
   - 사용자 수가 증가함에 따라 낙관적 락과 비관적 락 사이의 처리 속도 차이가 점점 더 벌어질 것으로 예상
+- Distributed Lock, Redisson 활용
+  - lettuce는 계속 락 획득을 시도하는 반면에 redisson은 락 해제가 되었을 때 최소한의 시도를 하기 때문에 Redis의 부하를 줄여주게 된다.
   
     | 구분(Users)            | 100명       | 1000명      |
     |------------|------------|---------|
     | Pessimistic Lock | 1.417 sec	 | 7.526 sec  |
     | Optimistic Lock | 6.105 sec  | 24.529 sec |
-    | 처리속도 비교       | +4.69 sec  | +17.00 sec      |
+    | 처리속도 비교       | +4.69 sec  | +17.00 sec |
+    | Distributed Lock | 1.748 sec  | 8.955 sec  |
 > #### 시나리오
 > 1. 100명의 사용자가 예기치 못하게 동시에 같은 Menu(Beverage)를 주문
 > 2. 주문 당 해당 메뉴 주문 수량만큼 재고 감소
@@ -72,10 +76,14 @@
   - 낙관적 락은 충돌이 비교적 드물게 발생하는 상황에 유용하다. 
   - 주문 시스템의 경우 동시에 여러 사용자가 같은 메뉴를 주문하는 상황이 자주 발생하므로, 낙관적 락을 사용하면 충돌로 인한 롤백이 빈번하게 발생하여 오버헤드가 발생할거라 판단
 
-  #### 생각해 보아야 할 점
+
+- Distributed Locking 선택한 이유
+  - redisson은 자신이 점유하고 있는 락을 해제할 때 pub/sub방식으로 채널에 메세지를 보내줌으로써 락을 획득해야 하는 스레드들에게 메세지를 전달
+  - 단일 DB 환경에서도 사용할 수 있지만 분산 락은 여러 노드에 걸쳐 있는 데이터에 대한 동시성을 제어할 수 있어 분산 DB에서의 확장성 고려하여 테스트
+  
+#### 생각해 보아야 할 점
 - 나머지 스레드(사용자 별 주문 요청)들은 락이 해제될 때까지 대기 상태에 머무른다.
 - 이 방식은 동시성 문제를 방지할 수 있지만, 대기 시간이 길어질 수 있다는 단점
-- 대체 방안 분산 락?
 - 최대 사용자는 몇 명까지인지 부하테스트 필요 (사용자가 늘어날수록 시간도 기하급수적 증가)
   - 10명: 564ms
   - 100명: 1s 417ms

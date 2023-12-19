@@ -49,7 +49,7 @@ public class RedissonLockStockFacade {
         RLock lock = redissonClient.getLock(menuId.toString());
 
         try {
-            boolean available = lock.tryLock(15, 1, TimeUnit.SECONDS);
+            boolean available = lock.tryLock(10, 1, TimeUnit.SECONDS);
 
             if (!available) {
                 System.out.println("lock 획득 실패");
@@ -71,7 +71,7 @@ public class RedissonLockStockFacade {
         RLock lock = redissonClient.getLock(menuId.toString());
 
         try {
-            boolean available = lock.tryLock(15, 1, TimeUnit.SECONDS);
+            boolean available = lock.tryLock(10, 1, TimeUnit.SECONDS);
 
             if (!available) {
                 System.out.println("lock 획득 실패");
