@@ -19,6 +19,7 @@ public interface PayRepository {
 
     CardPayment findByOrderUuidAnAndPaymentStatus(String orderUuid, PaymentStatus paymentStatus);
     CardPayment findByOrderIdAnAndPaymentStatus(Long orderId, PaymentStatus paymentStatus);
+    CardPayment findByOrderId(Long orderId);
 
     CardPayment findByPaymentKeyAndPaymentStatus(String paymentKey, PaymentStatus paymentStatus);
 

@@ -29,4 +29,9 @@ public interface JpaPayRepository extends JpaRepository<CardPayment, Long> {
             @Param("orderId") Long orderId,
             @Param("paymentStatus") PaymentStatus paymentStatus
     );
+
+    @Query("SELECT cp FROM CardPayment cp WHERE cp.order.id = :orderId")
+    Optional<CardPayment> findByOrderId(
+            @Param("orderId") Long orderId
+    );
 }

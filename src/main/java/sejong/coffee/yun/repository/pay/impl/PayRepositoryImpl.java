@@ -63,6 +63,11 @@ public class PayRepositoryImpl implements PayRepository {
     }
 
     @Override
+    public CardPayment findByOrderId(Long orderId) {
+        return jpaPayRepository.findByOrderId(orderId).orElseThrow(NOT_FOUND_PAY_DETAILS::paymentDetailsException);
+    }
+
+    @Override
     public CardPayment findByPaymentKeyAndPaymentStatus(String paymentKey, PaymentStatus paymentStatus) {
         return jpaPayRepository.findByPaymentKeyAndPaymentStatus(paymentKey, paymentStatus)
                 .orElseThrow(NOT_FOUND_PAY_DETAILS::paymentDetailsException);
