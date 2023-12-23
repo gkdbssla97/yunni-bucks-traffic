@@ -14,8 +14,8 @@ import static sejong.coffee.yun.dto.ocr.OcrDto.Response;
 public class JsonParsing {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public static String parsePaymentStringByJson(CardPaymentDto.Request request) throws JsonProcessingException {
-//        object정Mapper.registerModule(new JavaTimeModule());
+    public static String parsePaymentStringByJson(Object request) throws JsonProcessingException {
+//        objectMapper.registerModule(new JavaTimeModule());
 //        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         return objectMapper.writeValueAsString(request);
     }

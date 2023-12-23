@@ -16,6 +16,7 @@ import sejong.coffee.yun.mapper.CustomMapper;
 import sejong.coffee.yun.service.PayService;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 import static sejong.coffee.yun.dto.pay.CardPaymentDto.Request;
 import static sejong.coffee.yun.dto.pay.CardPaymentDto.Response;
@@ -64,8 +65,9 @@ public class PaymentController {
 
     @GetMapping("/cancel")
     public ResponseEntity<Response> cancelPayment(@RequestParam("paymentKey") String paymentKey,
-                                                  @RequestParam("cancelCode") String cancelCode) {
-        CardPayment cancelCardPayment = payService.cancelPayment(paymentKey, cancelCode);
+                                                  @RequestParam("cancelCode") String cancelCode,
+                                                  @RequestParam("refundAmount") BigDecimal money) {
+        CardPayment cancelCardPayment = payService.cancelPayment(paymentKey, cancelCode, money);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(cancel(cancelCardPayment));

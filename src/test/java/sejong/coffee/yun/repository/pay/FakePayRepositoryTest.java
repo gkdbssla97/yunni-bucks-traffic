@@ -11,15 +11,16 @@ import sejong.coffee.yun.domain.pay.PaymentCancelReason;
 import sejong.coffee.yun.domain.pay.PaymentStatus;
 import sejong.coffee.yun.domain.user.Cart;
 import sejong.coffee.yun.domain.user.Member;
-import sejong.coffee.yun.service.mock.FakeUuidHolder;
+import sejong.coffee.yun.mock.repository.FakeCartRepository;
 import sejong.coffee.yun.mock.repository.FakeOrderRepository;
+import sejong.coffee.yun.mock.repository.FakePayRepository;
 import sejong.coffee.yun.mock.repository.FakeUserRepository;
 import sejong.coffee.yun.repository.cart.CartRepository;
-import sejong.coffee.yun.mock.repository.FakeCartRepository;
 import sejong.coffee.yun.repository.order.OrderRepository;
-import sejong.coffee.yun.mock.repository.FakePayRepository;
 import sejong.coffee.yun.repository.user.UserRepository;
+import sejong.coffee.yun.service.mock.FakeUuidHolder;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -176,7 +177,7 @@ public class FakePayRepositoryTest extends BeforeCreatedData {
         IntStream.range(0, 10).forEach(i ->
         {
             CardPayment approvalPayment = CardPayment.approvalPayment(cardPayment, paymentKey + i, LocalDateTime.now().plusMinutes(i).toString());
-            approvalPayment.cancelPayment(PaymentCancelReason.CHANGE_PRODUCT);
+            approvalPayment.cancelPayment(PaymentCancelReason.CHANGE_PRODUCT, BigDecimal.ZERO);
             payRepository.save(approvalPayment);
         });
 
