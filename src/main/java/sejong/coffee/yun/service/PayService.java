@@ -20,6 +20,7 @@ import sejong.coffee.yun.repository.order.OrderRepository;
 import sejong.coffee.yun.repository.pay.PayRepository;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 import static sejong.coffee.yun.domain.pay.PaymentStatus.DONE;
@@ -88,10 +89,10 @@ public class PayService {
     }
 
     @Transactional
-    public CardPayment cancelPayment(String paymentKey, String cancelCode) {
+    public CardPayment cancelPayment(String paymentKey, String cancelCode, BigDecimal money) {
         CardPayment findCardPayment = payRepository.findByPaymentKeyAndPaymentStatus(paymentKey, DONE);
         PaymentCancelReason byCode = PaymentCancelReason.getByCode(cancelCode);
-        findCardPayment.cancelPayment(byCode);
+        findCardPayment.cancelPayment(byCode, money);
         return findCardPayment;
     }
 

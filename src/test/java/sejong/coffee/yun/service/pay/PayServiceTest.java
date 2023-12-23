@@ -179,7 +179,7 @@ public class PayServiceTest extends CreatePaymentData {
 
         //when
         String cancelCode = "0001";
-        CardPayment cancelPayment = payService.cancelPayment(approvalPayment.getPaymentKey(), cancelCode);
+        CardPayment cancelPayment = payService.cancelPayment(approvalPayment.getPaymentKey(), cancelCode, cardPayment.getOrder().fetchTotalOrderPrice());
 
         //then
         assertThat(cancelPayment.getCancelReason()).isEqualTo(PaymentCancelReason.getByCode(cancelCode));
@@ -224,14 +224,14 @@ public class PayServiceTest extends CreatePaymentData {
         //given
         Long orderId = 1L;
         Long memberId = 1L;
-        orderRepository.findById(orderId);
+        Order byId = orderRepository.findById(orderId);
         userRepository.findById(memberId);
 
         IntStream.range(0, 10).forEach(i -> {
                     CardPaymentDto.Request request = payService.initPayment(orderId, memberId);
                     try {
                         CardPayment pay = payService.pay(request);
-                        pay.cancelPayment(PaymentCancelReason.NOT_SATISFIED_SERVICE);
+                        pay.cancelPayment(PaymentCancelReason.NOT_SATISFIED_SERVICE, byId.getOrderPrice().getTotalPrice());
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }

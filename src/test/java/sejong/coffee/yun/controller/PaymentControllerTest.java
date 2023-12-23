@@ -18,6 +18,7 @@ import sejong.coffee.yun.dto.pay.CardPaymentDto;
 import sejong.coffee.yun.dto.pay.CardPaymentPageDto;
 import sejong.coffee.yun.mapper.CustomMapper;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.stream.IntStream;
@@ -141,7 +142,7 @@ class PaymentControllerTest extends CreatePaymentData {
                 .payService(testPayContainer.payService)
                 .customMapper(new CustomMapper())
                 .build()
-                .cancelPayment("testPaymentKey", "0001");
+                .cancelPayment("testPaymentKey", "0001", BigDecimal.ZERO);
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -167,7 +168,7 @@ class PaymentControllerTest extends CreatePaymentData {
                 .payService(testPayContainer.payService)
                 .customMapper(new CustomMapper())
                 .build()
-                .cancelPayment("testPaymentKey", "0005"))
+                .cancelPayment("testPaymentKey", "0005", BigDecimal.ZERO))
                 .isInstanceOf(ExceptionControl.NOT_MATCHED_CANCEL_STATUS.paymentException().getClass())
                 .hasMessageContaining("결제취소 사유가 올바르지 않습니다.");
     }

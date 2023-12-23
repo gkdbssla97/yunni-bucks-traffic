@@ -191,7 +191,7 @@ public class PayServiceIntegrateTest extends MainIntegrationTest {
 
             //when
             String cancelCode = "0001";
-            CardPayment cancelPayment = payService.cancelPayment(approvalPayment.getPaymentKey(), cancelCode);
+            CardPayment cancelPayment = payService.cancelPayment(approvalPayment.getPaymentKey(), cancelCode, request.order().fetchTotalOrderPrice());
 
             //then
             assertThat(cancelPayment.getCancelReason()).isEqualTo(getByCode(cancelCode));
@@ -242,7 +242,7 @@ public class PayServiceIntegrateTest extends MainIntegrationTest {
                         try {
                             CardPayment approvalPayment = payService.pay(request);
                             CardPayment findCardPayment = payService.findById(approvalPayment.getId());
-                            payService.cancelPayment(findCardPayment.getPaymentKey(), NOT_SATISFIED_SERVICE.getCode());
+                            payService.cancelPayment(findCardPayment.getPaymentKey(), NOT_SATISFIED_SERVICE.getCode(), order.fetchTotalOrderPrice());
                             System.out.println("cancel: " + findCardPayment);
                         } catch (Exception e) {
                             throw new RuntimeException(e);
