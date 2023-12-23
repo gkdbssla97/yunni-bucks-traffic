@@ -15,6 +15,7 @@ import sejong.coffee.yun.infra.port.UuidHolder;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static sejong.coffee.yun.util.parse.ParsingUtil.parsingCardValidDate;
@@ -26,13 +27,16 @@ import static sejong.coffee.yun.util.parse.ParsingUtil.parsingMemberIdentityNumb
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CardPaymentDto {
 
-    public record Cancel(
-            @NotNull(message = "결제취소 사유가 없습니다.")
-            String cancelReason,
-            int cancelAmount,
-            @JsonIgnore
-            Order order
+    public record Confirm(
+            @NotNull(message = "Payment Key가 없습니다.")
+            String paymentKey,
+            @NotNull(message = "OrderId가 없습니다.")
+            Long orderId,
+            BigDecimal amount
     ) {
+        public static Confirm confirm(String paymentKey, Order order) {
+            return new CardPaymentDto.Confirm(paymentKey, order.getId(), order.getOrderPrice().getTotalPrice());
+        }
     }
 
     public record Request(
