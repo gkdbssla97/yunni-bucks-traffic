@@ -11,8 +11,8 @@ import sejong.coffee.yun.domain.exception.ExceptionControl;
 import sejong.coffee.yun.domain.order.Order;
 import sejong.coffee.yun.domain.pay.CardPayment;
 import sejong.coffee.yun.domain.pay.PaymentCancelReason;
+import sejong.coffee.yun.domain.pay.PaymentStatus;
 import sejong.coffee.yun.domain.user.Card;
-import sejong.coffee.yun.dto.pay.CardPaymentDto;
 import sejong.coffee.yun.infra.ApiService;
 import sejong.coffee.yun.infra.port.UuidHolder;
 import sejong.coffee.yun.repository.card.CardRepository;
@@ -24,7 +24,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static sejong.coffee.yun.domain.pay.PaymentStatus.DONE;
-import static sejong.coffee.yun.dto.pay.CardPaymentDto.Response;
+import static sejong.coffee.yun.dto.pay.CardPaymentDto.*;
 
 @Service
 @RequiredArgsConstructor
@@ -58,7 +58,7 @@ public class PayService {
     }
 
     @Transactional
-    public CardPaymentDto.Request initPayment(Long orderId, Long memberId) {
+    public Request initPayment(Long orderId, Long memberId) {
         Order order = orderRepository.findById(orderId);
         Card card = cardRepository.findByMemberId(memberId);
 
@@ -66,12 +66,24 @@ public class PayService {
             throw ExceptionControl.NOT_FOUND_ORDER_ID_FOR_PAYMENT.paymentException();
         }
 
-        return CardPaymentDto.Request.create(card, order, uuidHolder);
+        return Request.create(card, order, uuidHolder);
+
     }
 
+    @Transactional
+    public Confirm initConfirm(Long orderId) {
+        Order order = orderRepository.findById(orderId);
+        CardPayment payment = payRepository.findByOrderIdAnAndPaymentStatus(orderId, DONE);
+
+        if (order == null) {
+            throw ExceptionControl.NOT_FOUND_ORDER_ID_FOR_PAYMENT.paymentException();
+        }
+
+        return Confirm.confirm(payment.getPaymentKey(), order);
+    }
 
     @Transactional
-    public CardPayment pay(CardPaymentDto.Request request) throws IOException, InterruptedException {
+    public CardPayment pay(Request request) throws IOException, InterruptedException {
 
         Response response = apiService.callExternalPayApi(request);
         CardPayment approvalPayment = CardPayment.approvalPayment(CardPayment.fromModel(request), response.paymentKey(), response.approvedAt());
@@ -82,7 +94,13 @@ public class PayService {
     }
 
     @Transactional
-    public void changeOrderPayStatus(CardPaymentDto.Request request) {
+    public CardPayment confirm(Confirm confirm) throws IOException, InterruptedException {
+        apiService.confirm(confirm);
+        return payRepository.findByPaymentKeyAndPaymentStatus(confirm.paymentKey(), DONE);
+    }
+
+    @Transactional
+    public void changeOrderPayStatus(Request request) {
         Long orderId = request.order().getId();
         Order order = orderRepository.findById(orderId);
         order.setPayStatus();
@@ -94,6 +112,10 @@ public class PayService {
         PaymentCancelReason byCode = PaymentCancelReason.getByCode(cancelCode);
         findCardPayment.cancelPayment(byCode, money);
         return findCardPayment;
+    }
+
+    public PaymentStatus checkPaymentStatus(Long orderId) {
+        return payRepository.findByOrderId(orderId).getPaymentStatus();
     }
 
     public Page<CardPayment> getAllByUsernameAndPaymentStatus(Pageable pageable, String username) {

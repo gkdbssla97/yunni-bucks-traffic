@@ -11,15 +11,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sejong.coffee.yun.custom.annotation.MemberId;
 import sejong.coffee.yun.domain.pay.CardPayment;
+import sejong.coffee.yun.domain.pay.PaymentStatus;
 import sejong.coffee.yun.dto.pay.CardPaymentPageDto;
 import sejong.coffee.yun.mapper.CustomMapper;
 import sejong.coffee.yun.service.PayService;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.http.HttpTimeoutException;
 
-import static sejong.coffee.yun.dto.pay.CardPaymentDto.Request;
-import static sejong.coffee.yun.dto.pay.CardPaymentDto.Response;
+import static sejong.coffee.yun.domain.pay.PaymentCancelReason.NETWORK_CANCEL;
+import static sejong.coffee.yun.dto.pay.CardPaymentDto.*;
 import static sejong.coffee.yun.dto.pay.CardPaymentDto.Response.cancel;
 
 @RestController
@@ -36,6 +38,26 @@ public class PaymentController {
     public ResponseEntity<Response> keyIn(@PathVariable Long orderId, @MemberId Long memberId) throws IOException, InterruptedException {
         Request request = payService.initPayment(orderId, memberId);
         CardPayment cardPayment = payService.pay(request);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(customMapper.map(cardPayment, Response.class));
+    }
+
+    @PostMapping("/confirm/{orderId}")
+    public ResponseEntity<Response> confirm(@PathVariable Long orderId) throws IOException, InterruptedException {
+        Confirm confirm = null;
+        CardPayment cardPayment = null;
+        try {
+            confirm = payService.initConfirm(orderId);
+            cardPayment = payService.confirm(confirm);
+            return ResponseEntity.status(HttpStatus.CREATED).body(customMapper.map(cardPayment, Response.class));
+        } catch (HttpTimeoutException e) {
+            PaymentStatus status = payService.checkPaymentStatus(orderId);
+            if (status.equals(PaymentStatus.READY)) {
+                payService.cancelPayment(cardPayment.getPaymentKey(), NETWORK_CANCEL.getCode(), confirm.amount());
+            }
+        }
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

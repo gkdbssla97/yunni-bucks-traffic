@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sejong.coffee.yun.dto.ocr.OcrDto;
+import sejong.coffee.yun.dto.pay.CardPaymentDto;
 import sejong.coffee.yun.infra.port.ClovaApiService;
 import sejong.coffee.yun.infra.port.TossApiService;
 import sejong.coffee.yun.infra.port.UuidHolder;
@@ -28,6 +29,10 @@ public class ApiService {
 
     public Response callExternalPayApi(Request request) throws IOException, InterruptedException {
         return tossApiService.callExternalApi(request);
+    }
+
+    public Response confirm(CardPaymentDto.Confirm confirm) throws IOException, InterruptedException {
+        return tossApiService.confirm(confirm);
     }
 
     public OcrDto.Response callExternalOcrApi(OcrDto.Request request, UuidHolder uuidHolder) throws IOException, InterruptedException {

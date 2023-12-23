@@ -6,4 +6,6 @@ import java.io.IOException;
 
 public interface TossApiService {
     CardPaymentDto.Response callExternalApi(CardPaymentDto.Request cardPaymentDto) throws IOException, InterruptedException;
+
+    CardPaymentDto.Response confirm(CardPaymentDto.Confirm cardPaymentDto) throws IOException, InterruptedException;
 }
