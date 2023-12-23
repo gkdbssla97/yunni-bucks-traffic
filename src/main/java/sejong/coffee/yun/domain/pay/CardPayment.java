@@ -8,6 +8,7 @@ import sejong.coffee.yun.infra.port.UuidHolder;
 import sejong.coffee.yun.util.parse.ParsingUtil;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static sejong.coffee.yun.domain.pay.PaymentStatus.*;
@@ -40,6 +41,7 @@ public class CardPayment extends PaymentDateTimeEntity implements Pay {
     private LocalDateTime cancelPaymentAt;
     @Enumerated(value = EnumType.STRING)
     private PaymentCancelReason cancelReason;
+    private BigDecimal refundAmount;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
@@ -119,9 +121,14 @@ public class CardPayment extends PaymentDateTimeEntity implements Pay {
     }
 
     @Override
-    public void cancelPayment(PaymentCancelReason cancelReason) {
+    public void cancelPayment(PaymentCancelReason cancelReason, BigDecimal refundAmount) {
         this.cancelReason = cancelReason;
         this.paymentStatus = CANCEL;
         this.cancelPaymentAt = LocalDateTime.now();
+        if (refundAmount.equals(BigDecimal.ZERO)) {
+            this.refundAmount = order.fetchTotalOrderPrice();
+        } else {
+            this.refundAmount = refundAmount;
+        }
     }
 }

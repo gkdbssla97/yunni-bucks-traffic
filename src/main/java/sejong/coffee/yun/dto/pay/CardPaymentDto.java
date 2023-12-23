@@ -26,6 +26,15 @@ import static sejong.coffee.yun.util.parse.ParsingUtil.parsingMemberIdentityNumb
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CardPaymentDto {
 
+    public record Cancel(
+            @NotNull(message = "결제취소 사유가 없습니다.")
+            String cancelReason,
+            int cancelAmount,
+            @JsonIgnore
+            Order order
+    ) {
+    }
+
     public record Request(
             @NotNull(message = "카드번호가 없습니다.")
             String cardNumber,
