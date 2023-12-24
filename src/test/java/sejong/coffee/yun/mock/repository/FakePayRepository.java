@@ -86,6 +86,14 @@ public class FakePayRepository implements PayRepository {
     }
 
     @Override
+    public CardPayment findByOrderId(Long orderId) {
+        return data.stream()
+                .filter(element -> Objects.equals(element.getOrder().getId(), orderId))
+                .findAny()
+                .orElseThrow(NOT_FOUND_PAY_DETAILS::paymentDetailsException);
+    }
+
+    @Override
     public CardPayment findByPaymentKeyAndPaymentStatus(String paymentKey, PaymentStatus paymentStatus) {
         return data.stream()
                 .filter(element -> Objects.equals(element.getPaymentKey(), paymentKey))
