@@ -33,6 +33,17 @@ public class FakeMenuReviewRepository implements MenuReviewRepository {
     }
 
     @Override
+    public void saveByBulk(Long id, MenuReview menuReview, Long memberId, Long menuId) {
+        if(menuReview.getId() == null || menuReview.getId() == 0L) {
+            MenuReview newMenuReview = MenuReview.from(id, menuReview);
+
+            reviews.add(newMenuReview);
+        }
+        reviews.removeIf(mr -> Objects.equals(mr.getId(), menuReview.getId()));
+        reviews.add(menuReview);
+    }
+
+    @Override
     public MenuReview findById(Long reviewId) {
         return reviews.stream()
                 .filter(review -> Objects.equals(review.getId(), reviewId))

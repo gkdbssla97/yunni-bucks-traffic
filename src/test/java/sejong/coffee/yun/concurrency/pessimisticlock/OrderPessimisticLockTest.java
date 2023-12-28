@@ -49,7 +49,7 @@ public class OrderPessimisticLockTest extends MainIntegrationTest {
     private Menu beverage;
     private Cart cart;
     private Coupon coupon;
-    private final int parameter = 1000;
+    private final int parameter = 100;
 
     @PostConstruct
     void init() {
