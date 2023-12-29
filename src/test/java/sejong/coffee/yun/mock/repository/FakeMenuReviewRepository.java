@@ -9,6 +9,7 @@ import sejong.coffee.yun.repository.review.menu.MenuReviewRepository;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import static sejong.coffee.yun.domain.exception.ExceptionControl.NOT_FOUND_MENU_REVIEW;
 
@@ -30,17 +31,6 @@ public class FakeMenuReviewRepository implements MenuReviewRepository {
         reviews.removeIf(mr -> Objects.equals(mr.getId(), menuReview.getId()));
         reviews.add(menuReview);
         return menuReview;
-    }
-
-    @Override
-    public void saveByBulk(Long id, MenuReview menuReview, Long memberId, Long menuId) {
-        if(menuReview.getId() == null || menuReview.getId() == 0L) {
-            MenuReview newMenuReview = MenuReview.from(id, menuReview);
-
-            reviews.add(newMenuReview);
-        }
-        reviews.removeIf(mr -> Objects.equals(mr.getId(), menuReview.getId()));
-        reviews.add(menuReview);
     }
 
     @Override
@@ -99,5 +89,24 @@ public class FakeMenuReviewRepository implements MenuReviewRepository {
     @Override
     public void clear() {
         reviews.clear();
+    }
+
+    @Override
+    public List<MenuReview> findMenuReviewByCommentsContaining(String keyword) {
+        return reviews.stream()
+                .filter(review -> review.getComments().contains(keyword))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<MenuReview> findMenuReviewByCommentsContainingWithQuery(String keyword) {
+        return reviews.stream()
+                .filter(review -> review.getComments().contains(keyword))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<MenuReview> findMenuReviewByCommentsContainingOnFullTextSearchWithQuery(String keyword) {
+        return null;
     }
 }
