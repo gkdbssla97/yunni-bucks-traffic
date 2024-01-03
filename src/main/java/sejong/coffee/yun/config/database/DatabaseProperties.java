@@ -1,0 +1,58 @@
+package sejong.coffee.yun.config.database;
+
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@Data
+@Configuration
+@ConfigurationProperties(prefix = "spring.datasource")
+public class DatabaseProperties {
+    private DatabaseDetail main;
+    private DatabaseDetail sub;
+
+    @Data
+    public static class DatabaseDetail {
+        private String driverClassName;
+        private String url;
+        private String username;
+        private String password;
+        private Hibernate hibernate;
+    }
+
+    @Data
+    public static class Hibernate {
+        private String ddlAuto;
+        private String dialect;
+        private Naming naming;
+
+        public static Map<String, Object> propertiesToMap(Hibernate hibernateProperties) {
+            Map<String, Object> properties = new HashMap<>();
+
+            if (hibernateProperties.getDdlAuto() != null) {
+                properties.put("hibernate.hbm2ddl.auto", hibernateProperties.getDdlAuto());
+            }
+
+            DatabaseProperties.Naming hibernateNaming = hibernateProperties.getNaming();
+            if (hibernateNaming != null) {
+                if (hibernateNaming.getImplicitStrategy() != null) {
+                    properties.put("hibernate.implicit_naming_strategy", hibernateNaming.getImplicitStrategy());
+                }
+                if (hibernateNaming.getPhysicalStrategy() != null) {
+                    properties.put("hibernate.physical_naming_strategy", hibernateNaming.getPhysicalStrategy());
+                }
+            }
+
+            return properties;
+        }
+    }
+
+    @Data
+    public static class Naming {
+        private String implicitStrategy;
+        private String physicalStrategy;
+    }
+}

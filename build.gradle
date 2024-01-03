@@ -79,7 +79,9 @@ dependencies {
 	implementation("net.gpedro.integrations.slack:slack-webhook:1.4.0")
 
 	implementation 'net.datafaker:datafaker:2.0.2'
-
+	
+	// postgres
+	implementation 'org.postgresql:postgresql:42.6.0'
 }
 
 ext {
