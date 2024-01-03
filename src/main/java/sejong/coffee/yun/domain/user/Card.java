@@ -13,7 +13,6 @@ import static sejong.coffee.yun.util.parse.ParsingUtil.parsingCardValidDate;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString
 public class Card extends DateTimeEntity {
 
     @Id

@@ -1,4 +1,4 @@
-package sejong.coffee.yun.repository.review.menu;
+package sejong.coffee.yun.repository.review;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,7 +19,7 @@ public class MenuReviewJdbcRepository {
 
     private int batchSize = 1000;
 
-    @Transactional
+    @Transactional("twoDBTransactionManager")
     public void saveAll(List<MenuReview> items, Long memberId, Long menuId) {
 
         List<MenuReview> subItems = new ArrayList<>();

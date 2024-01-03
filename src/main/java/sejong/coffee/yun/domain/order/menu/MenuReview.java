@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "menu_review")
 public class MenuReview {
 
     @Id @GeneratedValue
@@ -24,7 +25,9 @@ public class MenuReview {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_id")
     private Menu menu;
+    @Column(name = "create_at")
     private LocalDateTime createAt;
+    @Column(name = "update_at")
     private LocalDateTime updateAt;
 
     @Builder

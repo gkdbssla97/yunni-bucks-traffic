@@ -10,7 +10,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 import sejong.coffee.yun.domain.order.menu.MenuReview;
 import sejong.coffee.yun.integration.MainIntegrationTest;
-import sejong.coffee.yun.repository.review.menu.MenuReviewRepository;
+import sejong.coffee.yun.repository.review.MenuReviewRepository;
 import sejong.coffee.yun.service.MenuReviewService;
 
 import java.time.LocalDateTime;

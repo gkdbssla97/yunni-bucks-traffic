@@ -1,4 +1,4 @@
-package sejong.coffee.yun.repository.review.menu;
+package sejong.coffee.yun.repository.review;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -3,6 +3,7 @@ package sejong.coffee.yun.repository.pay.impl;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -22,6 +23,7 @@ import static sejong.coffee.yun.domain.user.QCart.cart;
 import static sejong.coffee.yun.domain.user.QMember.member;
 
 @Repository
+@Primary
 @RequiredArgsConstructor
 public class PayRepositoryImpl implements PayRepository {
 

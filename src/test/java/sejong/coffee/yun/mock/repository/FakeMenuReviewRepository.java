@@ -5,7 +5,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import sejong.coffee.yun.domain.order.menu.MenuReview;
-import sejong.coffee.yun.repository.review.menu.MenuReviewRepository;
+import sejong.coffee.yun.repository.review.MenuReviewRepository;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;

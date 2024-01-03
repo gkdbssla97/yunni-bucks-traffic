@@ -1,4 +1,4 @@
-package sejong.coffee.yun.repository.review.menu.impl;
+package sejong.coffee.yun.repository.review.impl;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -10,8 +10,8 @@ import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import sejong.coffee.yun.domain.order.menu.MenuReview;
-import sejong.coffee.yun.repository.review.menu.MenuReviewRepository;
-import sejong.coffee.yun.repository.review.menu.jpa.JpaMenuReviewRepository;
+import sejong.coffee.yun.repository.review.MenuReviewRepository;
+import sejong.coffee.yun.repository.review.jpa.JpaMenuReviewRepository;
 
 import java.util.List;
 
