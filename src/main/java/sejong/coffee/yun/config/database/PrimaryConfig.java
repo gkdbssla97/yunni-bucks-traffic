@@ -17,11 +17,13 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import static sejong.coffee.yun.config.database.PrimaryConfig.*;
+
 @Configuration
 @EnableConfigurationProperties(DatabaseProperties.class)
 @EnableJpaRepositories(basePackages = {"sejong.coffee.yun.repository"},
-        entityManagerFactoryRef = PrimaryConfig.ENTITY_MANAGER_BEAN_NAME,
-        transactionManagerRef = PrimaryConfig.TRANSACTION_MANAGER_BEAN_NAME)
+        entityManagerFactoryRef = ENTITY_MANAGER_BEAN_NAME,
+        transactionManagerRef = TRANSACTION_MANAGER_BEAN_NAME)
 public class PrimaryConfig {
     public static final String TRANSACTION_MANAGER_BEAN_NAME = "oneDBTransactionManager";
     public static final String ENTITY_MANAGER_BEAN_NAME = "oneDBEntityManager";
