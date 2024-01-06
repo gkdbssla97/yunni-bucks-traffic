@@ -28,6 +28,7 @@ public class DatabaseProperties {
         private String ddlAuto;
         private String dialect;
         private Naming naming;
+        private String metadataBuilderContributor;
 
         public static Map<String, Object> propertiesToMap(Hibernate hibernateProperties) {
             Map<String, Object> properties = new HashMap<>();
@@ -35,7 +36,9 @@ public class DatabaseProperties {
             if (hibernateProperties.getDdlAuto() != null) {
                 properties.put("hibernate.hbm2ddl.auto", hibernateProperties.getDdlAuto());
             }
-
+            if (hibernateProperties.getMetadataBuilderContributor() != null) {
+                properties.put("hibernate.metadata_builder_contributor", hibernateProperties.getMetadataBuilderContributor());
+            }
             DatabaseProperties.Naming hibernateNaming = hibernateProperties.getNaming();
             if (hibernateNaming != null) {
                 if (hibernateNaming.getImplicitStrategy() != null) {

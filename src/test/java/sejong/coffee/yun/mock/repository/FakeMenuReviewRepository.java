@@ -104,9 +104,4 @@ public class FakeMenuReviewRepository implements MenuReviewRepository {
                 .filter(review -> review.getComments().contains(keyword))
                 .collect(Collectors.toList());
     }
-
-    @Override
-    public List<MenuReview> findMenuReviewByCommentsContainingOnFullTextSearchWithQuery(String keyword) {
-        return null;
-    }
 }

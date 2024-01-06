@@ -15,9 +15,10 @@ import java.time.LocalDateTime;
 @Table(name = "menu_review")
 public class MenuReview {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Long id;
-    @Column(name = "comments")
+    @Column(name = "comments", columnDefinition = "TEXT")
     private String comments;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

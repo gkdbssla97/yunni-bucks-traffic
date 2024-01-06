@@ -40,10 +40,11 @@ spring:
       hikari:
         auto-commit: false
         connection-test-query: SELECT 1
-        maximum-pool-size: 10
-        pool-name: mysql-example2-cp
+        maximum-pool-size: 40
+        pool-name: postgres-example2-cp
       hibernate:
         ddl-auto: create
+        metadata_builder_contributor: sejong.coffee.yun.config.database.SqlFunctionsMetadataBuilderContributor
 
   redis:
     host: localhost

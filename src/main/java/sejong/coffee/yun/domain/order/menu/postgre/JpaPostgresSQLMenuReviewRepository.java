@@ -15,9 +15,12 @@ public interface JpaPostgresSQLMenuReviewRepository extends JpaRepository<MenuRe
 
     List<MenuReview> findMenuReviewByCommentsContaining(@Param("keyword") String keyword);
 
-    @Query("SELECT m FROM MenuReview m WHERE m.comments LIKE %:keyword%")
+    @Query(nativeQuery = true, value = "SELECT * FROM menu_review WHERE comments LIKE %:keyword%")
     List<MenuReview> findMenuReviewByCommentsContainingWithQuery(@Param("keyword") String keyword);
+    List<MenuReview> findByCommentsContains(@Param("keyword") String keyword);
 
-    @Query(value = "SELECT * FROM menu_review WHERE MATCH (comments) AGAINST (:keyword IN NATURAL LANGUAGE MODE)", nativeQuery = true)
+
+    //    @Query("SELECT m FROM MenuReview m WHERE fts(m.comments, :keyword) = true")
+    @Query(value = "SELECT * FROM menu_review WHERE to_tsvector('english', comments) @@ plainto_tsquery('english', ?)", nativeQuery = true)
     List<MenuReview> findMenuReviewByCommentsContainingOnFullTextSearchWithQuery(@Param("keyword") String keyword);
 }

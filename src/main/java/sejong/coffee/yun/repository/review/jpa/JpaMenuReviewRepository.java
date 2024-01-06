@@ -17,7 +17,4 @@ public interface JpaMenuReviewRepository extends JpaRepository<MenuReview, Long>
 
     @Query("SELECT m FROM MenuReview m WHERE m.comments LIKE %:keyword%")
     List<MenuReview> findMenuReviewByCommentsContainingWithQuery(@Param("keyword") String keyword);
-
-    @Query(value = "SELECT * FROM menu_review WHERE MATCH (comments) AGAINST (:keyword IN NATURAL LANGUAGE MODE)", nativeQuery = true)
-    List<MenuReview> findMenuReviewByCommentsContainingOnFullTextSearchWithQuery(@Param("keyword") String keyword);
 }

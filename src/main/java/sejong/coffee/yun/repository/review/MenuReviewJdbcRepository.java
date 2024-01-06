@@ -1,26 +1,41 @@
 package sejong.coffee.yun.repository.review;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StreamUtils;
 import sejong.coffee.yun.domain.order.menu.MenuReview;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-@RequiredArgsConstructor
 public class MenuReviewJdbcRepository {
 
     private final JdbcTemplate jdbcTemplate;
+    private final int batchSize = 1000;
 
-    private int batchSize = 1000;
+
+    public MenuReviewJdbcRepository(@Qualifier("postgresJdbcTemplate") JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Transactional("twoDBTransactionManager")
-    public void saveAll(List<MenuReview> items, Long memberId, Long menuId) {
+    public void saveAll(List<MenuReview> items, Long memberId, Long menuId) throws IOException {
+
+        Resource resource = new ClassPathResource("schema-postgresql.sql");
+        InputStream inputStream = resource.getInputStream();
+        String sql = StreamUtils.copyToString(inputStream, Charset.defaultCharset());
+
+        jdbcTemplate.execute(sql);
 
         List<MenuReview> subItems = new ArrayList<>();
         for (MenuReview item : items) {
@@ -34,10 +49,11 @@ public class MenuReviewJdbcRepository {
             batchInsert(subItems, memberId, menuId);
         }
     }
+
     private void batchInsert(List<MenuReview> subItems, Long memberId, Long menuId) {
 
         jdbcTemplate.batchUpdate(
-                "INSERT INTO menu_review (id, comments, create_at, update_at, member_id, menu_id) VALUES (?, ?, ?, ?, ?, ?)",
+                "INSERT INTO menu_review (id, comments, create_at, update_at) VALUES (?, ?, ?, ?)",
                 subItems,
                 batchSize,
                 (ps, argument) -> {
@@ -45,8 +61,8 @@ public class MenuReviewJdbcRepository {
                     ps.setString(2, argument.getComments());
                     ps.setTimestamp(3, Timestamp.from(Instant.now()));
                     ps.setTimestamp(4, Timestamp.from(Instant.now()));
-                    ps.setLong(5, memberId);
-                    ps.setLong(6, menuId);
+//                    ps.setLong(5, memberId);
+//                    ps.setLong(6, menuId);
                 }
         );
     }
