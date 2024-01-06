@@ -90,12 +90,12 @@ public class MenuReviewRepositoryImpl implements MenuReviewRepository {
     }
 
     @Override
-    public List<MenuReview> findMenuReviewByCommentsContaining(String keyword) {
-        return jpaMenuReviewRepository.findMenuReviewByCommentsContaining(keyword);
+    public List<MenuReview> findMenuReviewByCommentsContainingWithQuery(String keyword) {
+        return jpaMenuReviewRepository.findMenuReviewByCommentsContainingWithQuery(keyword);
     }
 
     @Override
-    public List<MenuReview> findMenuReviewByCommentsContainingWithQuery(String keyword) {
-        return jpaMenuReviewRepository.findMenuReviewByCommentsContainingWithQuery(keyword);
+    public List<MenuReview> findMenuReviewByCommentsContainingWithFTS(String keyword) {
+        return jpaMenuReviewRepository.findMenuReviewByCommentsContainingWithFTS(keyword);
     }
 }

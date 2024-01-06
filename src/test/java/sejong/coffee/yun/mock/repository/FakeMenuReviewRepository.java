@@ -92,14 +92,14 @@ public class FakeMenuReviewRepository implements MenuReviewRepository {
     }
 
     @Override
-    public List<MenuReview> findMenuReviewByCommentsContaining(String keyword) {
+    public List<MenuReview> findMenuReviewByCommentsContainingWithQuery(String keyword) {
         return reviews.stream()
                 .filter(review -> review.getComments().contains(keyword))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<MenuReview> findMenuReviewByCommentsContainingWithQuery(String keyword) {
+    public List<MenuReview> findMenuReviewByCommentsContainingWithFTS(String keyword) {
         return reviews.stream()
                 .filter(review -> review.getComments().contains(keyword))
                 .collect(Collectors.toList());
