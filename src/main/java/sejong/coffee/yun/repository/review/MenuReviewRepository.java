@@ -18,5 +18,4 @@ public interface MenuReviewRepository {
     void clear();
     List<MenuReview> findMenuReviewByCommentsContaining(String keyword);
     List<MenuReview> findMenuReviewByCommentsContainingWithQuery(String keyword);
-    List<MenuReview> findMenuReviewByCommentsContainingOnFullTextSearchWithQuery(String keyword);
 }

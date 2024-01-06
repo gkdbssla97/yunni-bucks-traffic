@@ -20,36 +20,36 @@ import static sejong.coffee.yun.domain.order.menu.QMenuReview.menuReview;
 public class PostgresSQLMenuReviewRepositoryImpl implements PostgresMenuReviewRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
-    private final JpaPostgresSQLMenuReviewRepository jpaMenuReviewRepository;
+    private final JpaPostgresSQLMenuReviewRepository jpaPostgresSQLMenuReviewRepository;
 
     @Override
     @Transactional("twoDBTransactionManager")
     public MenuReview save(MenuReview menuReview) {
-        return jpaMenuReviewRepository.save(menuReview);
+        return jpaPostgresSQLMenuReviewRepository.save(menuReview);
     }
 
     @Override
     public MenuReview findById(Long reviewId) {
-        return jpaMenuReviewRepository.findById(reviewId)
+        return jpaPostgresSQLMenuReviewRepository.findById(reviewId)
                 .orElseThrow(NOT_FOUND_MENU_REVIEW::notFoundException);
     }
 
     @Override
     public MenuReview findByMemberIdAndId(Long memberId, Long reviewId) {
-        return jpaMenuReviewRepository.findByMemberIdAndId(memberId, reviewId)
+        return jpaPostgresSQLMenuReviewRepository.findByMemberIdAndId(memberId, reviewId)
                 .orElseThrow(NOT_FOUND_MENU_REVIEW::notFoundException);
     }
 
     @Override
     public List<MenuReview> findAll() {
-        return jpaMenuReviewRepository.findAll();
+        return jpaPostgresSQLMenuReviewRepository.findAll();
     }
 
     @Override
     @Transactional
     public void delete(Long reviewId) {
         try {
-            jpaMenuReviewRepository.deleteById(reviewId);
+            jpaPostgresSQLMenuReviewRepository.deleteById(reviewId);
         } catch (Exception e) {
             throw NOT_FOUND_MENU_REVIEW.notFoundException();
         }
@@ -59,7 +59,7 @@ public class PostgresSQLMenuReviewRepositoryImpl implements PostgresMenuReviewRe
     @Transactional
     public void delete(Long memberId, Long reviewId) {
         try {
-            jpaMenuReviewRepository.deleteByMemberIdAndId(memberId, reviewId);
+            jpaPostgresSQLMenuReviewRepository.deleteByMemberIdAndId(memberId, reviewId);
         } catch (Exception e) {
             throw NOT_FOUND_MENU_REVIEW.notFoundException();
         }
@@ -82,21 +82,26 @@ public class PostgresSQLMenuReviewRepositoryImpl implements PostgresMenuReviewRe
 
     @Override
     public void clear() {
-        jpaMenuReviewRepository.deleteAll();
+        jpaPostgresSQLMenuReviewRepository.deleteAll();
     }
 
     @Override
     public List<MenuReview> findMenuReviewByCommentsContaining(String keyword) {
-        return jpaMenuReviewRepository.findMenuReviewByCommentsContaining(keyword);
+        return jpaPostgresSQLMenuReviewRepository.findMenuReviewByCommentsContaining(keyword);
     }
 
     @Override
     public List<MenuReview> findMenuReviewByCommentsContainingWithQuery(String keyword) {
-        return jpaMenuReviewRepository.findMenuReviewByCommentsContainingWithQuery(keyword);
+        return jpaPostgresSQLMenuReviewRepository.findMenuReviewByCommentsContainingWithQuery(keyword);
     }
 
     @Override
     public List<MenuReview> findMenuReviewByCommentsContainingOnFullTextSearchWithQuery(String keyword) {
-        return jpaMenuReviewRepository.findMenuReviewByCommentsContainingOnFullTextSearchWithQuery(keyword);
+        return jpaPostgresSQLMenuReviewRepository.findMenuReviewByCommentsContainingOnFullTextSearchWithQuery(keyword);
+    }
+
+    @Override
+    public List<MenuReview> findByCommentsContains(String keyword) {
+        return jpaPostgresSQLMenuReviewRepository.findByCommentsContains(keyword);
     }
 }

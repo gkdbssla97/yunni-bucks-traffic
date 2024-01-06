@@ -19,4 +19,5 @@ public interface PostgresMenuReviewRepository {
     List<MenuReview> findMenuReviewByCommentsContaining(String keyword);
     List<MenuReview> findMenuReviewByCommentsContainingWithQuery(String keyword);
     List<MenuReview> findMenuReviewByCommentsContainingOnFullTextSearchWithQuery(String keyword);
+    List<MenuReview> findByCommentsContains(String keyword);
 }
