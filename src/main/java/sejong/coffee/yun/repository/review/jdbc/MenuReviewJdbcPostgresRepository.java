@@ -1,4 +1,4 @@
-package sejong.coffee.yun.repository.review;
+package sejong.coffee.yun.repository.review.jdbc;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
@@ -18,16 +18,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class MenuReviewJdbcRepository {
+public class MenuReviewJdbcPostgresRepository implements MenuReviewJdbcRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final int batchSize = 1000;
 
 
-    public MenuReviewJdbcRepository(@Qualifier("postgresJdbcTemplate") JdbcTemplate jdbcTemplate) {
+    public MenuReviewJdbcPostgresRepository(@Qualifier("postgresJdbcTemplate") JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    @Override
     @Transactional("twoDBTransactionManager")
     public void saveAll(List<MenuReview> items, Long memberId, Long menuId) throws IOException {
 

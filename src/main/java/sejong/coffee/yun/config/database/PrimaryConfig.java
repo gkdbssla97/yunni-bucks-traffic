@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -17,7 +18,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
-import static sejong.coffee.yun.config.database.PrimaryConfig.*;
+import static sejong.coffee.yun.config.database.PrimaryConfig.ENTITY_MANAGER_BEAN_NAME;
+import static sejong.coffee.yun.config.database.PrimaryConfig.TRANSACTION_MANAGER_BEAN_NAME;
 
 @Configuration
 @EnableConfigurationProperties(DatabaseProperties.class)
@@ -65,5 +67,11 @@ public class PrimaryConfig {
     @Bean(name = TRANSACTION_MANAGER_BEAN_NAME)
     public PlatformTransactionManager transactionManager(@Qualifier(ENTITY_MANAGER_BEAN_NAME) EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);
+    }
+
+    @Primary
+    @Bean
+    public JdbcTemplate mysqlJdbcTemplate(@Qualifier(DATASOURCE_BEAN_NAME) DataSource dataSource) {
+        return new JdbcTemplate(dataSource);
     }
 }
