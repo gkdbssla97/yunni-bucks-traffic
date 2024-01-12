@@ -28,7 +28,7 @@ public class DataSourceConfig {
         dataSourceMap.put("slave", slaveDataSource);
 
         routingDataSource.setTargetDataSources(dataSourceMap);
-        routingDataSource.setDefaultTargetDataSource(masterDataSource);
+        routingDataSource.setDefaultTargetDataSource(routingDataSource);
 
         return routingDataSource;
     }
@@ -38,4 +38,3 @@ public class DataSourceConfig {
         return new LazyConnectionDataSourceProxy(routingDataSource);
     }
 }
-
