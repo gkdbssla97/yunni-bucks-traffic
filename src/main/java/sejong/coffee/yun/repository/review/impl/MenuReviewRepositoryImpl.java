@@ -33,18 +33,21 @@ public class MenuReviewRepositoryImpl implements MenuReviewRepository {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public MenuReview findById(Long reviewId) {
         return jpaMenuReviewRepository.findById(reviewId)
                 .orElseThrow(NOT_FOUND_MENU_REVIEW::notFoundException);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public MenuReview findByMemberIdAndId(Long memberId, Long reviewId) {
         return jpaMenuReviewRepository.findByMemberIdAndId(memberId, reviewId)
                 .orElseThrow(NOT_FOUND_MENU_REVIEW::notFoundException);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MenuReview> findAll() {
         return jpaMenuReviewRepository.findAll();
     }
@@ -70,6 +73,7 @@ public class MenuReviewRepositoryImpl implements MenuReviewRepository {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<MenuReview> findAllByMemberId(Pageable pageable, Long memberId) {
         List<MenuReview> menuReviews = jpaQueryFactory.selectFrom(menuReview)
                 .where(menuReview.member.id.eq(memberId))
@@ -90,11 +94,13 @@ public class MenuReviewRepositoryImpl implements MenuReviewRepository {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MenuReview> findMenuReviewByCommentsContainingWithQuery(String keyword) {
         return jpaMenuReviewRepository.findMenuReviewByCommentsContainingWithQuery(keyword);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MenuReview> findMenuReviewByCommentsContainingWithFTS(String keyword) {
         return jpaMenuReviewRepository.findMenuReviewByCommentsContainingWithFTS(keyword);
     }

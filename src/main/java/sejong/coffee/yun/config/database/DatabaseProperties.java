@@ -11,8 +11,7 @@ import java.util.Map;
 @Configuration
 @ConfigurationProperties(prefix = "spring.datasource")
 public class DatabaseProperties {
-    private DatabaseDetail main;
-    private DatabaseDetail sub;
+    private DatabaseDetail databaseDetail;
 
     @Data
     public static class DatabaseDetail {

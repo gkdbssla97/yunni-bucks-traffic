@@ -8,6 +8,8 @@ secrets:
     secret-key: Basic dGVzdF9za183WFpZa0tMNE1yakFsYUJ5MGExVjB6SndsRVdSOg==
 
 spring:
+  application:
+    name: root
   jpa:
     hibernate:
       ddl-auto: create
@@ -16,10 +18,9 @@ spring:
         format_sql: true
         default_batch_fetch_size: 100
         auto_quote_keyword: true
-    database-platform:
 
   datasource:
-    main:
+    master:
       driver-class-name: com.mysql.cj.jdbc.Driver
       url: jdbc:mysql://127.0.0.1:3306/yunni_bucks_traffic?rewriteBatchedStatements=true
       username: root
@@ -27,11 +28,17 @@ spring:
       hikari:
         auto-commit: false
         connection-test-query: SELECT 1
-        maximum-pool-size: 40
-        pool-name: mysql-example-cp
+        maximum-pool-size: 24
+        pool-name: mysqlM-example-cp
       hibernate:
         ddl-auto: create
-
+    slave:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://127.0.0.1:3307/yunni_bucks_traffic?rewriteBatchedStatements=true
+      username: root
+      password: 1234
+      hibernate:
+        ddl-auto: create
     sub:
       driver-class-name: org.postgresql.Driver
       url: jdbc:postgresql://127.0.0.1:5432/yunni_bucks_traffic
@@ -40,15 +47,23 @@ spring:
       hikari:
         auto-commit: false
         connection-test-query: SELECT 1
-        maximum-pool-size: 40
-        pool-name: postgres-example2-cp
+        maximum-pool-size: 10
+        pool-name: postgres-example-cp
       hibernate:
         ddl-auto: create
-        metadata_builder_contributor: sejong.coffee.yun.config.database.SqlFunctionsMetadataBuilderContributor
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
   redis:
     host: localhost
     port: 6379
+
+management:
+  server:
+    port: 8082
+  endpoints:
+    web:
+      exposure:
+        include: '*'
 
 logging:
   level: #띄어쓰기 없음

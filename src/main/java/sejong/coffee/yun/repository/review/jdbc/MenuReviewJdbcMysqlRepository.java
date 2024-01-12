@@ -29,7 +29,7 @@ public class MenuReviewJdbcMysqlRepository implements MenuReviewJdbcRepository {
     }
 
     @Override
-    @Transactional("oneDBTransactionManager")
+    @Transactional
     public void saveAll(List<MenuReview> items, Long memberId, Long menuId) throws IOException {
 
         Resource resource = new ClassPathResource("schema-mysql.sql");

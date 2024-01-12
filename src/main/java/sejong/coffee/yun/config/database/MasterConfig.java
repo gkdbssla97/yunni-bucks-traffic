@@ -11,26 +11,26 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
+import sejong.coffee.yun.util.log.LoggingJpaTransactionManager;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
-import static sejong.coffee.yun.config.database.PrimaryConfig.ENTITY_MANAGER_BEAN_NAME;
-import static sejong.coffee.yun.config.database.PrimaryConfig.TRANSACTION_MANAGER_BEAN_NAME;
+import static sejong.coffee.yun.config.database.MasterConfig.ENTITY_MANAGER_BEAN_NAME;
+import static sejong.coffee.yun.config.database.MasterConfig.TRANSACTION_MANAGER_BEAN_NAME;
 
 @Configuration
 @EnableConfigurationProperties(DatabaseProperties.class)
 @EnableJpaRepositories(basePackages = {"sejong.coffee.yun.repository"},
         entityManagerFactoryRef = ENTITY_MANAGER_BEAN_NAME,
         transactionManagerRef = TRANSACTION_MANAGER_BEAN_NAME)
-public class PrimaryConfig {
+public class MasterConfig {
     public static final String TRANSACTION_MANAGER_BEAN_NAME = "oneDBTransactionManager";
     public static final String ENTITY_MANAGER_BEAN_NAME = "oneDBEntityManager";
-    private static final String DATASOURCE_BEAN_NAME = "oneDataSource";
-    private static final String DATASOURCE_PROPERTIES_PREFIX = "spring.datasource.main";
+    private static final String DATASOURCE_BEAN_NAME = "masterDataSource";
+    private static final String DATASOURCE_PROPERTIES_PREFIX = "spring.datasource.master";
     private static final String DATASOURCE_PROPERTIES = "oneDataSourceProperties";
     private static final String HIBERNATE_PROPERTIES = "oneHibernateProperties";
 
@@ -61,12 +61,13 @@ public class PrimaryConfig {
     @ConfigurationProperties(prefix = DATASOURCE_PROPERTIES_PREFIX + ".hikari")
     public DataSource dataSource(@Qualifier(DATASOURCE_PROPERTIES) DataSourceProperties dataSourceProperties) {
         return dataSourceProperties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
+
     }
 
     @Primary
     @Bean(name = TRANSACTION_MANAGER_BEAN_NAME)
     public PlatformTransactionManager transactionManager(@Qualifier(ENTITY_MANAGER_BEAN_NAME) EntityManagerFactory entityManagerFactory) {
-        return new JpaTransactionManager(entityManagerFactory);
+        return new LoggingJpaTransactionManager(entityManagerFactory, DATASOURCE_BEAN_NAME);
     }
 
     @Primary

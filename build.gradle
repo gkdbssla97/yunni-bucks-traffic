@@ -47,7 +47,7 @@ dependencies {
 	//implementation  'com.h2database:h2:2.1.210'
 	implementation 'org.redisson:redisson-spring-boot-starter:3.17.4'
 
-	runtimeOnly 'mysql:mysql-connector-java:8.0.32'
+	runtimeOnly 'mysql:mysql-connector-java:8.0.33'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	asciidoctorExtentions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
@@ -79,9 +79,13 @@ dependencies {
 	implementation("net.gpedro.integrations.slack:slack-webhook:1.4.0")
 
 	implementation 'net.datafaker:datafaker:2.0.2'
-	
+
 	// postgres
 	implementation 'org.postgresql:postgresql:42.6.0'
+
+	// prometheus
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 }
 
 ext {
