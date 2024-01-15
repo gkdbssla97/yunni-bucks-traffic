@@ -2,16 +2,17 @@ package sejong.coffee.yun.config.database;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Data
-@Configuration
+@Component
 @ConfigurationProperties(prefix = "spring.datasource")
 public class DatabaseProperties {
-    private DatabaseDetail databaseDetail;
+    private DatabaseDetail master, slave;
+    private DatabaseDetail postgres;
 
     @Data
     public static class DatabaseDetail {
@@ -33,7 +34,7 @@ public class DatabaseProperties {
             Map<String, Object> properties = new HashMap<>();
 
             if (hibernateProperties.getDdlAuto() != null) {
-                properties.put("hibernate.hbm2ddl.auto", hibernateProperties.getDdlAuto());
+                properties.put("hibernate.hbm2ddl.auto", "spring.jpa.hibernate.ddl-auto");
             }
             if (hibernateProperties.getMetadataBuilderContributor() != null) {
                 properties.put("hibernate.metadata_builder_contributor", hibernateProperties.getMetadataBuilderContributor());

@@ -18,5 +18,6 @@ public interface MenuReviewRepository {
     void clear();
     List<MenuReview> findMenuReviewByCommentsContainingWithQuery(String keyword);
     List<MenuReview> findMenuReviewByCommentsContainingWithFTS(String keyword);
+    void deleteAllInBatch();
 
 }

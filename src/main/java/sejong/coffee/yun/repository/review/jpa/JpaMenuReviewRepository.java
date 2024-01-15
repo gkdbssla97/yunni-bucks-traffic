@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface JpaMenuReviewRepository extends JpaRepository<MenuReview, Long> {
     void deleteByMemberIdAndId(Long memberId, Long reviewId);
-
+    void deleteAllInBatch();
     Optional<MenuReview> findByMemberIdAndId(Long memberId, Long reviewId);
 
     @Query("SELECT m FROM MenuReview m WHERE m.comments LIKE %:keyword%")

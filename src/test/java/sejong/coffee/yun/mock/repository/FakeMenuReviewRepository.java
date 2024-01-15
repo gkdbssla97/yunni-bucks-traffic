@@ -104,4 +104,9 @@ public class FakeMenuReviewRepository implements MenuReviewRepository {
                 .filter(review -> review.getComments().contains(keyword))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void deleteAllInBatch() {
+        reviews.clear();
+    }
 }
