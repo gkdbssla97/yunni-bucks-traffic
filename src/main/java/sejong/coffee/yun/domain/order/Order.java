@@ -23,6 +23,7 @@ import static sejong.coffee.yun.domain.order.OrderStatus.ORDER;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "orders")
 public class Order {
 
     @Id @GeneratedValue

@@ -104,4 +104,9 @@ public class MenuReviewRepositoryImpl implements MenuReviewRepository {
     public List<MenuReview> findMenuReviewByCommentsContainingWithFTS(String keyword) {
         return jpaMenuReviewRepository.findMenuReviewByCommentsContainingWithFTS(keyword);
     }
+
+    @Override
+    public void deleteAllInBatch() {
+        jpaMenuReviewRepository.deleteAllInBatch();
+    }
 }
