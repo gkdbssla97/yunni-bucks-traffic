@@ -12,7 +12,7 @@ spring:
     name: root
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
@@ -25,20 +25,20 @@ spring:
       url: jdbc:mysql://127.0.0.1:3306/yunni_bucks_traffic?rewriteBatchedStatements=true
       username: root
       password: 1234
-      hikari:
-        auto-commit: false
-        connection-test-query: SELECT 1
-        maximum-pool-size: 24
-        pool-name: mysqlM-example-cp
+      auto-commit: false
+      connection-test-query: SELECT 1
+      maximum-pool-size: 24
+      pool-name: mysqlM-example-cp
       hibernate:
-        ddl-auto: create
+        ddl-auto: validate
     slave:
       driver-class-name: com.mysql.cj.jdbc.Driver
       url: jdbc:mysql://127.0.0.1:3307/yunni_bucks_traffic?rewriteBatchedStatements=true
       username: root
       password: 1234
       hibernate:
-        ddl-auto: create
+        ddl-auto: validate
+
     sub:
       driver-class-name: org.postgresql.Driver
       url: jdbc:postgresql://127.0.0.1:5432/yunni_bucks_traffic
@@ -52,6 +52,8 @@ spring:
       hibernate:
         ddl-auto: create
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: true
 
   redis:
     host: localhost
