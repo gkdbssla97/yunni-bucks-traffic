@@ -31,6 +31,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Member findByEmail(String email) {
         return jpaUserRepository.findByEmail(email);
     }

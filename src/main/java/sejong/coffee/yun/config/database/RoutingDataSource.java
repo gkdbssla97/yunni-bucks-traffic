@@ -13,7 +13,6 @@ public class RoutingDataSource extends AbstractRoutingDataSource {
         log.info("Current DataSource is " + lookupKey);
         return lookupKey;
     }
-
 }
 
 

@@ -1,1 +1,0 @@
-CREATE FULLTEXT INDEX ftx_comments ON menu_review (comments) WITH PARSER ngram;
