@@ -17,6 +17,7 @@ public interface MenuReviewRepository {
     Page<MenuReview> findAllByMemberId(Pageable pageable, Long memberId);
     void clear();
     List<MenuReview> findMenuReviewByCommentsContainingWithQuery(String keyword);
+    List<MenuReview> findMenuReviewByCommentsContainingWithQueryMaster(String keyword);
     List<MenuReview> findMenuReviewByCommentsContainingWithFTS(String keyword);
     void deleteAllInBatch();
 

@@ -2,6 +2,7 @@ package sejong.coffee.yun.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.datafaker.Faker;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -9,15 +10,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import sejong.coffee.yun.custom.annotation.MemberId;
+import sejong.coffee.yun.domain.order.menu.Menu;
 import sejong.coffee.yun.domain.order.menu.MenuReview;
+import sejong.coffee.yun.domain.user.Member;
 import sejong.coffee.yun.dto.review.menu.MenuReviewDto;
 import sejong.coffee.yun.dto.review.menu.MenuReviewPageDto;
 import sejong.coffee.yun.mapper.CustomMapper;
+import sejong.coffee.yun.repository.menu.MenuRepository;
+import sejong.coffee.yun.repository.review.MenuReviewRepository;
+import sejong.coffee.yun.repository.review.jdbc.MenuReviewMysqlJdbcRepository;
 import sejong.coffee.yun.service.MenuReviewService;
+import sejong.coffee.yun.service.UserService;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+
+import static java.time.LocalDateTime.now;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,6 +40,10 @@ public class MenuReviewController {
 
     private final MenuReviewService menuReviewService;
     private final CustomMapper customMapper;
+    private final UserService userService;
+    private final MenuRepository menuRepository;
+    private final MenuReviewMysqlJdbcRepository menuReviewMysqlJdbcRepository;
+    private final MenuReviewRepository menuReviewRepository;
 
     @PostMapping("/{menuId}/reviews")
     ResponseEntity<MenuReviewDto.Response> menuReviewCreate(@RequestBody @Valid MenuReviewDto.Request request,
@@ -91,5 +107,50 @@ public class MenuReviewController {
         List<MenuReviewDto.Response> responses = menuReviewList.stream().map(MenuReviewDto.Response::new).toList();
 
         return ResponseEntity.ok(responses);
+    }
+
+    @PostMapping("/dummy/{size}")
+    ResponseEntity<Void> createBulkData(@PathVariable("size") int size) throws IOException {
+        Member member = userService.findMember(1L);
+        Menu menu = menuRepository.findByTitle("빵");
+        Faker faker = new Faker(new Locale("ko"));
+        List<MenuReview> menuReviewList = new ArrayList<>();
+
+        for (int i = 0; i < size; i++) {
+            String comments = faker.lorem().sentence();  // 랜덤한 문장 생성
+            String s = faker.food().ingredient() + " " +
+                    faker.food().ingredient() + " " +
+                    faker.food().ingredient() + " " +
+                    faker.food().ingredient() + " " +
+                    faker.food().ingredient();
+
+            MenuReview menuReview = MenuReview.builder()
+                    .id((long) (i + 1))
+                    .comments(comments)
+                    .member(member)
+                    .menu(menu)
+                    .now(now())
+                    .build();
+
+            menuReviewList.add(menuReview);
+        }
+//        menuReviewJdbcPostgresRepository.saveAll(menuReviews, member.getId(), menu.getId());
+        menuReviewMysqlJdbcRepository.saveAll(menuReviewList, member.getId(), menu.getId());
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/reviews/search/master")
+    ResponseEntity<Void> searchMaster() {
+        List<MenuReview> menuReviewList = menuReviewRepository.findMenuReviewByCommentsContainingWithQuery("과학");
+        log.info("SLAVE SEARCH SIZE: " + menuReviewList.size());
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/reviews/search/slave")
+    ResponseEntity<Void> searchSlave() {
+        List<MenuReview> menuReviewList = menuReviewRepository.findMenuReviewByCommentsContainingWithQueryMaster("과학");
+        log.info("MASTER SEARCH SIZE: " + menuReviewList.size());
+        return ResponseEntity.noContent().build();
     }
 }
