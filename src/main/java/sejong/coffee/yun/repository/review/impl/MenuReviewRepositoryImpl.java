@@ -100,6 +100,12 @@ public class MenuReviewRepositoryImpl implements MenuReviewRepository {
     }
 
     @Override
+    @Transactional(readOnly = false)
+    public List<MenuReview> findMenuReviewByCommentsContainingWithQueryMaster(String keyword) {
+        return jpaMenuReviewRepository.findMenuReviewByCommentsContainingWithQuery(keyword);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<MenuReview> findMenuReviewByCommentsContainingWithFTS(String keyword) {
         return jpaMenuReviewRepository.findMenuReviewByCommentsContainingWithFTS(keyword);
