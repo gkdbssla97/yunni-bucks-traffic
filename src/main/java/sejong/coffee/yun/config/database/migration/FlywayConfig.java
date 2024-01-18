@@ -32,10 +32,10 @@ public class FlywayConfig {
 //    }
 
 //    @Bean
-//    public Flyway subFlyway(DataSource subDataSource) {
+//    public Flyway subFlyway(@Qualifier("secondDataSource") DataSource subDataSource) {
 //        Flyway flyway = Flyway.configure()
 //                .dataSource(subDataSource)
-//                .locations("classpath:database/migration/sub")
+//                .locations("classpath:database/migration/postgres")
 //                .load();
 //        flyway.migrate();
 //        return flyway;
