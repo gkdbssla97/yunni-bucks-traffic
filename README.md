@@ -1,17 +1,34 @@
 # ☕️ YUNNI-BUCKS-TRAFFIC
+#### 이 프로젝트는 YUNNI-BUCKS에 백엔드 고도화를 위한 개선작업을 진행하고 있습니다.
 #### [YUNNI-BUCKS 프로젝트 세부 사항](https://github.com/gkdbssla97/yunni-bucks)
 
 1. 개발 기간 : 2023-07 ~ 2022-09 *(MVP기능 구현 완료)* </br>
 2. 개발 기간 : 2022-10 ~ *(트래픽 상황 대처 프로젝트 고도화)*
 --- 
+### Architecture
+<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/b626e81c-e074-441d-9005-8b911df5d803">
+
+---
 
 ### Traffic 개요
+#### 대용량 데이터 검색 성능 개선
+- PostgreSQL 검색 전용 DB로 역할 분배
+  - Full Text Search
+    - GIN INDEX
+    - tsvector 
+    - tsquery
+- Master-Slave 구조로 MySQL Read/Write 역할 분배
+  - Prometheus로 Metric 수집
+    - Mysql Exporter
+    - Spring Actuator
+  - Grafana 활용하여 Prometheus Metric 시각화 처리
+  
 #### 동시성 처리
 - 멀티 쓰레드 동작 중 발생 가능 문제점 해결 방안
   - 낙관 락(Optimistic Lock)
   - 비관 락(Pessimistic Lock)
   - 분산 락(Redisson, Distributed Lock)
-#### 성능 개선
+#### Redis 활용 성능 개선
 - Redis Caching
   - Write-Behind Caching
   - Time-To-Live (TTL) Caching
@@ -33,6 +50,30 @@
     - Redis zSet 활용
   
 ---
+### 메뉴 리뷰
+#### 1. 대용량 메뉴 리뷰 데이터(10만, 100만)일 경우 검색
+- PostgreSQL 활용
+  #### 구현 이유 
+  1. **검색 정확도**: PostgreSQL의 tsvector는 텍스트를 토큰화하고, tsquery는 검색어를 토큰화하여 검색 정확도 향상, PostgreSQL의 어간 추출, 불용어 설정  
+  2. **GIN 인덱스**: GIN 인덱스는 토큰에 대한 포인터를 저장하여, 특정 토큰을 가진 데이터를 빠르게 찾을 수 있다. 
+  3. **다양한 RDBMS 활용**: 확장 모듈과 SQL 표준 준수로 인한 높은 호환성 제공으로 시스템의 확장성 기대
+
+  #### 검색 기법
+  
+  1. **LIKE 연산자를 사용한 검색**: 가장 기본적인 문자열 검색 방식으로 와일드카드 검색 수행. <br>Full Table Scan은 테이블의 모든 행을 검사하기 때문에 데이터 양이 증가함에 따라 성능이 선형적으로 감소
+  2. **ts_vector와 plainto_tsquery를 사용한 Full Text Search**: tsvector는 텍스트를 '단어'로 분할하고, 이를 정규화시킴. 이 단어들은 GIN 인덱스에 포인터를 저장하여 쿼리 시 각 단어를 효율적으로 검색 to_tsquery는 검색 쿼리를 tsvector 형식으로 변환하여, 인덱스에서 빠르게 검색
+  
+  | 구분(Menu Review)            | 100,000개 | 1,000,000개 |
+      |---------|------------|---------|
+  | Full Table Scan | 726 ms	 | 11.927 sec |
+  | Full Text Search | 493 ms  | 4.264 sec  |
+  | 처리속도 비교       | -233 ms | -7.663 sec |
+
+> #### 시나리오
+> 1. 사용자가 특정 메뉴의 리뷰를 keyword로 검색 (ex. 달콤한, 맛 없는, 푸짐한 양 ...)
+> 2. 검색 요청이 들어오면, 먼저 keyword를 `plainto_tsquery` 함수를 이용해 `tsquery` 형식으로 변환. keyword는 공백 기준 단어로 분할되고, 각 단어는 정규화
+> 3. 변환된 `tsquery`를 사용하여, `tsvector` 칼럼에 저장된 리뷰 텍스트와 매칭(`@@`), `GIN 인덱스`를 활용하여 효율적인 검색 수행
+> 4. 매칭된 리뷰들을 반환. Full Text Search는 keyword가 포함된 리뷰를 빠르게 찾아내므로, 사용자는 원하는 리뷰 정보를 즉시 응답받음
 
 ### 메뉴 주문
 #### 1. 한 사용자가 여러 개의 주문을 동시에 요청
@@ -42,7 +83,7 @@
   - 대부분의 상황에서 실제로 동일한 리소스에 대한 동시 요청이 드물게 발생하고, 이런 상황에서는 Optimistic Locking이 더 효율적
   - 낮은 비용으로 높은 동시성을 제공하며, 충돌 발생 시 재시도 로직을 통해 처리
 
-처리 속도 증감율
+
 - Pessimistic Lock 사용하지 않은 이유
   - 다중 사용자가 아닌 한 명의 사용자 이므로 충돌이 자주 발생하거나, 데이터 일관성을 보장이 중요한 작업이라 판단하지 않았음
 #### 2. 여러 사용자가 음료 A를 주문을 동시에 요청 *(주문 메뉴 재고 감소 및 주문수 증가)*
