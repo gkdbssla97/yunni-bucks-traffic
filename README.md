@@ -15,9 +15,8 @@
 - PostgreSQL 검색 전용 DB로 역할 분배
   - Full Text Search
     - GIN INDEX
-    - tsvector 
-    - tsquery
-- Master-Slave 구조로 MySQL Read/Write 역할 분배
+    - tsvector, tsquery
+- Master-Slave Replication으로 MySQL Read/Write 역할 분리
   - Prometheus로 Metric 수집
     - Mysql Exporter
     - Spring Actuator
@@ -35,6 +34,9 @@
 - Redis zSet
 ---
 ### 기능 개선 및 정합성 관리
+- 메뉴 리뷰
+  - PostgreSQL Full Text Search
+  - Master-Slave Replication MySQL 이중화
 - 메뉴 주문
   - Optimistic Lock
   - Pessimistic Lock
@@ -51,7 +53,7 @@
   
 ---
 ### 메뉴 리뷰
-#### 1. 대용량 메뉴 리뷰 데이터(10만, 100만)일 경우 검색
+#### 1. 메뉴 리뷰 대용량 데이터(10만, 100만)일 경우 검색
 - PostgreSQL 활용
   #### 구현 이유 
   1. **검색 정확도**: PostgreSQL의 tsvector는 텍스트를 토큰화하고, tsquery는 검색어를 토큰화하여 검색 정확도 향상, PostgreSQL의 어간 추출, 불용어 설정  
@@ -64,7 +66,7 @@
   2. **ts_vector와 plainto_tsquery를 사용한 Full Text Search**: tsvector는 텍스트를 '단어'로 분할하고, 이를 정규화시킴. 이 단어들은 GIN 인덱스에 포인터를 저장하여 쿼리 시 각 단어를 효율적으로 검색 to_tsquery는 검색 쿼리를 tsvector 형식으로 변환하여, 인덱스에서 빠르게 검색
   
   | 구분(Menu Review)            | 100,000개 | 1,000,000개 |
-      |---------|------------|---------|
+  |---------|------------|---------|
   | Full Table Scan | 726 ms	 | 11.927 sec |
   | Full Text Search | 493 ms  | 4.264 sec  |
   | 처리속도 비교       | -233 ms | -7.663 sec |
@@ -75,6 +77,19 @@
 > 3. 변환된 `tsquery`를 사용하여, `tsvector` 칼럼에 저장된 리뷰 텍스트와 매칭(`@@`), `GIN 인덱스`를 활용하여 효율적인 검색 수행
 > 4. 매칭된 리뷰들을 반환. Full Text Search는 keyword가 포함된 리뷰를 빠르게 찾아내므로, 사용자는 원하는 리뷰 정보를 즉시 응답받음
 
+- Master-Slave 구조 활용
+  #### 구현 이유
+  1. **데이터 안정성**: Master DB는 Write 작업을 처리하고, Slave DB는 Read 작업을 처리함으로써 부하 분산이 가능해질거라 판단
+  2. **데이터 확장성**: Master DB에 문제가 발생한 경우, Slave DB를 Master로 승격시켜 서비스의 중단 없이 운영 FailOver
+
+  - Slave로 MySQL 선택한 이유
+    - 일반적으로 Master-Slave 복제 방식은 같은 RDBMS 간에서만 가능
+      - 각 RDBMS가 고유의 데이터 저장 방식과 통신 프로토콜을 가지고 있기 때문
+  - Slave로 PostgreSQL 사용하지 않은 이유
+    - MySQL에서 PostgreSQL로 데이터를 복제하려면 데이터 변환 및 동기화를 처리할 수 있는 도구가 필요하며, Debezium이나 Kafka Connect와 같은 CDC 기반의 도구를 사용 
+      - 추가적 기술비용으로 인한 후순위 배치
+    - tsvector를 이용한 전문검색 시 한국어를 지원하지 않음
+- 
 ### 메뉴 주문
 #### 1. 한 사용자가 여러 개의 주문을 동시에 요청
 - Optimistic Lock 활용
@@ -91,13 +106,13 @@
   - Optimistic Lock과 성능 비교 시 비관적 락 우위
   - 사용자 수가 증가함에 따라 낙관적 락과 비관적 락 사이의 처리 속도 차이가 점점 더 벌어질 것으로 예상
 - Distributed Lock, Redisson 활용
-  - lettuce는 계속 락 획득을 시도하는 반면에 redisson은 락 해제가 되었을 때 최소한의 시도를 하기 때문에 Redis의 부하를 줄여주게 된다.
+   lettuce는 계속 락 획득을 시도하는 반면에 redisson은 락 해제가 되었을 때 최소한의 시도를 하기 때문에 Redis의 부하를 줄여주게 된다.
   
     | 구분(Users)            | 100명       | 1000명      |
     |------------|------------|---------|
-    | Pessimistic Lock | 1.417 sec	 | 7.526 sec  |
     | Optimistic Lock | 6.105 sec  | 24.529 sec |
-    | 처리속도 비교       | +4.69 sec  | +17.00 sec |
+    | Pessimistic Lock | 1.417 sec	 | 7.526 sec  |
+    | 처리속도 비교       | -4.69 sec  | -17.00 sec |
     | Distributed Lock | 1.748 sec  | 8.955 sec  |
 > #### 시나리오
 > 1. 100명의 사용자가 예기치 못하게 동시에 같은 Menu(Beverage)를 주문
@@ -126,9 +141,13 @@
 - 나머지 스레드(사용자 별 주문 요청)들은 락이 해제될 때까지 대기 상태에 머무른다.
 - 이 방식은 동시성 문제를 방지할 수 있지만, 대기 시간이 길어질 수 있다는 단점
 - 최대 사용자는 몇 명까지인지 부하테스트 필요 (사용자가 늘어날수록 시간도 기하급수적 증가)
-  - 10명: 564ms
-  - 100명: 1s 417ms
-  - 1000명: 7s 526ms
+    
+  | 구분 | 응답시간      |
+  |-----------|-----------|
+    | 10명 | 564 ms    |
+    | 100명 | 1.417 sec | 
+    | 1000명 | 7.526 sec |
+  | 1억명 | ? sec     |
 ---
 
 ### 메뉴 조회
