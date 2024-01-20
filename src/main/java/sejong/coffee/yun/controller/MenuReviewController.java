@@ -140,14 +140,14 @@ public class MenuReviewController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/reviews/search/master")
+    @GetMapping("/reviews/search/slave")
     ResponseEntity<Void> searchMaster() {
         List<MenuReview> menuReviewList = menuReviewRepository.findMenuReviewByCommentsContainingWithQuery("과학");
         log.info("SLAVE SEARCH SIZE: " + menuReviewList.size());
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/reviews/search/slave")
+    @GetMapping("/reviews/search/master")
     ResponseEntity<Void> searchSlave() {
         List<MenuReview> menuReviewList = menuReviewRepository.findMenuReviewByCommentsContainingWithQueryMaster("과학");
         log.info("MASTER SEARCH SIZE: " + menuReviewList.size());
