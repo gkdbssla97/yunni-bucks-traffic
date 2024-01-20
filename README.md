@@ -8,6 +8,12 @@
 ### Architecture
 <img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/b626e81c-e074-441d-9005-8b911df5d803">
 
+| Local Server            |       Docker        |       Utility       |
+  |:-------------------:|:-------------------:|:---:|
+  | SpringBoot 2.7.14 |  MySQL 8.2.0 (M)	   | MySQL Exporter (M)  |
+  | Java 17 |   MySQL 8.2.0 (S)   | MySQL Exporter (S)  |
+  |        |   PostgreSQL 16.1   | Prometheus, Grafana 
+  |        |     Redis 7.2.3     |    Flyway 8.4.4     |
 ---
 
 ### Traffic 개요
@@ -80,7 +86,7 @@
 - Master-Slave 구조 활용
   #### 구현 이유
   1. **데이터 안정성**: Master DB는 Write 작업을 처리하고, Slave DB는 Read 작업을 처리함으로써 부하 분산이 가능해질거라 판단
-  2. **데이터 확장성**: Master DB에 문제가 발생한 경우, Slave DB를 Master로 승격시켜 서비스의 중단 없이 운영 FailOver
+  2. **데이터 확장성**: Master DB에 문제가 발생한 경우, Slave DB를 Master로 승격시켜 서비스의 중단 없이 운영 (Failover & Failback)
 
   - Slave로 MySQL 선택한 이유
     - 일반적으로 Master-Slave 복제 방식은 같은 RDBMS 간에서만 가능
@@ -89,7 +95,21 @@
     - MySQL에서 PostgreSQL로 데이터를 복제하려면 데이터 변환 및 동기화를 처리할 수 있는 도구가 필요하며, Debezium이나 Kafka Connect와 같은 CDC 기반의 도구를 사용 
       - 추가적 기술비용으로 인한 후순위 배치
     - tsvector를 이용한 전문검색 시 한국어를 지원하지 않음
-- 
+    <br/>
+- #### Grafana 
+  - Network Traffic Monitoring <br>10만개 데이터 Write/Read 작업 시 Master-Slave를 통해 네트워크 트래픽 부하를 분산시켜서 읽기 작업을 효율적으로 처리하고 있는 것으로 판단</br><br>
+  <img width="482" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/df23fc8b-3e67-456b-9469-8b80ca136485"> 
+
+    |   DB   |   Write   | Master Read |  Slave Read |
+    |:------:|:---------:|:-----------:|:-----------:|
+    | Master | 2.10 MB/s | 260.36 kB/s |  3.71 kB/s  |
+    |  Slave | 1.49 MB/s |  8.96 kB/s  | 269.74 kB/s |
+
+  - QPS Monitoring
+
+    
+  
+
 ### 메뉴 주문
 #### 1. 한 사용자가 여러 개의 주문을 동시에 요청
 - Optimistic Lock 활용
