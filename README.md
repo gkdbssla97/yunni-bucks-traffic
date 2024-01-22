@@ -111,7 +111,7 @@
 
     <img width="486" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/43bc77de-3a60-4ade-98e5-19dd8e63af67">
 
-    Master와 Slave의 QPS 차이는 각 서버가 처리하는 작업의 양, 즉 서버에 도착하는 트래픽을 대략적으로 나타내므로, 이를 통해 대략적인 부하 분산의 평가를 할 수 있다.<br>
+    Master-Slave 구조에서 Master와 Slave의 QPS가 각각 2.0과 3.2로 분산되었는데, Master는 쓰기 작업에 더 많은 부하를 갖고 있고, Slave는 읽기 작업에 더 많은 부하를 갖고 있다. 이를 통해 읽기 및 쓰기 작업이 적절하게 분산되었다고 보여진다.<br>
     QPS는 단순히 쿼리 수를 측정하는 지표이기 때문에, 실제 작업의 처리 시간, 응답 시간 등과 같은 다른 요소들을 고려하지 못한다. 또한, 전체 interval에서의 평균 QPS를 측정하기 때문에 Write/Read 작업의 순간적인 QPS를 측정하기 어려움이 있다.
 
 ### 메뉴 주문
