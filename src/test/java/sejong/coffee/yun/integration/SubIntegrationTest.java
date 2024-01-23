@@ -128,7 +128,6 @@ public class SubIntegrationTest extends MainIntegrationTest {
                 fieldWithPath("orderDto.menuList[].nutrients.fats").description("지방"),
                 fieldWithPath("orderDto.menuList[].nutrients.proteins").description("단백질"),
                 fieldWithPath("orderDto.menuList[].menuSize").description("메뉴 크기"),
-                fieldWithPath("orderDto.menuList[].menuSize").description("메뉴 크기"),
                 fieldWithPath("orderDto.menuList[].stock").description("재고"),
                 fieldWithPath("orderDto.menuList[].viewCount").description("조회수"),
                 fieldWithPath("orderDto.menuList[].orderCount").description("주문수"),
