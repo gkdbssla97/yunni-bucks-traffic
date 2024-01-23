@@ -33,11 +33,11 @@ public class OrderService {
     private final MenuRepository menuRepository;
     private final CouponRepository couponRepository;
 
+    private final CartService cartService;
     @Transactional
     public Order orderWithPessimisticLock(Long memberId, LocalDateTime now) {
 
-        Cart cart = cartRepository.findByMember(memberId);
-
+        Cart cart = cartService.getCartByMember(memberId);
         List<CartItem> cartItems = cart.getCartItems();
 
         cartItems.stream()
@@ -46,7 +46,6 @@ public class OrderService {
                     decreaseStockWithPessimisticLock(menu.getId(), 1);
                     increaseMenuOrderCountWithPessimisticLock(menu.getId(), 1);
                 });
-
 
         Money money = calculator.calculateMenus(cart.getMember(), cart.convertToMenus());
 

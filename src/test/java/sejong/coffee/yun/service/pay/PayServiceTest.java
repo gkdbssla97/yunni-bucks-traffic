@@ -34,6 +34,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static sejong.coffee.yun.domain.pay.PaymentStatus.DONE;
+import static sejong.coffee.yun.dto.pay.CardPaymentDto.*;
 
 public class PayServiceTest extends CreatePaymentData {
 
@@ -81,8 +82,8 @@ public class PayServiceTest extends CreatePaymentData {
     void findById는_DONE_상태인_결제내역_단건을_조회한다() throws IOException, InterruptedException {
 
         //given
-        CardPaymentDto.Request request = CardPaymentDto.Request.from(cardPayment);
-        CardPaymentDto.Response response = fakeTossApiService.callExternalApi(request);
+        Request request = Request.from(cardPayment);
+        Response response = fakeTossApiService.callExternalApi(request);
         CardPayment approvalPayment = CardPayment.approvalPayment(cardPayment, response.paymentKey(), request.requestedAt().toString());
 
         payRepository.save(approvalPayment);
@@ -97,8 +98,8 @@ public class PayServiceTest extends CreatePaymentData {
     @Test
     void getByOrderId는_결제내역_단건을_조회한다() throws IOException, InterruptedException {
         //given
-        CardPaymentDto.Request request = CardPaymentDto.Request.from(cardPayment);
-        CardPaymentDto.Response response = fakeTossApiService.callExternalApi(request);
+        Request request = Request.from(cardPayment);
+        Response response = fakeTossApiService.callExternalApi(request);
         CardPayment approvalPayment = CardPayment.approvalPayment(cardPayment, response.paymentKey(), request.requestedAt().toString());
 
         payRepository.save(approvalPayment);
@@ -115,8 +116,8 @@ public class PayServiceTest extends CreatePaymentData {
     @Test
     void getByPaymentKey는_결제내역_단건을_조회한다() throws IOException, InterruptedException {
         //given
-        CardPaymentDto.Request request = CardPaymentDto.Request.from(cardPayment);
-        CardPaymentDto.Response response = fakeTossApiService.callExternalApi(request);
+        Request request = Request.from(cardPayment);
+        Response response = fakeTossApiService.callExternalApi(request);
         CardPayment approvalPayment = CardPayment.approvalPayment(cardPayment, response.paymentKey(), request.requestedAt().toString());
 
         payRepository.save(approvalPayment);
@@ -139,7 +140,7 @@ public class PayServiceTest extends CreatePaymentData {
         orderRepository.findById(orderId);
 
         //when
-        CardPaymentDto.Request request = payService.initPayment(orderId, memberId);
+        Request request = payService.initPayment(orderId, memberId);
 
         //then
         assertThat(request.orderId()).isEqualTo("qwerqewrqwer");
@@ -155,24 +156,22 @@ public class PayServiceTest extends CreatePaymentData {
         userRepository.findById(memberId);
 
         //when
-        CardPaymentDto.Request request = payService.initPayment(orderId, memberId);
-        CardPayment cardPayment = payService.pay(request);
+        Request request = payService.initPayment(orderId, memberId);
+        CardPaymentDto.Response cardPayment = payService.pay(request);
 
         //then
-        assertThat(cardPayment.getPaymentKey()).isEqualTo("paypaypaypay_1234");
-        assertThat(cardPayment.getOrderUuid()).isEqualTo("qwerqewrqwer");
-        assertThat(cardPayment.getOrder().getOrderPrice().getTotalPrice().toString()).isEqualTo("3000");
-        assertThat(cardPayment.getCustomerName()).isEqualTo("하윤");
+        assertThat(cardPayment.paymentKey()).isEqualTo("paypaypaypay_1234");
+        assertThat(cardPayment.orderUuid()).isEqualTo("qwerqewrqwer");
 
         Card byMemberId = cardRepository.findByMemberId(memberId);
-        assertThat(byMemberId.getMember().getName()).isEqualTo(cardPayment.getCustomerName());
+        assertThat(byMemberId.getNumber()).isEqualTo(cardPayment.cardNumber());
     }
 
     @Test
     void cancelPayment는_결제를_취소한다() throws IOException, InterruptedException {
         //given
-        CardPaymentDto.Request request = CardPaymentDto.Request.from(cardPayment);
-        CardPaymentDto.Response response = fakeTossApiService.callExternalApi(request);
+        Request request = Request.from(cardPayment);
+        Response response = fakeTossApiService.callExternalApi(request);
         CardPayment approvalPayment = CardPayment.approvalPayment(cardPayment, response.paymentKey(), request.requestedAt().toString());
 
         payRepository.save(approvalPayment);
@@ -195,7 +194,7 @@ public class PayServiceTest extends CreatePaymentData {
         userRepository.findById(memberId);
 
         IntStream.range(0, 10).forEach(i -> {
-                    CardPaymentDto.Request request = payService.initPayment(orderId, memberId);
+                    Request request = payService.initPayment(orderId, memberId);
                     try {
                         payService.pay(request);
                     } catch (Exception e) {
@@ -228,10 +227,11 @@ public class PayServiceTest extends CreatePaymentData {
         userRepository.findById(memberId);
 
         IntStream.range(0, 10).forEach(i -> {
-                    CardPaymentDto.Request request = payService.initPayment(orderId, memberId);
+                    Request request = payService.initPayment(orderId, memberId);
                     try {
-                        CardPayment pay = payService.pay(request);
-                        pay.cancelPayment(PaymentCancelReason.NOT_SATISFIED_SERVICE, byId.getOrderPrice().getTotalPrice());
+                        Response response = payService.pay(request);
+                        CardPayment byPaymentKey = payService.getByPaymentKey(response.paymentKey());
+                        byPaymentKey.cancelPayment(PaymentCancelReason.NOT_SATISFIED_SERVICE, byId.getOrderPrice().getTotalPrice());
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -262,7 +262,7 @@ public class PayServiceTest extends CreatePaymentData {
         userRepository.findById(memberId);
 
         IntStream.range(0, 10).forEach(i -> {
-                    CardPaymentDto.Request request = payService.initPayment(orderId, memberId);
+                    Request request = payService.initPayment(orderId, memberId);
                     try {
                         payService.pay(request);
                     } catch (Exception e) {

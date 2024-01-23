@@ -166,16 +166,14 @@ public class PayServiceIntegrateTest extends MainIntegrationTest {
             //when
             Request request = payService.initPayment(orderId, memberId);
             System.out.println("-> " + request);
-            CardPayment cardPayment = payService.pay(request);
+            Response cardPayment = payService.pay(request);
 
             //then
-            assertThat(cardPayment.getPaymentKey()).isNotEmpty();
-            assertThat(cardPayment.getOrderUuid()).isNotEmpty();
-            assertThat(cardPayment.getOrder().getOrderPrice().getTotalPrice().toString()).isEqualTo("3000.00");
-            assertThat(cardPayment.getCustomerName()).isEqualTo("홍길동");
+            assertThat(cardPayment.paymentKey()).isNotEmpty();
+            assertThat(cardPayment.orderUuid()).isNotEmpty();
 
             Card byMemberId = cardRepository.findByMemberId(memberId);
-            assertThat(byMemberId.getMember().getName()).isEqualTo(cardPayment.getCustomerName());
+            assertThat(byMemberId.getNumber()).isEqualTo(cardPayment.cardNumber());
         }
 
         @Test
@@ -240,8 +238,8 @@ public class PayServiceIntegrateTest extends MainIntegrationTest {
             IntStream.range(0, 10).forEach(i -> {
                         Request request = payService.initPayment(orderId, memberId);
                         try {
-                            CardPayment approvalPayment = payService.pay(request);
-                            CardPayment findCardPayment = payService.findById(approvalPayment.getId());
+                            Response approvalPayment = payService.pay(request);
+                            CardPayment findCardPayment = payService.getByPaymentKey(approvalPayment.paymentKey());
                             payService.cancelPayment(findCardPayment.getPaymentKey(), NOT_SATISFIED_SERVICE.getCode(), order.fetchTotalOrderPrice());
                             System.out.println("cancel: " + findCardPayment);
                         } catch (Exception e) {

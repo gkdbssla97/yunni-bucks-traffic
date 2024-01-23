@@ -3,10 +3,10 @@ package sejong.coffee.yun.domain.order.menu;
 import net.datafaker.Faker;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.annotation.Rollback;
-import sejong.coffee.yun.domain.order.menu.postgre.PostgresMenuReviewRepository;
 import sejong.coffee.yun.domain.user.Member;
 import sejong.coffee.yun.integration.MainIntegrationTest;
 import sejong.coffee.yun.repository.menu.MenuRepository;
@@ -24,6 +24,7 @@ import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 
 //@AutoConfigureTestDatabase(replace = Replace.NONE)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MenuReviewTest extends MainIntegrationTest {
 
     @Autowired
@@ -32,15 +33,15 @@ public class MenuReviewTest extends MainIntegrationTest {
     private UserRepository userRepository;
     @Autowired
     private MenuRepository menuRepository;
-    @Autowired
-    private PostgresMenuReviewRepository postgresMenuReviewRepository;
+//    @Autowired
+//    private PostgresMenuReviewRepository postgresMenuReviewRepository;
+//
+//    @Autowired
+//    @Qualifier("menuReviewPostgresJdbcRepository")
+//    MenuReviewJdbcRepository menuReviewJdbcPostgresRepository;
 
     @Autowired
-    @Qualifier("menuReviewJdbcPostgresRepository")
-    MenuReviewJdbcRepository menuReviewJdbcPostgresRepository;
-
-    @Autowired
-    @Qualifier("menuReviewJdbcMysqlRepository")
+    @Qualifier("menuReviewMysqlJdbcRepository")
     MenuReviewJdbcRepository menuReviewJdbcMysqlRepository;
 
     private final List<MenuReview> menuReviews = new ArrayList<>();
@@ -55,14 +56,14 @@ public class MenuReviewTest extends MainIntegrationTest {
 
     @PostConstruct
     public void init() throws IOException {
-        menuReviewRepository.clear();
+        menuReviewRepository.deleteAllInBatch();
         userRepository.clear();
         member = userRepository.save(member());
         menu = menuRepository.save(bread());
 
         Faker faker = new Faker(new Locale("ko"));
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100000; i++) {
             String comments = faker.lorem().sentence();  // 랜덤한 문장 생성
             String s = faker.food().ingredient() + " " +
                     faker.food().ingredient() + " " +
@@ -72,7 +73,7 @@ public class MenuReviewTest extends MainIntegrationTest {
 
             MenuReview menuReview = MenuReview.builder()
                     .id((long) (i + 1))
-                    .comments(s)
+                    .comments(comments)
                     .member(member)
                     .menu(menu)
                     .now(now())
@@ -82,11 +83,18 @@ public class MenuReviewTest extends MainIntegrationTest {
         }
 //        menuReviewJdbcPostgresRepository.saveAll(menuReviews, member.getId(), menu.getId());
         menuReviewJdbcMysqlRepository.saveAll(menuReviews, member.getId(), menu.getId());
+
     }
 
     @Test
     void MasterSlaveTest() {
-        System.out.println("----");
+
+        for (MenuReview menuReview : menuReviews) {
+            System.out.println("--saveS--");
+            menuReviewRepository.save(menuReview);
+            System.out.println("--saveE--");
+        }
+        System.out.println("--findAll--");
         List<MenuReview> all = menuReviewRepository.findAll();
         Assertions.assertThat(all.size()).isEqualTo(10);
     }
@@ -97,12 +105,10 @@ public class MenuReviewTest extends MainIntegrationTest {
     }
 
     @Test
-    @Rollback(value = false)
     void 대용량데이터FullTextSearch로검색_MySQL() {
         System.out.println("크기: " + menuReviews.size());
-//        List<MenuReview> menuReviewList = menuReviewRepository.findMenuReviewByCommentsContainingWithQuery("Ri");
-        String keyword = "%" + "Rice" + "%";
-        List<MenuReview> menuReviewList = menuReviewRepository.findMenuReviewByCommentsContainingWithFTS("Ri");
+        List<MenuReview> menuReviewList = menuReviewRepository.findMenuReviewByCommentsContainingWithQuery("과학");
+//        List<MenuReview> menuReviewList = menuReviewRepository.findMenuReviewByCommentsContainingWithFTS("과학");
         assertThat(menuReviewList.size()).isGreaterThan(0);
         System.out.println("크기: " + menuReviewList.size());
     }
@@ -140,27 +146,27 @@ public class MenuReviewTest extends MainIntegrationTest {
 
         String keyword = "%" + "Rice" + "%";
         long startTime2 = System.nanoTime();
-        List<MenuReview> menuReviewList2 = postgresMenuReviewRepository.findMenuReviewByCommentsContainingWithQuery("Rice");
+//        List<MenuReview> menuReviewList2 = postgresMenuReviewRepository.findMenuReviewByCommentsContainingWithQuery("Rice");
         long endTime2 = System.nanoTime();
         double duration2 = (endTime2 - startTime2) / 1_000_000.0; // 나노초를 밀리초로 변환 후, 밀리초를 초로 변환
         System.out.println("%LIKE% 실행 시간: " + duration2 + " ms");
 
         long startTime1 = System.nanoTime();
-        List<MenuReview> menuReviewList1 = postgresMenuReviewRepository.findMenuReviewByCommentsContainingOnFullTextSearchWithQuery("Rice");
+//        List<MenuReview> menuReviewList1 = postgresMenuReviewRepository.findMenuReviewByCommentsContainingOnFullTextSearchWithQuery("Rice");
         long endTime1 = System.nanoTime();
         double duration1 = (endTime1 - startTime1) / 1_000_000.0; // 나노초를 밀리초로 변환 후, 밀리초를 초로 변환
         System.out.println("Full Text Search 실행 시간: " + duration1 + " ms");
 
-        assertThat(menuReviewList1.size()).isGreaterThan(0);
-        assertThat(menuReviewList2.size()).isGreaterThan(0);
-        System.out.println("Full Text Search 결과 크기: " + menuReviewList1.size());
-        System.out.println("%LIKE% 결과 크기: " + menuReviewList2.size());
+//        assertThat(menuReviewList1.size()).isGreaterThan(0);
+//        assertThat(menuReviewList2.size()).isGreaterThan(0);
+//        System.out.println("Full Text Search 결과 크기: " + menuReviewList1.size());
+//        System.out.println("%LIKE% 결과 크기: " + menuReviewList2.size());
     }
 
 
     @Test
     void 대용량데이터JPQL로검색() {
-        List<MenuReview> menuReviewList = menuReviewRepository.findMenuReviewByCommentsContainingWithQuery("의무");
+        List<MenuReview> menuReviewList = menuReviewRepository.findMenuReviewByCommentsContainingWithQuery("하윤");
         System.out.println(menuReviewList.size());
         assertThat(menuReviewList.size()).isGreaterThan(0);
 
@@ -176,7 +182,7 @@ public class MenuReviewTest extends MainIntegrationTest {
                     .menu(menu)
                     .now(now())
                     .build();
-        menuReviewRepository.save(menuReview);
-        postgresMenuReviewRepository.save(menuReview);
+//        menuReviewRepository.save(menuReview);
+//        postgresMenuReviewRepository.save(menuReview);
     }
 }

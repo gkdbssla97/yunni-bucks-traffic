@@ -204,7 +204,7 @@ public class CartServiceTest {
 
     @Test
     void 유저의_카트를_찾을_수_없을_때() {
-        assertThatThrownBy(() -> cartService.findCartByMember(100L))
+        assertThatThrownBy(() -> cartService.getCartByMember(100L))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(NOT_FOUND_CART.getMessage());
     }

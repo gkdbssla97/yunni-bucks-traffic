@@ -124,7 +124,7 @@ class OrderControllerTest {
     @Test
     void 주문() throws Exception {
         // given
-        given(cartService.findCartByMember(anyLong())).willReturn(cart);
+        given(cartService.getCartByMember(anyLong())).willReturn(cart);
         given(orderService.orderWithPessimisticLock(anyLong(), any())).willReturn(order);
         given(customMapper.map(any(), any())).willReturn(response);
 

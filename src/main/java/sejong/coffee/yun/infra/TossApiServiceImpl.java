@@ -37,7 +37,7 @@ public class TossApiServiceImpl implements TossApiService {
 
         // 외부 API 호출하는 로직
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.tosspayments.com/v1/payments/confirm"))
+                .uri(URI.create(apiUri))
                 .header("Authorization", secretKey)
                 .header("Content-Type", "application/json")
                 .method("POST", HttpRequest.BodyPublishers.ofString(parsePaymentStringByJson(cardPaymentDto)))

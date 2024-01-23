@@ -121,7 +121,7 @@ class CartServiceTest {
         // when
 
         // then
-        assertThatThrownBy(() -> cartService.findCartByMember(1L))
+        assertThatThrownBy(() -> cartService.getCartByMember(1L))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(NOT_FOUND_CART.getMessage());
     }

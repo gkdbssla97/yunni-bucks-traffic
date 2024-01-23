@@ -2,22 +2,18 @@ package sejong.coffee.yun.controller.mock;
 
 import lombok.Builder;
 import sejong.coffee.yun.infra.ApiService;
-import sejong.coffee.yun.service.mock.FakeOcrApiService;
-import sejong.coffee.yun.service.mock.FakeTossApiService;
-import sejong.coffee.yun.service.mock.FakeUuidHolder;
 import sejong.coffee.yun.infra.port.UuidHolder;
-import sejong.coffee.yun.mock.repository.FakeOrderRepository;
-import sejong.coffee.yun.mock.repository.FakeUserRepository;
+import sejong.coffee.yun.mock.repository.*;
 import sejong.coffee.yun.repository.card.CardRepository;
-import sejong.coffee.yun.mock.repository.FakeCardRepository;
 import sejong.coffee.yun.repository.cart.CartRepository;
-import sejong.coffee.yun.mock.repository.FakeCartRepository;
 import sejong.coffee.yun.repository.order.OrderRepository;
 import sejong.coffee.yun.repository.pay.PayRepository;
-import sejong.coffee.yun.mock.repository.FakePayRepository;
 import sejong.coffee.yun.repository.user.UserRepository;
 import sejong.coffee.yun.service.CardService;
 import sejong.coffee.yun.service.PayService;
+import sejong.coffee.yun.service.mock.FakeOcrApiService;
+import sejong.coffee.yun.service.mock.FakeTossApiService;
+import sejong.coffee.yun.service.mock.FakeUuidHolder;
 
 public class TestPayContainer {
 
