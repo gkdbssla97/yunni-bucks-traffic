@@ -35,7 +35,7 @@ public class CartController {
     @GetMapping("")
     ResponseEntity<CartDto.Response> getCart(@MemberId Long memberId) {
 
-        Cart cart = cartService.findCartByMember(memberId);
+        Cart cart = cartService.getCartByMember(memberId);
 
         CartDto.Response response = customMapper.map(cart, CartDto.Response.class);
 

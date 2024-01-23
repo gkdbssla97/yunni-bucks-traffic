@@ -116,7 +116,7 @@ class CartControllerTest {
     @Test
     void 카트_조회() throws Exception {
         // given
-        given(cartService.findCartByMember(anyLong())).willReturn(cart);
+        given(cartService.getCartByMember(anyLong())).willReturn(cart);
         given(customMapper.map(any(), any())).willReturn(response);
 
         // when
