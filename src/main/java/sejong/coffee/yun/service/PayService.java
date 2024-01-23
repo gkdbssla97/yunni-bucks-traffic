@@ -2,7 +2,6 @@ package sejong.coffee.yun.service;
 
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,13 +24,14 @@ import java.util.List;
 
 import static sejong.coffee.yun.domain.pay.PaymentStatus.DONE;
 import static sejong.coffee.yun.dto.pay.CardPaymentDto.*;
+import static sejong.coffee.yun.dto.pay.CardPaymentDto.Response.*;
 
 @Service
 @RequiredArgsConstructor
 @Builder
 public class PayService {
 
-    private final @Qualifier("tossApiServiceImpl") ApiService apiService;
+    private final ApiService apiService;
     private final PayRepository payRepository;
     private final OrderRepository orderRepository;
     private final CardRepository cardRepository;
@@ -67,7 +67,6 @@ public class PayService {
         }
 
         return Request.create(card, order, uuidHolder);
-
     }
 
     @Transactional
@@ -83,14 +82,14 @@ public class PayService {
     }
 
     @Transactional
-    public CardPayment pay(Request request) throws IOException, InterruptedException {
+    public Response pay(Request request) throws IOException, InterruptedException {
 
         Response response = apiService.callExternalPayApi(request);
         CardPayment approvalPayment = CardPayment.approvalPayment(CardPayment.fromModel(request), response.paymentKey(), response.approvedAt());
-        changeOrderPayStatus(request);
+        Order changeOrder = changeOrderPayStatus(request);
         approvalPayment = payRepository.save(approvalPayment);
 
-        return approvalPayment;
+        return from(approvalPayment, changeOrder);
     }
 
     @Transactional
@@ -99,11 +98,11 @@ public class PayService {
         return payRepository.findByPaymentKeyAndPaymentStatus(confirm.paymentKey(), DONE);
     }
 
-    @Transactional
-    public void changeOrderPayStatus(Request request) {
+    public Order changeOrderPayStatus(Request request) {
         Long orderId = request.order().getId();
         Order order = orderRepository.findById(orderId);
         order.setPayStatus();
+        return order;
     }
 
     @Transactional

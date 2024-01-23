@@ -3,7 +3,6 @@ package sejong.coffee.yun.controller.pay;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -22,7 +21,7 @@ import java.net.http.HttpTimeoutException;
 
 import static sejong.coffee.yun.domain.pay.PaymentCancelReason.NETWORK_CANCEL;
 import static sejong.coffee.yun.dto.pay.CardPaymentDto.*;
-import static sejong.coffee.yun.dto.pay.CardPaymentDto.Response.cancel;
+import static sejong.coffee.yun.dto.pay.CardPaymentDto.Response.from;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -31,17 +30,17 @@ import static sejong.coffee.yun.dto.pay.CardPaymentDto.Response.cancel;
 @Builder
 public class PaymentController {
 
-    private final @Qualifier("tossApiServiceImpl") PayService payService;
+    private final PayService payService;
     private final CustomMapper customMapper;
 
     @PostMapping("/{orderId}")
     public ResponseEntity<Response> keyIn(@PathVariable Long orderId, @MemberId Long memberId) throws IOException, InterruptedException {
         Request request = payService.initPayment(orderId, memberId);
-        CardPayment cardPayment = payService.pay(request);
+        Response cardPayment = payService.pay(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(customMapper.map(cardPayment, Response.class));
+                .body(cardPayment);
     }
 
     @PostMapping("/confirm/{orderId}")
@@ -92,7 +91,7 @@ public class PaymentController {
         CardPayment cancelCardPayment = payService.cancelPayment(paymentKey, cancelCode, money);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(cancel(cancelCardPayment));
+                .body(from(cancelCardPayment, cancelCardPayment.getOrder()));
     }
 
     @GetMapping("/username-payment/{pageNumber}")
