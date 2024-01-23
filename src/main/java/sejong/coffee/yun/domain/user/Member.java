@@ -36,7 +36,7 @@ public class Member extends DateTimeEntity {
     private Coupon coupon;
 
     @Version
-    private Long version;
+    private Long version = 0L;
 
     @Builder
     public Member(Long id, String name, String password, String email, UserRank userRank, Address address, Money money, Integer orderCount, Coupon coupon) {

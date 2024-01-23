@@ -27,7 +27,7 @@ spring:
       password: 1234
       auto-commit: false
       connection-test-query: SELECT 1
-      maximum-pool-size: 24
+      maximum-pool-size: 40
       pool-name: mysqlM-example-cp
       hibernate:
         ddl-auto: validate

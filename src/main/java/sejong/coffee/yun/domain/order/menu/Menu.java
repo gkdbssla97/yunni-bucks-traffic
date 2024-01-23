@@ -43,7 +43,7 @@ public abstract class Menu {
     private double score;
 
     @Version
-    private Long version;
+    private Long version = 0L;
 
     @Transient
     private final int MAX_STOCK = 100;

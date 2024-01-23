@@ -64,8 +64,9 @@ public class CardPaymentDto {
             // 객체를 JSON 문자열로 변환
     ) {
         public static Request create(Card card, Order order, UuidHolder uuidHolder) {
-            return new CardPaymentDto.Request(card.getNumber(), card.getCardPassword().substring(0, 2), parsingCardValidDate(card.getValidThru())[0],
-                    parsingCardValidDate(card.getValidThru())[1], uuidHolder.random(), order.getName(), String.valueOf(order.getOrderPrice().getTotalPrice().intValue()),
+            return new CardPaymentDto.Request(card.getNumber(), card.getCardPassword().substring(0, 2),
+                    parsingCardValidDate(card.getValidThru())[0], parsingCardValidDate(card.getValidThru())[1],
+                    uuidHolder.random(), order.getName(), String.valueOf(order.getOrderPrice().getTotalPrice().intValue()),
 //                    parsingMemberIdentityNumber(card.getMember().getEmail()),
                     parsingMemberIdentityNumber("231212"),
                     card.getMember().getName(), LocalDateTime.now(), order);
@@ -106,11 +107,17 @@ public class CardPaymentDto {
                     entity.getRequestedAt().toString(), entity.getApprovedAt().toString(), new OrderDto.Response(entity.getOrder()), entity.getCancelReason());
         }
 
-        public static Response cancel(CardPayment entity) {
+//        public static Response from(CardPayment entity, Order order) {
+//            return new Response(entity.getId(), entity.getOrderUuid(), entity.getOrder().getName(), entity.getCardNumber(),
+//                    entity.getCardExpirationYear(), entity.getCardExpirationMonth(),
+//                    entity.getOrder().getOrderPrice().getTotalPrice().toString(), entity.getPaymentKey(), entity.getPaymentStatus(),
+//                    entity.getRequestedAt().toString(), entity.getApprovedAt().toString(), new OrderDto.Response(order), entity.getCancelReason());
+//        }
+        public static Response from(CardPayment entity, Order order) {
             return new Response(entity.getId(), entity.getOrderUuid(), entity.getOrder().getName(), entity.getCardNumber(),
                     entity.getCardExpirationYear(), entity.getCardExpirationMonth(),
                     entity.getOrder().getOrderPrice().getTotalPrice().toString(), entity.getPaymentKey(), entity.getPaymentStatus(),
-                    entity.getRequestedAt().toString(), entity.getApprovedAt().toString(), new OrderDto.Response(entity.getOrder()), entity.getCancelReason());
+                    entity.getRequestedAt().toString(), entity.getApprovedAt().toString(), new OrderDto.Response(order), entity.getCancelReason());
         }
     }
 }

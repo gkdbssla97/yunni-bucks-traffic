@@ -24,7 +24,7 @@ public class Cart {
     private List<CartItem> cartItems;
 
     @Version
-    private Long version;
+    private Long version = 0L;
 
     @Builder
     public Cart(Long id, Member member, List<CartItem> cartItems) {

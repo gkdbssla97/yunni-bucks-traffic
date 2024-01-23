@@ -34,7 +34,7 @@ public class Coupon implements DiscountType {
     private CouponUse couponUse;
 
     @Version
-    private Long version;
+    private Long version = 0L;
 
     @Builder
     public Coupon(Long id, String name, String identityNumber, LocalDateTime createAt, LocalDateTime expireAt, double discountRate, CouponUse couponUse) {
