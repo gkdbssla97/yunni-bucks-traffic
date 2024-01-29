@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import sejong.coffee.yun.domain.order.menu.MenuReview;
 
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -24,8 +23,8 @@ public class MenuReviewMysqlJdbcRepository implements MenuReviewJdbcRepository {
     }
 
     @Override
-    @Transactional
-    public void saveAll(List<MenuReview> items, Long memberId, Long menuId) throws IOException {
+    @Transactional("transactionManager")
+    public void saveAll(List<MenuReview> items, Long memberId, Long menuId) {
 
         List<MenuReview> subItems = new ArrayList<>();
         for (MenuReview item : items) {
