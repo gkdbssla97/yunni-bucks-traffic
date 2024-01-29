@@ -1,26 +1,3 @@
-create table "Member"
-(
-    id          bigint not null
-        primary key,
-    createat    timestamp,
-    updateat    timestamp,
-    city        varchar(255),
-    detail      varchar(255),
-    district    varchar(255),
-    zipcode     varchar(255),
-    email       varchar(255),
-    totalprice  numeric(19, 2),
-    user_name   varchar(255),
-    order_count integer,
-    password    varchar(255),
-    userrank    varchar(255),
-    version     bigint,
-    coupon_id   bigint
-);
-
-alter table "Member"
-    owner to root;
-
 create table "orders"
 (
     id         bigint not null
