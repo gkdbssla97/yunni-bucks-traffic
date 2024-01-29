@@ -97,7 +97,6 @@ public class PaymentController {
     @GetMapping("/username-payment/{pageNumber}")
     public ResponseEntity<CardPaymentPageDto.Response> getAllByUsernameAndPaymentStatus(@PathVariable int pageNumber,
                                                                                         @RequestParam("username") String username) {
-
         PageRequest pageRequest = PageRequest.of(pageNumber, 5);
         Page<CardPayment> cardPayments = payService.getAllByUsernameAndPaymentStatus(pageRequest, username);
 

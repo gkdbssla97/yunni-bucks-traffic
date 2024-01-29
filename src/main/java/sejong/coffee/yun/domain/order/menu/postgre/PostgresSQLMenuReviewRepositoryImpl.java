@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import sejong.coffee.yun.domain.order.menu.MenuReview;
 
+import javax.annotation.PostConstruct;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 
 import static sejong.coffee.yun.domain.exception.ExceptionControl.NOT_FOUND_MENU_REVIEW;
@@ -17,13 +20,21 @@ import static sejong.coffee.yun.domain.order.menu.QMenuReview.menuReview;
 
 @Repository
 @RequiredArgsConstructor
+@Transactional("postgresTransactionManager")
 public class PostgresSQLMenuReviewRepositoryImpl implements PostgresMenuReviewRepository {
 
-    private final JPAQueryFactory jpaQueryFactory;
     private final JpaPostgresSQLMenuReviewRepository jpaPostgresSQLMenuReviewRepository;
+    @PersistenceContext(unitName = "postgres")
+    private final EntityManager entityManager;
+
+    private JPAQueryFactory jpaQueryFactory;
+
+    @PostConstruct
+    public void init() {
+        jpaQueryFactory = new JPAQueryFactory(entityManager);
+    }
 
     @Override
-    @Transactional("twoDBTransactionManager")
     public MenuReview save(MenuReview menuReview) {
         return jpaPostgresSQLMenuReviewRepository.save(menuReview);
     }
@@ -46,7 +57,6 @@ public class PostgresSQLMenuReviewRepositoryImpl implements PostgresMenuReviewRe
     }
 
     @Override
-    @Transactional
     public void delete(Long reviewId) {
         try {
             jpaPostgresSQLMenuReviewRepository.deleteById(reviewId);
@@ -56,7 +66,6 @@ public class PostgresSQLMenuReviewRepositoryImpl implements PostgresMenuReviewRe
     }
 
     @Override
-    @Transactional
     public void delete(Long memberId, Long reviewId) {
         try {
             jpaPostgresSQLMenuReviewRepository.deleteByMemberIdAndId(memberId, reviewId);

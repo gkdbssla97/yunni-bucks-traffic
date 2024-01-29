@@ -20,7 +20,7 @@ public class UserRepositoryImpl implements UserRepository {
     private final JpaUserRepository jpaUserRepository;
 
     @Override
-    @Transactional
+    @Transactional("transactionManager")
     public Member save(Member member) {
         return jpaUserRepository.save(member);
     }
@@ -96,6 +96,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    @Transactional
     public void clear() {
         jpaUserRepository.deleteAll();
     }
