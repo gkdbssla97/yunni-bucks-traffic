@@ -6,7 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.test.annotation.Rollback;
+import sejong.coffee.yun.domain.order.menu.postgre.PostgresMenuReviewRepository;
 import sejong.coffee.yun.domain.user.Member;
 import sejong.coffee.yun.integration.MainIntegrationTest;
 import sejong.coffee.yun.repository.menu.MenuRepository;
@@ -22,8 +24,9 @@ import java.util.Locale;
 
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.*;
 
-//@AutoConfigureTestDatabase(replace = Replace.NONE)
+@AutoConfigureTestDatabase(replace = Replace.NONE)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MenuReviewTest extends MainIntegrationTest {
 
@@ -33,12 +36,11 @@ public class MenuReviewTest extends MainIntegrationTest {
     private UserRepository userRepository;
     @Autowired
     private MenuRepository menuRepository;
-//    @Autowired
-//    private PostgresMenuReviewRepository postgresMenuReviewRepository;
-//
-//    @Autowired
-//    @Qualifier("menuReviewPostgresJdbcRepository")
-//    MenuReviewJdbcRepository menuReviewJdbcPostgresRepository;
+    @Autowired
+    private PostgresMenuReviewRepository postgresMenuReviewRepository;
+    @Autowired
+    @Qualifier("menuReviewPostgresJdbcRepository")
+    MenuReviewJdbcRepository menuReviewJdbcPostgresRepository;
 
     @Autowired
     @Qualifier("menuReviewMysqlJdbcRepository")
@@ -56,6 +58,7 @@ public class MenuReviewTest extends MainIntegrationTest {
 
     @PostConstruct
     public void init() throws IOException {
+        postgresMenuReviewRepository.clear();
         menuReviewRepository.deleteAllInBatch();
         userRepository.clear();
         member = userRepository.save(member());
@@ -63,7 +66,7 @@ public class MenuReviewTest extends MainIntegrationTest {
 
         Faker faker = new Faker(new Locale("ko"));
 
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 10; i++) {
             String comments = faker.lorem().sentence();  // 랜덤한 문장 생성
             String s = faker.food().ingredient() + " " +
                     faker.food().ingredient() + " " +
@@ -81,8 +84,8 @@ public class MenuReviewTest extends MainIntegrationTest {
 
             menuReviews.add(menuReview);
         }
-//        menuReviewJdbcPostgresRepository.saveAll(menuReviews, member.getId(), menu.getId());
-        menuReviewJdbcMysqlRepository.saveAll(menuReviews, member.getId(), menu.getId());
+        menuReviewJdbcPostgresRepository.saveAll(menuReviews, member.getId(), menu.getId());
+//        menuReviewJdbcMysqlRepository.saveAll(menuReviews, member.getId(), menu.getId());
 
     }
 
@@ -98,6 +101,7 @@ public class MenuReviewTest extends MainIntegrationTest {
         List<MenuReview> all = menuReviewRepository.findAll();
         Assertions.assertThat(all.size()).isEqualTo(10);
     }
+
     @Test
     void 대용량데이터JPA로검색() {
         List<MenuReview> menuReviewList = menuReviewRepository.findMenuReviewByCommentsContainingWithQuery("일반적으로");
@@ -173,16 +177,18 @@ public class MenuReviewTest extends MainIntegrationTest {
     }
 
     @Test
-//    @Rollback(value = false)
+    @Rollback(value = false)
     void Postgres저장() {
-        menuReviewRepository.clear();
         MenuReview menuReview = MenuReview.builder()
-                    .comments("hi")
-                    .member(member)
-                    .menu(menu)
-                    .now(now())
-                    .build();
-//        menuReviewRepository.save(menuReview);
-//        postgresMenuReviewRepository.save(menuReview);
+                .comments("hi")
+                .member(member)
+                .menu(menu)
+                .now(now())
+                .build();
+        postgresMenuReviewRepository.save(menuReview);
+        List<MenuReview> all = postgresMenuReviewRepository.findAll();
+        for (MenuReview review : all) {
+            System.out.println("댓글: " + review.getComments().toString());
+        }
     }
 }
