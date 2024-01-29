@@ -1,8 +1,8 @@
 package sejong.coffee.yun.repository.card.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import sejong.coffee.yun.domain.exception.ExceptionControl;
 import sejong.coffee.yun.domain.user.Card;
 import sejong.coffee.yun.repository.card.CardRepository;
@@ -11,13 +11,13 @@ import sejong.coffee.yun.repository.card.jpa.JpaCardRepository;
 import java.util.List;
 
 @Repository
+@Primary
 @RequiredArgsConstructor
 public class CardRepositoryImpl implements CardRepository {
 
     private final JpaCardRepository jpaCardRepository;
 
     @Override
-    @Transactional
     public Card save(Card card) {
         return jpaCardRepository.save(card);
     }
@@ -35,7 +35,6 @@ public class CardRepositoryImpl implements CardRepository {
     }
 
     @Override
-    @Transactional
     public void delete(Long id) {
         jpaCardRepository.delete(getCard(id));
     }
@@ -50,7 +49,6 @@ public class CardRepositoryImpl implements CardRepository {
     }
 
     @Override
-    @Transactional
     public void clear() {
         List<Card> cards = jpaCardRepository.findAll();
         cards.stream()

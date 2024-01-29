@@ -17,20 +17,5 @@ public class DatabaseProperties {
         private String url;
         private String username;
         private String password;
-        private Hibernate hibernate;
-    }
-
-    @Data
-    public static class Hibernate {
-        private String ddlAuto;
-        private String dialect;
-        private Naming naming;
-        private String metadataBuilderContributor;
-    }
-
-    @Data
-    public static class Naming {
-        private String implicitStrategy;
-        private String physicalStrategy;
     }
 }

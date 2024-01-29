@@ -50,6 +50,11 @@ public class DataSourceConfig {
         return createDataSource(databaseProperties.getSlave());
     }
 
+    @Bean("postgresDataSource")
+    public DataSource createPostgresDataSource(DatabaseProperties databaseProperties) {
+        return createDataSource(databaseProperties.getPostgres());
+    }
+
     private DataSource createDataSource(DatabaseProperties.DatabaseDetail databaseDetail) {
         HikariDataSource dataSource = new HikariDataSource();
         dataSource.setJdbcUrl(databaseDetail.getUrl());
@@ -80,5 +85,12 @@ public class DataSourceConfig {
     public JdbcTemplate masterJdbcTemplate(DatabaseProperties databaseProperties) {
         DataSource masterDataSource = createDataSource(databaseProperties.getMaster());
         return new JdbcTemplate(masterDataSource);
+    }
+
+    @Bean
+    @Qualifier("postgresJdbcTemplate")
+    public JdbcTemplate postgresJdbcTemplate(DatabaseProperties databaseProperties) {
+        DataSource postgresDataSource = createDataSource(databaseProperties.getPostgres());
+        return new JdbcTemplate(postgresDataSource);
     }
 }

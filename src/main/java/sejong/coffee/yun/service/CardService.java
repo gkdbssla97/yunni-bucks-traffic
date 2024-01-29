@@ -20,7 +20,7 @@ public class CardService {
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
 
-    @Transactional
+    @Transactional("transactionManager")
     public Card create(Long memberId, CardDto.Request request) {
         Member findMember = userRepository.findById(memberId);
         Card card = createCard(request.number(), request.validThru(), request.cardPassword(), findMember);
@@ -35,7 +35,7 @@ public class CardService {
         return cardRepository.findByMemberId(memberId);
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     public void removeCard(Long memberId) {
         Card findCard = cardRepository.findByMemberId(memberId);
         cardRepository.delete(findCard);

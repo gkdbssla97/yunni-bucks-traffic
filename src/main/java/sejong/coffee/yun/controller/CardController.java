@@ -19,7 +19,6 @@ import static sejong.coffee.yun.dto.card.CardDto.Response;
 @RequiredArgsConstructor
 @Slf4j
 @Builder
-
 public class CardController {
 
     private final CardService cardService;
