@@ -20,25 +20,14 @@ public class FlywayConfig {
         return flyway;
     }
 
-//    @Bean
-//    @DependsOn("masterFlyway")
-//    public Flyway slaveFlyway(@Qualifier("slaveDataSource") DataSource slaveDataSource) {
-//        Flyway flyway = Flyway.configure()
-//                .dataSource(slaveDataSource)
-//                .locations("classpath:database/migration/mysql/master")
-//                .load();
-//        flyway.migrate();
-//        return flyway;
-//    }
-
-//    @Bean
-//    public Flyway subFlyway(@Qualifier("secondDataSource") DataSource subDataSource) {
-//        Flyway flyway = Flyway.configure()
-//                .dataSource(subDataSource)
-//                .locations("classpath:database/migration/postgres")
-//                .load();
-//        flyway.migrate();
-//        return flyway;
-//    }
+    @Bean
+    public Flyway subFlyway(@Qualifier("postgresDataSource") DataSource subDataSource) {
+        Flyway flyway = Flyway.configure()
+                .dataSource(subDataSource)
+                .locations("classpath:database/migration/postgres")
+                .load();
+        flyway.migrate();
+        return flyway;
+    }
 }
 

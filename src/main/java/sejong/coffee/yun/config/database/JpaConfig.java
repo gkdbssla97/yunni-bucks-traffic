@@ -3,11 +3,12 @@ package sejong.coffee.yun.config.database;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -25,8 +26,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class JpaConfig {
 
-    private final Environment env;
-
     @Primary
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
@@ -41,17 +40,44 @@ public class JpaConfig {
                 "hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect"
         ));
 
+        return getLocalContainerEntityManagerFactoryBean(entityManagerFactory);
+    }
+
+    @Primary
+    @Bean
+    public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+        return new JpaTransactionManager(entityManagerFactory);
+    }
+
+    @Bean(name = "postgresEntityManagerFactory")
+    public LocalContainerEntityManagerFactoryBean postgresEntityManagerFactory(@Qualifier("postgresDataSource") DataSource dataSource) {
+        LocalContainerEntityManagerFactoryBean entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
+        entityManagerFactory.setDataSource(dataSource);
+        entityManagerFactory.setPackagesToScan("sejong.coffee.yun");
+        entityManagerFactory.setPersistenceUnitName("postgres");
+        entityManagerFactory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+        entityManagerFactory.setJpaPropertyMap(Map.of(
+                "hibernate.show_sql", true,
+                "hibernate.format_sql", true,
+                "hibernate.use_sql_comments", false,
+                "hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect"
+        ));
+
+        return getLocalContainerEntityManagerFactoryBean(entityManagerFactory);
+    }
+
+    @NotNull
+    private LocalContainerEntityManagerFactoryBean getLocalContainerEntityManagerFactoryBean(LocalContainerEntityManagerFactoryBean em) {
         final HashMap<String, Object> properties = new HashMap<String, Object>();
         properties.put("hibernate.physical_naming_strategy", CamelCaseToUnderscoresNamingStrategy.class.getName());
         properties.put("hibernate.implicit_naming_strategy", SpringImplicitNamingStrategy.class.getName());
-//        properties.put("hibernate.hbm2ddl.auto", env.getProperty("spring.jpa.hibernate.ddl-auto"));
-        entityManagerFactory.setJpaPropertyMap(properties);
+        em.setJpaPropertyMap(properties);
 
-        return entityManagerFactory;
+        return em;
     }
 
-    @Bean
-    public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+    @Bean(name = "postgresTransactionManager")
+    public PlatformTransactionManager postgresTransactionManager(@Qualifier("postgresEntityManagerFactory") EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);
     }
 }
