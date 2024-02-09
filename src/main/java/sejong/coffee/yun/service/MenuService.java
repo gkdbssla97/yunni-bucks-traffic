@@ -2,6 +2,7 @@ package sejong.coffee.yun.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +33,7 @@ public class MenuService {
     private final RedisTemplate<String, String> redisTemplate;
     private final RedisTemplate<String, Object> objectRedisTemplate;
 
+    @CacheEvict(value = "Menu", key = "#request.title()")
     public Menu create(MenuDto.Request request) {
         Menu menu = createMenu(request);
 
@@ -62,8 +64,7 @@ public class MenuService {
         throw ExceptionControl.INVALID_MENU_TYPE.menuException();
     }
 
-    @Transactional
-    @Cacheable(value = "Menu", cacheManager = "cacheManager")
+    @Cacheable(value = "Allmenus", key = "#pageable", cacheManager = "cacheManager")
     public RestPage<MenuDto.Response> findAllByCaching(Pageable pageable) {
         Page<Menu> allMenusPaged = menuRepository.findAllMenusPaged(pageable);
         return new RestPage<>(allMenusPaged.map(MenuDto.Response::new));
@@ -74,7 +75,7 @@ public class MenuService {
         return allMenusPaged.map(MenuDto.Response::new);
     }
 
-    @Transactional
+    @Cacheable(value = "Menu", key = "#menuTitle", cacheManager = "cacheManager")
     public MenuDto.Response menuSearch(String menuTitle) {
         Menu findMenu = menuRepository.findByTitle(menuTitle);
         double score = 0.0;
