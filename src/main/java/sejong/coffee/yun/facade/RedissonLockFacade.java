@@ -3,13 +3,17 @@ package sejong.coffee.yun.facade;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import sejong.coffee.yun.domain.order.Calculator;
 import sejong.coffee.yun.domain.order.Order;
+import sejong.coffee.yun.domain.order.menu.Menu;
 import sejong.coffee.yun.domain.user.Cart;
 import sejong.coffee.yun.domain.user.CartItem;
 import sejong.coffee.yun.domain.user.Money;
+import sejong.coffee.yun.dto.menu.MenuDto;
 import sejong.coffee.yun.repository.cart.CartRepository;
+import sejong.coffee.yun.repository.menu.MenuRepository;
 import sejong.coffee.yun.repository.order.OrderRepository;
 import sejong.coffee.yun.service.OrderService;
 
@@ -19,12 +23,13 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
-public class RedissonLockStockFacade {
+public class RedissonLockFacade {
 
     private final RedissonClient redissonClient;
     private final OrderService orderService;
     private final CartRepository cartRepository;
     private final OrderRepository orderRepository;
+    private final MenuRepository menuRepository;
     private final Calculator calculator;
 
     public Order order(Long id, LocalDateTime localDateTime) {
@@ -85,5 +90,21 @@ public class RedissonLockStockFacade {
                 lock.unlock();
             }
         }
+    }
+
+    public MenuDto.Response findMenuFromCache(String menuTitle) {
+        RLock lock = redissonClient.getLock("MenuLock");
+        lock.lock();
+        try {
+            return findMenu(menuTitle);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Cacheable(value = "Menu", key = "#menuTitle", cacheManager = "cacheManager")
+    public MenuDto.Response findMenu(String menuTitle) {
+        Menu findMenu = menuRepository.findByTitle(menuTitle);
+        return MenuDto.Response.fromMenu(findMenu);
     }
 }

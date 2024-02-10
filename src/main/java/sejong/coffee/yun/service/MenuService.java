@@ -17,6 +17,7 @@ import sejong.coffee.yun.domain.order.menu.Bread;
 import sejong.coffee.yun.domain.order.menu.Menu;
 import sejong.coffee.yun.domain.order.menu.MenuType;
 import sejong.coffee.yun.dto.menu.MenuDto;
+import sejong.coffee.yun.facade.RedissonLockFacade;
 import sejong.coffee.yun.repository.menu.MenuRepository;
 import sejong.coffee.yun.util.wrapper.RestPage;
 
@@ -30,6 +31,7 @@ import static sejong.coffee.yun.dto.menu.MenuRankingDto.Response;
 public class MenuService {
 
     private final MenuRepository menuRepository;
+    private final RedissonLockFacade redissonLockFacade;
     private final RedisTemplate<String, String> redisTemplate;
     private final RedisTemplate<String, Object> objectRedisTemplate;
 
@@ -75,19 +77,13 @@ public class MenuService {
         return allMenusPaged.map(MenuDto.Response::new);
     }
 
-    @Cacheable(value = "Menu", key = "#menuTitle", cacheManager = "cacheManager")
     public MenuDto.Response menuSearch(String menuTitle) {
-        Menu findMenu = menuRepository.findByTitle(menuTitle);
-        double score = 0.0;
-        try {
-            findMenu.increaseViewCount();
-            redisTemplate.opsForZSet().incrementScore("ranking", menuTitle, 1);
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        }
-        redisTemplate.opsForZSet().incrementScore("ranking", menuTitle, score);
+        increaseScore(menuTitle);
+        return redissonLockFacade.findMenuFromCache(menuTitle);
+    }
 
-        return MenuDto.Response.fromMenu(findMenu);
+    public void increaseScore(String menuTitle) {
+        redisTemplate.opsForZSet().incrementScore("ranking", menuTitle, 1);
     }
 
     public List<Response> searchRankList() {
@@ -120,17 +116,11 @@ public class MenuService {
                             if (score != null && findMenu != null) {
                                 findMenu.updatePopularScoreByWritingBack(popularMenu.getOrderCount(), popularMenu.getViewCount(), score);
                             } else {
-                                menuRepository.save(popularMenu);
+                                menuRepository.save(findMenu);
                             }
                         })
                 );
 
         redisTemplate.delete("menu::*");
-
-//        List<Menu> popularMenus = menuRepository.findAll();
-//
-//        for (Menu menu : popularMenus) {
-//            redisTemplate.opsForZSet().incrementScore("ranking", menu.getTitle(), menu.getScore());
-//        }
     }
 }
