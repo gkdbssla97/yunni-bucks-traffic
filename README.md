@@ -110,7 +110,7 @@
 
   - QPS Monitoring
       
-    Master Read &ensp; &emsp; &ensp; &emsp; &ensp; &emsp;&ensp; &emsp;&ensp; &emsp;&ensp; &emsp;&ensp; &emsp;&ensp; &emsp;&ensp; &emsp;&ensp; &emsp;&ensp; &emsp;&ensp; &emsp;&ensp; &emsp;&ensp;Slave Read
+    Master Read &ensp; &emsp; &ensp; &emsp; &ensp; &emsp;&ensp; &emsp;&ensp; &emsp;&ensp; Slave Read
 
     <img width="486" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/43bc77de-3a60-4ade-98e5-19dd8e63af67">
 
