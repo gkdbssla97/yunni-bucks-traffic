@@ -35,7 +35,7 @@ public class MenuService {
     private final RedisTemplate<String, String> redisTemplate;
     private final RedisTemplate<String, Object> objectRedisTemplate;
 
-    @CacheEvict(value = "Menu", key = "#request.title()")
+    @CacheEvict(value = {"Menu", "AllMenus"}, allEntries = true)
     public Menu create(MenuDto.Request request) {
         Menu menu = createMenu(request);
 
