@@ -2,8 +2,8 @@
 #### 이 프로젝트는 YUNNI-BUCKS에 백엔드 고도화를 위한 개선작업을 진행하고 있습니다.
 #### [YUNNI-BUCKS 프로젝트 세부 사항](https://github.com/gkdbssla97/yunni-bucks)
 
-1. 개발 기간 : 2023-07 ~ 2022-09 *(MVP기능 구현 완료)* </br>
-2. 개발 기간 : 2022-10 ~ *(트래픽 상황 대처 프로젝트 고도화)*
+1. 개발 기간 : 2023-07 ~ 2023-09 *(MVP기능 구현 완료)* </br>
+2. 개발 기간 : 2023-10 ~ *(트래픽 상황 대처 프로젝트 고도화)*
 --- 
 ### Architecture
 <img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/b626e81c-e074-441d-9005-8b911df5d803">
