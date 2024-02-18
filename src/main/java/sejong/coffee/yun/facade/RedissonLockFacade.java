@@ -3,7 +3,7 @@ package sejong.coffee.yun.facade;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 import sejong.coffee.yun.domain.order.Calculator;
 import sejong.coffee.yun.domain.order.Order;
@@ -19,6 +19,7 @@ import sejong.coffee.yun.service.OrderService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -31,6 +32,7 @@ public class RedissonLockFacade {
     private final OrderRepository orderRepository;
     private final MenuRepository menuRepository;
     private final Calculator calculator;
+    private final CacheManager cacheManager;
 
     public Order order(Long id, LocalDateTime localDateTime) {
         Cart cart = cartRepository.findByMember(id);
@@ -93,18 +95,25 @@ public class RedissonLockFacade {
     }
 
     public MenuDto.Response findMenuFromCache(String menuTitle) {
+        MenuDto.Response cachedMenu = null;
         RLock lock = redissonClient.getLock("MenuLock");
-        lock.lock();
-        try {
-            return findMenu(menuTitle);
-        } finally {
-            lock.unlock();
+
+        // 먼저 캐시에서 메뉴를 조회
+        cachedMenu = Objects.requireNonNull(cacheManager.getCache("Menu")).get(menuTitle, MenuDto.Response.class);
+
+        // 캐시에 메뉴가 없을 경우에만 RDB에서 메뉴를 조회하고 캐시에 저장
+        if (cachedMenu == null) {
+            lock.lock();
+            try {
+                Menu findMenu = menuRepository.findByTitle(menuTitle);
+                cachedMenu = MenuDto.Response.fromMenu(findMenu);
+                Objects.requireNonNull(cacheManager.getCache("Menu")).put(menuTitle, cachedMenu);
+            } finally {
+                lock.unlock();
+            }
         }
+
+        return cachedMenu;
     }
 
-    @Cacheable(value = "Menu", key = "#menuTitle", cacheManager = "cacheManager")
-    public MenuDto.Response findMenu(String menuTitle) {
-        Menu findMenu = menuRepository.findByTitle(menuTitle);
-        return MenuDto.Response.fromMenu(findMenu);
-    }
 }
