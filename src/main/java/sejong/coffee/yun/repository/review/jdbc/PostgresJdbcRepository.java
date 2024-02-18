@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import sejong.coffee.yun.domain.order.menu.Menu;
 import sejong.coffee.yun.domain.order.menu.MenuReview;
 
 import java.sql.Timestamp;
@@ -12,19 +13,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class MenuReviewMysqlJdbcRepository implements MenuReviewJdbcRepository {
+public class PostgresJdbcRepository implements JdbcRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final int batchSize = 1000;
 
 
-    public MenuReviewMysqlJdbcRepository(@Qualifier("masterJdbcTemplate") JdbcTemplate jdbcTemplate) {
+    public PostgresJdbcRepository(@Qualifier("postgresJdbcTemplate") JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    @Transactional("transactionManager")
-    public void saveAll(List<MenuReview> items, Long memberId, Long menuId) {
+    @Transactional("postgresTransactionManager")
+    public void saveReviewsByJdbc(List<MenuReview> items, Long memberId, Long menuId) {
 
         List<MenuReview> subItems = new ArrayList<>();
         for (MenuReview item : items) {
@@ -39,10 +40,13 @@ public class MenuReviewMysqlJdbcRepository implements MenuReviewJdbcRepository {
         }
     }
 
+    @Override
+    public void saveMenusByJdbc(List<Menu> menus) {}
+
     private void batchInsert(List<MenuReview> subItems, Long memberId, Long menuId) {
 
         jdbcTemplate.batchUpdate(
-                "INSERT INTO menu_review (id, comments, create_at, update_at, member_id, menu_id) VALUES (?, ?, ?, ?, ?, ?)",
+                "INSERT INTO menu_review (id, comments, create_at, update_at) VALUES (?, ?, ?, ?)",
                 subItems,
                 batchSize,
                 (ps, argument) -> {
@@ -50,8 +54,8 @@ public class MenuReviewMysqlJdbcRepository implements MenuReviewJdbcRepository {
                     ps.setString(2, argument.getComments());
                     ps.setTimestamp(3, Timestamp.from(Instant.now()));
                     ps.setTimestamp(4, Timestamp.from(Instant.now()));
-                    ps.setLong(5, memberId);
-                    ps.setLong(6, menuId);
+//                    ps.setLong(5, memberId);
+//                    ps.setLong(6, menuId);
                 }
         );
     }

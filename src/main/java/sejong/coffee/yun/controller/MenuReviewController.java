@@ -18,7 +18,7 @@ import sejong.coffee.yun.dto.review.menu.MenuReviewPageDto;
 import sejong.coffee.yun.mapper.CustomMapper;
 import sejong.coffee.yun.repository.menu.MenuRepository;
 import sejong.coffee.yun.repository.review.MenuReviewRepository;
-import sejong.coffee.yun.repository.review.jdbc.MenuReviewMysqlJdbcRepository;
+import sejong.coffee.yun.repository.review.jdbc.MysqlJdbcRepository;
 import sejong.coffee.yun.service.MenuReviewService;
 import sejong.coffee.yun.service.UserService;
 
@@ -42,7 +42,7 @@ public class MenuReviewController {
     private final CustomMapper customMapper;
     private final UserService userService;
     private final MenuRepository menuRepository;
-    private final MenuReviewMysqlJdbcRepository menuReviewMysqlJdbcRepository;
+    private final MysqlJdbcRepository mysqlJdbcRepository;
     private final MenuReviewRepository menuReviewRepository;
 
     @PostMapping("/{menuId}/reviews")
@@ -135,7 +135,7 @@ public class MenuReviewController {
             menuReviewList.add(menuReview);
         }
 //        menuReviewJdbcPostgresRepository.saveAll(menuReviews, member.getId(), menu.getId());
-        menuReviewMysqlJdbcRepository.saveReviewsByJdbc(menuReviewList, member.getId(), menu.getId());
+        mysqlJdbcRepository.saveReviewsByJdbc(menuReviewList, member.getId(), menu.getId());
 
         return ResponseEntity.noContent().build();
     }

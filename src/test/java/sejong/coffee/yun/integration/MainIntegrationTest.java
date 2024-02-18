@@ -169,6 +169,18 @@ public class MainIntegrationTest {
                 .build();
     }
 
+    public Bread bread(int num) {
+        return Bread.builder()
+                .id((long) (num))
+                .title("빵" + num)
+                .description("성심당과 콜라보한 빵")
+                .nutrients(new Nutrients(num, num, num, num))
+                .now(LocalDateTime.now())
+                .menuSize(MenuSize.M)
+                .price(Money.initialPrice(new BigDecimal(4000)))
+                .build();
+    }
+
     public Beverage beverage() {
         return Beverage.builder()
                 .title("커피")
