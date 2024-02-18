@@ -132,7 +132,7 @@ public class MenuService {
 
         // 모든 비동기 작업이 완료되면 redisTemplate.delete("menu::*") 작업을 실행
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                .thenRunAsync(() -> redisTemplate.delete("menu::*"));
+                .thenRunAsync(() -> redisTemplate.delete("menu::"));
     }
 
     // 각 작업이 별도의 트랜잭션에서 실행되며, 하나의 작업이 실패하더라도 다른 작업에는 영향을 주지 않는다.
