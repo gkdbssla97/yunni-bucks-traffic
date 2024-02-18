@@ -135,7 +135,7 @@ public class MenuReviewController {
             menuReviewList.add(menuReview);
         }
 //        menuReviewJdbcPostgresRepository.saveAll(menuReviews, member.getId(), menu.getId());
-        menuReviewMysqlJdbcRepository.saveAll(menuReviewList, member.getId(), menu.getId());
+        menuReviewMysqlJdbcRepository.saveReviewsByJdbc(menuReviewList, member.getId(), menu.getId());
 
         return ResponseEntity.noContent().build();
     }

@@ -10,7 +10,7 @@ import sejong.coffee.yun.domain.order.menu.Menu;
 import sejong.coffee.yun.domain.order.menu.MenuSize;
 import sejong.coffee.yun.domain.order.menu.Nutrients;
 import sejong.coffee.yun.domain.user.*;
-import sejong.coffee.yun.facade.RedissonLockStockFacade;
+import sejong.coffee.yun.facade.RedissonLockFacade;
 import sejong.coffee.yun.integration.MainIntegrationTest;
 import sejong.coffee.yun.repository.cart.CartRepository;
 import sejong.coffee.yun.repository.menu.MenuRepository;
@@ -45,7 +45,7 @@ public class OrderRedissonLockTest extends MainIntegrationTest {
     @Autowired
     private CartRepository cartRepository;
     @Autowired
-    private RedissonLockStockFacade redissonLockStockFacade;
+    private RedissonLockFacade redissonLockFacade;
 
     private List<Member> members = new ArrayList<>();
     private List<CartItem> menuList = new ArrayList<>();
@@ -102,7 +102,7 @@ public class OrderRedissonLockTest extends MainIntegrationTest {
         for(Member member : members) {
             executorService.submit(() -> {
                 try {
-                    redissonLockStockFacade.order(member.getId(), LocalDateTime.now());
+                    redissonLockFacade.order(member.getId(), LocalDateTime.now());
                 } finally {
                     countDownLatch.countDown();
                 }

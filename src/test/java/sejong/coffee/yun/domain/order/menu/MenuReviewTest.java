@@ -84,7 +84,7 @@ public class MenuReviewTest extends MainIntegrationTest {
 
             menuReviews.add(menuReview);
         }
-        menuReviewJdbcPostgresRepository.saveAll(menuReviews, member.getId(), menu.getId());
+        menuReviewJdbcPostgresRepository.saveReviewsByJdbc(menuReviews, member.getId(), menu.getId());
 //        menuReviewJdbcMysqlRepository.saveAll(menuReviews, member.getId(), menu.getId());
 
     }

@@ -24,7 +24,7 @@ public class MenuReviewPostgresJdbcRepository implements MenuReviewJdbcRepositor
 
     @Override
     @Transactional("postgresTransactionManager")
-    public void saveAll(List<MenuReview> items, Long memberId, Long menuId) {
+    public void saveReviewsByJdbc(List<MenuReview> items, Long memberId, Long menuId) {
 
         List<MenuReview> subItems = new ArrayList<>();
         for (MenuReview item : items) {
