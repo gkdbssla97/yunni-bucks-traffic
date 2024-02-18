@@ -56,7 +56,7 @@ public class CompletableFutureTest extends MainIntegrationTest {
         long start = System.nanoTime();
 
         // 비동기 코드 또는 동기 코드 실행
-//        menuService.refreshPopularMenusInRedis();
+        menuService.refreshPopularMenusInRedis();
         synchronizedRefreshPopularMenusInRedis();
         long end = System.nanoTime();
 

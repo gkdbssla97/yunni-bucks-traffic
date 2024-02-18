@@ -13,7 +13,7 @@ import sejong.coffee.yun.domain.user.Member;
 import sejong.coffee.yun.integration.MainIntegrationTest;
 import sejong.coffee.yun.repository.menu.MenuRepository;
 import sejong.coffee.yun.repository.review.MenuReviewRepository;
-import sejong.coffee.yun.repository.review.jdbc.MenuReviewJdbcRepository;
+import sejong.coffee.yun.repository.review.jdbc.JdbcRepository;
 import sejong.coffee.yun.repository.user.UserRepository;
 
 import javax.annotation.PostConstruct;
@@ -39,12 +39,12 @@ public class MenuReviewTest extends MainIntegrationTest {
     @Autowired
     private PostgresMenuReviewRepository postgresMenuReviewRepository;
     @Autowired
-    @Qualifier("menuReviewPostgresJdbcRepository")
-    MenuReviewJdbcRepository menuReviewJdbcPostgresRepository;
+    @Qualifier("postgresJdbcRepository")
+    JdbcRepository menuReviewJdbcPostgresRepository;
 
     @Autowired
-    @Qualifier("menuReviewMysqlJdbcRepository")
-    MenuReviewJdbcRepository menuReviewJdbcMysqlRepository;
+    @Qualifier("mysqlJdbcRepository")
+    JdbcRepository menuReviewJdbcMysqlRepository;
 
     private final List<MenuReview> menuReviews = new ArrayList<>();
     private Member member;

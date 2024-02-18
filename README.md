@@ -161,11 +161,11 @@
 
 
 - Distributed Locking 선택한 이유
-  - redisson은 자신이 점유하고 있는 락을 해제할 때 pub/sub방식으로 채널에 메세지를 보내줌으로써 락을 획득해야 하는 스레드들에게 메세지를 전달
+  - redisson은 자신이 점유하고 있는 락을 해제할 때 pub/sub방식으로 채널에 메세지를 보내줌으로써 락을 획득해야 하는 쓰레드들에게 메세지를 전달
   - 단일 DB 환경에서도 사용할 수 있지만 분산 락은 여러 노드에 걸쳐 있는 데이터에 대한 동시성을 제어할 수 있어 분산 DB에서의 확장성 고려하여 테스트
   
 #### 생각해 보아야 할 점
-- 나머지 스레드(사용자 별 주문 요청)들은 락이 해제될 때까지 대기 상태에 머무른다.
+- 나머지 쓰레드(사용자 별 주문 요청)들은 락이 해제될 때까지 대기 상태에 머무른다.
 - 이 방식은 동시성 문제를 방지할 수 있지만, 대기 시간이 길어질 수 있다는 단점
 - 최대 사용자는 몇 명까지인지 부하테스트 필요 (사용자가 늘어날수록 시간도 기하급수적 증가)
     
@@ -219,7 +219,7 @@
 - Redis zSet 선택한 이유
   - 실시간 처리: Redis는 실시간으로 데이터를 처리한다. 메뉴의 조회수가 변경될 때마다 즉시 ZSET의 스코어를 업데이트할 수 있다.
   - 정렬 기능: zSet은 스코어에 따라 자동으로 메뉴를 정렬한다. 조회수를 Score로 사용하면, 인기 메뉴를 스코어가 높은 순서로 쉽게 조회할 수 있다고 판단했다.
-  - 동시성 처리: Redis는 단일 스레드 모델을 사용하며, atomic operations를 지원한다. 따라서, 여러 사용자가 동시에 인기 메뉴를 조회하거나, 조회수를 업데이트하더라도 데이터의 일관성을 유지할 수 있다.
+  - 동시성 처리: Redis는 단일 쓰레드 모델을 사용하며, atomic operations를 지원한다. 따라서, 여러 사용자가 동시에 인기 메뉴를 조회하거나, 조회수를 업데이트하더라도 데이터의 일관성을 유지할 수 있다.
   
 
 #### 생각해 보아야 할 점
@@ -254,17 +254,25 @@ redis-cli → ranking 이름의 Sorted Set(ZSET)에서, Score(조회수)가 0에
 - 동점일 경우, 메뉴 조회시 캐싱된 메뉴 주문수량 내림차순 기준으로 인기메뉴를 정렬한다.
 > 당일 데이터 Redis 사용법
 
-1. 매번 주문을 할 때마다 Redis에 zSetOperations의 incremetScore 진행
-2. 오늘이 끝날 때에 RDB에 write back 값 저장
-3. Redis 비우기 `redisTemplate.delete("menu::*");`
+1. 매번 주문을 할 때마다 Redis에 zSetOperations의 `ZINCRBY` 명령어  _(Atomic Operation)_
+2. 오늘이 끝날 때에 RDB에 `Write-Back` 값 저장
+3. Redis 비우기, `redisTemplate.delete("menu::*");`
 
-> 스케쥴러를 사용해 당일(00시 00분)이 됐을 때  RDB, Redis 순차적 업데이트 과정
+**스케쥴러를 사용해 자정(00:00:00)이 됐을 때  Write-Back Caching**
 ```java
-  @Scheduled(cron = "0 0 0 * * *") // 매일 00시 00분에 실행
-  @Transactional
-  public void refreshPopularMenusInRedis() {...}
-  ```
-  
+@Scheduled(cron = "0 0 0 * * *")
+public void refreshPopularMenusInRedis() {
+    Set<String> keys = Optional.ofNullable(redisTemplate.keys("menu::*")).orElse(Collections.emptySet());    
+    List<CompletableFuture<Void>> futures = keys.stream() 
+        .map(key -> CompletableFuture.runAsync(() -> {
+        ...
+} // 동기식: (keys -> keys.stream() ...)
+```
+>**Synchronized Stream → Asynchronized Stream<br><br>**
+I/O 작업을 동기적으로 처리하면, 작업이 완료될 때까지 쓰레드가 대기 상태가 되어야 하므로, 쓰레드의 CPU 사용률이 낮아진다.<br>
+`CompletableFuture` 비동기 처리를 사용하면 메인 쓰레드가 별도의 작업 쓰레드의 완료를 기다리지 않고 다음 작업을 계속 진행하여 쓰레드의 CPU 사용률을 높일 수 있다고 판단하여 적용했다.
+> <br>_`parallelStream()`을 사용하더라도 병렬 쓰레드는 I/O 작업 대기시간을 없앨 수 없기에 사용 X_
+
 #### RDB
 1. 매일 자정이 되면, Redis에서 `menu::`로 시작하는 모든 키를 찾는다. 이 키들은 인기 메뉴 데이터를 나타낸다.
 2. 이 키들을 찾은 후, 각 키에 해당하는 값을 가져온다. 값은 메뉴 score로, 인기 메뉴의 정보를 담고 있다.
