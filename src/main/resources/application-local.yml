@@ -31,13 +31,22 @@ spring:
       pool-name: mysqlM-example-cp
       hibernate:
         ddl-auto: validate
-    slave:
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://127.0.0.1:3307/yunni_bucks_traffic?rewriteBatchedStatements=true
-      username: root
-      password: 1234
-      hibernate:
-        ddl-auto: validate
+    slaves:
+      - name: slave-1
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3307/yunni_bucks_traffic?rewriteBatchedStatements=true
+        username: root
+        password: 1234
+        hibernate:
+          ddl-auto: validate
+
+      - name: slave-2
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3308/yunni_bucks_traffic?rewriteBatchedStatements=true
+        username: root
+        password: 1234
+        hibernate:
+          ddl-auto: validate
 
     postgres:
       driver-class-name: org.postgresql.Driver

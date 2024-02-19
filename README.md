@@ -230,7 +230,6 @@
 #### 인기메뉴 조회 (상위 3개 메뉴)
 >  *총 4개의 메뉴 중 조회수, 주문량을 종합해 인기메뉴 3개를 조회한다.*
 > <img width="639" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/7a725c55-9382-4637-aa68-f01b658584b9">
-<br>
 
 <img width="300" height="300" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/174bc528-6ba0-4a23-851b-2c40f50233c7"/>
 
