@@ -1,7 +1,6 @@
 package sejong.coffee.yun.config.database;
 
 import com.zaxxer.hikari.HikariDataSource;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -13,8 +12,14 @@ import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.sql.DataSource;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
+
+import static sejong.coffee.yun.config.database.DatabaseProperties.DatabaseDetail;
 
 @Configuration
 @Slf4j
@@ -22,12 +27,24 @@ public class DataSourceConfig {
 
     @Bean
     public DataSource routingDataSource(@Qualifier("masterDataSource") DataSource masterDataSource,
-                                        @Qualifier("slaveDataSource") DataSource slaveDataSource) {
+                                        @Qualifier("slaveDataSources") List<DataSource> slaveDataSources) {
         Map<Object, Object> dataSources = new LinkedHashMap<>();
         dataSources.put("master", masterDataSource);
-        dataSources.put("slave", slaveDataSource);
 
-        RoutingDataSource routingDataSource = new RoutingDataSource();
+        IntStream.range(0, slaveDataSources.size())
+                .forEach(i -> {
+                    DataSource slaveDataSource = slaveDataSources.get(i);
+                    dataSources.put(String.format("slave-%d", (i + 1)), slaveDataSource);
+                });
+
+        List<Object> onlySlaveDataSources = new ArrayList<>(dataSources.values());
+        onlySlaveDataSources.remove(masterDataSource);
+
+        List<String> slaveDataSourceNames = dataSources.keySet().stream()
+                .map(Object::toString)
+                .filter(key -> key.startsWith("slave")).toList();
+
+        RoutingDataSource routingDataSource = new RoutingDataSource(onlySlaveDataSources, slaveDataSourceNames);
         routingDataSource.setTargetDataSources(dataSources);
         routingDataSource.setDefaultTargetDataSource(masterDataSource);
         return routingDataSource;
@@ -45,9 +62,15 @@ public class DataSourceConfig {
         return createDataSource(databaseProperties.getMaster());
     }
 
-    @Bean("slaveDataSource")
-    public DataSource createSlaveDataSource(DatabaseProperties databaseProperties) {
-        return createDataSource(databaseProperties.getSlave());
+    @Bean("slaveDataSources")
+    public List<DataSource> createSlaveDataSources(DatabaseProperties databaseProperties) {
+        log.info("Creating slave data sources...");
+        List<DataSource> slaveDataSources = new ArrayList<>();
+        for (DatabaseDetail slave : databaseProperties.getSlaves()) {
+            log.info("Slave DB detail: {}", slave);
+            slaveDataSources.add(createDataSource(slave));
+        }
+        return slaveDataSources;
     }
 
     @Bean("postgresDataSource")
@@ -55,27 +78,33 @@ public class DataSourceConfig {
         return createDataSource(databaseProperties.getPostgres());
     }
 
-    private DataSource createDataSource(DatabaseProperties.DatabaseDetail databaseDetail) {
+    private DataSource createDataSource(DatabaseDetail databaseDetail) {
         HikariDataSource dataSource = new HikariDataSource();
         dataSource.setJdbcUrl(databaseDetail.getUrl());
         dataSource.setDriverClassName(databaseDetail.getDriverClassName());
         dataSource.setUsername(databaseDetail.getUsername());
         dataSource.setPassword(databaseDetail.getPassword());
+
         return dataSource;
     }
 
     @Slf4j
-    @RequiredArgsConstructor
     private static class RoutingDataSource extends AbstractRoutingDataSource {
+        private final AtomicInteger index = new AtomicInteger(0);
+        private final List<Object> slaveDataSources;
+        private final List<String> slaveDataSourceNames;
+
+        public RoutingDataSource(List<Object> slaveDataSources, List<String> slaveDataSourceNames) {
+            this.slaveDataSources = slaveDataSources;
+            this.slaveDataSourceNames = slaveDataSourceNames;
+        }
 
         @Override
         protected Object determineCurrentLookupKey() {
             String dataSourceName = TransactionSynchronizationManager.isCurrentTransactionReadOnly()
-                    ? "slave"
+                    ? slaveDataSourceNames.get(index.getAndIncrement() % slaveDataSources.size())
                     : "master";
-
             log.info("[DATA_SOURCE_NAME] : {}", dataSourceName);
-
             return dataSourceName;
         }
     }
