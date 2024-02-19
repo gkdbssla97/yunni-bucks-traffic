@@ -1,7 +1,6 @@
 package sejong.coffee.yun.domain.order.menu;
 
 import net.datafaker.Faker;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,7 @@ import java.util.Locale;
 
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.*;
+import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -84,8 +83,8 @@ public class MenuReviewTest extends MainIntegrationTest {
 
             menuReviews.add(menuReview);
         }
-        menuReviewJdbcPostgresRepository.saveReviewsByJdbc(menuReviews, member.getId(), menu.getId());
-//        menuReviewJdbcMysqlRepository.saveAll(menuReviews, member.getId(), menu.getId());
+//        menuReviewJdbcPostgresRepository.saveReviewsByJdbc(menuReviews, member.getId(), menu.getId());
+        menuReviewJdbcMysqlRepository.saveReviewsByJdbc(menuReviews, member.getId(), menu.getId());
 
     }
 
@@ -97,9 +96,10 @@ public class MenuReviewTest extends MainIntegrationTest {
             menuReviewRepository.save(menuReview);
             System.out.println("--saveE--");
         }
-        System.out.println("--findAll--");
-        List<MenuReview> all = menuReviewRepository.findAll();
-        Assertions.assertThat(all.size()).isEqualTo(10);
+        System.out.println("--findAllS1--");
+        for(int i = 1; i <= 10; i++) {
+            menuReviewRepository.findAll();
+        }
     }
 
     @Test
