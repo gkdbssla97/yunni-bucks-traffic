@@ -232,7 +232,7 @@
 > <img width="639" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/7a725c55-9382-4637-aa68-f01b658584b9">
 <br>
 
-<img width="403" height="360" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/174bc528-6ba0-4a23-851b-2c40f50233c7"/>
+<img width="300" height="300" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/174bc528-6ba0-4a23-851b-2c40f50233c7"/>
 
 - 가장 높은 조회수(*5*)를 기록한 `빵1` 최상위 1번에 위치
 - 조회수 동점을 이룬 `빵2`와 `빵3`중 주문량이 높은 `빵3`이 2번 위치
