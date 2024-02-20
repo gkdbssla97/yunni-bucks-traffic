@@ -23,6 +23,9 @@
     - GIN INDEX
     - tsvector, tsquery
 - Master-Slave Replication으로 MySQL Read/Write 역할 분리
+  - Slave DB Scale-Out
+    - Round-Robin 
+    - MHA Failover (예정) 
   - Prometheus로 Metric 수집
     - Mysql Exporter
     - Spring Actuator
@@ -98,7 +101,12 @@
     - MySQL에서 PostgreSQL로 데이터를 복제하려면 데이터 변환 및 동기화를 처리할 수 있는 도구가 필요하며, Debezium이나 Kafka Connect와 같은 CDC 기반의 도구를 사용 
       - 추가적 기술비용으로 인한 후순위 배치
     - tsvector를 이용한 전문검색 시 한국어를 지원하지 않음
-    <br/>
+  
+  #### Slave DB Scale-Out
+  1. **Slave 서버 증설**: 웹 서버의 트래픽 증가로 인해 Read 작업의 부하를 감당하기 어려워질 수 있다. Scale-Out으로 각 서버가 처리하는 트래픽을 줄여 성능 향상을 이루며, 데이터를 분산 저장해 안정성을 높임
+     1. Round-Robin: 각 Slave 데이터 소스를 공평하게 사용하여, 특정 데이터 소스에 과도한 부하를 방지한다.
+  2. **Failover**: Slave 서버는 최소 2대 이상이어야 하며, Master 서버에 장애가 발생했을 때, Slave 서버 중 하나를 새로운 Master로 승격시키고, 나머지 Slave 서버들이 새로운 Master를 참조할 수 있어야 한다. (예정)
+  <br/>
 - #### Grafana 
   - Network Traffic Monitoring <br>10만개 데이터 Write/Read 작업 시 Master-Slave를 통해 네트워크 트래픽 부하를 분산시켜서 읽기 작업을 효율적으로 처리하고 있는 것으로 판단</br><br>
   <img width="482" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/df23fc8b-3e67-456b-9469-8b80ca136485"> 
