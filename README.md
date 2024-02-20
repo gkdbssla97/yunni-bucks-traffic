@@ -6,7 +6,9 @@
 2. 개발 기간 : 2023-10 ~ *(트래픽 상황 대처 프로젝트 고도화)*
 --- 
 ### Architecture
-<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/b626e81c-e074-441d-9005-8b911df5d803">
+<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/d3a9049e-b005-4c48-a925-aeb0b3a2882d">
+
+[//]: # (<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/b626e81c-e074-441d-9005-8b911df5d803">)
 
 | Local Server            |       Docker        |       Utility       |
   |:-------------------:|:-------------------:|:---:|
