@@ -191,6 +191,8 @@
 #### 1. 사용자가 전체 메뉴를 조회한다.
 - Redis Caching 활용
   - @Cacheable, Look-Aside Caching 전략
+  - 최신 메뉴 등록 기준 5Page 이하만 Caching 처리
+    - 유저들이 최신 메뉴를 우선적으로 볼 것이라 판단
 #### 구현 이유
 - Redis Caching 선택한 이유
   - 높은 트래픽을 효율적으로 처리: 사용자가 전체 메뉴를 조회하는 경우, DB에 직접 접근하지 않고 Redis에 캐싱된 데이터를 사용하면, 응답 시간을 크게 단축시키고 DB에 가해지는 부하를 줄일 수 있다.
@@ -201,19 +203,19 @@
   - 단순히 데이터를 조회하는 경우 (예: 메뉴 조회)와 같이 데이터의 변경이 없는 상황에서는 DB Lock 없이 Redis Caching만으로도 충분히 빠른 응답 시간과 효율적인 서버 운영
 
 #### 적용 결과
-<img src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/4f547d8a-2e8c-482c-a081-f02d71273be0" width="500" height="300">
-<img src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/e5d4887e-4cd3-439b-bd86-c69859c9a99b" width="500" height="300">
-
+ Caching 적용 전
+<img width="1089" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/0bcb2f4e-e83f-4de3-82b0-e14d99678325"><br>
+ Caching 적용 후
+<img width="1085" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/37fd5ace-0d7d-42ec-abf0-03709894c9b5">
 *아래 값은 작업 시작 시간 에서 종료 시간까지의 평균 값으로 산출*
 
-| 구분             | TPS        | 응답시간(ms) |
-|----------------|------------|---------|
-| 레디스 캐싱 전략 사용 전 | 1247.75	   | 520.58  |
-| 레디스 캐싱 전략 사용 후 | 2494.0     | 184.26  |
-| 속도 개선 증가       | 2.0배 (TPS) | 2.83배   |
+| 구분             | TPS    | 응답시간(ms) |
+|----------------|--------|----------|
+| 레디스 캐싱 전략 사용 전 | 171.4	 | 55.67    |
+| 레디스 캐싱 전략 사용 후 | 339.2  | 28.15    |
+| 속도 개선 증가       | 2.0 배  | 2.0 배    |
 
- - caching miss 했을 때 응답시간 193ms, caching hit 했을 때 응답시간 175ms
- - caching hit 시 응답시간이 약 9.3% 단축
+- (Caching Miss 시 응답시간 - Caching Hit 시 응답시간) / Caching Miss 시 응답시간 * 100% → **캐싱 적용 후 응답시간이 캐싱 적용 전의 약 49.4% 단축**
 
 #### 2. 사용자가 인기 메뉴를 조회한다.
 - Redis zSet 활용
