@@ -42,13 +42,18 @@ public class CompletableFutureTest extends MainIntegrationTest {
     @PostConstruct
     public void init() throws IOException {
 
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 10000; i++) {
             Menu menu = bread(i + 1);
 
             menus.add(menu);
         }
         menuReviewJdbcMysqlRepository.saveMenusByJdbc(menus);
-        cacheMenus(menus);
+//        cacheMenus(menus);
+    }
+
+    @Test
+    void insertMenuBulkData() {
+
     }
 
     @Test

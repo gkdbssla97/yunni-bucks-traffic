@@ -178,6 +178,7 @@ public class MainIntegrationTest {
                 .now(LocalDateTime.now())
                 .menuSize(MenuSize.M)
                 .price(Money.initialPrice(new BigDecimal(4000)))
+                .stock(100)
                 .build();
     }
 

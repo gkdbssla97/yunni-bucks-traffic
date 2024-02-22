@@ -96,7 +96,7 @@ public class MenuReviewTest extends MainIntegrationTest {
             menuReviewRepository.save(menuReview);
             System.out.println("--saveE--");
         }
-        System.out.println("--findAllS1--");
+        System.out.println("--findAll--");
         for(int i = 1; i <= 10; i++) {
             menuReviewRepository.findAll();
         }
