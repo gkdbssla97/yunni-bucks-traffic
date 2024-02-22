@@ -67,7 +67,8 @@ public class MenuService {
         throw ExceptionControl.INVALID_MENU_TYPE.menuException();
     }
 
-    @Cacheable(value = "AllMenus", key = "#pageable", cacheManager = "cacheManager")
+    @Cacheable(value = "AllMenus", key = "#pageable.pageNumber", cacheManager = "cacheManager", condition = "#pageable.pageNumber <= 5")
+    @Transactional(readOnly = true)
     public RestPage<MenuDto.Response> findAllByCaching(Pageable pageable) {
         Page<Menu> allMenusPaged = menuRepository.findAllMenusPaged(pageable);
         return new RestPage<>(allMenusPaged.map(MenuDto.Response::new));

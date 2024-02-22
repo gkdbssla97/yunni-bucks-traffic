@@ -6,7 +6,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import sejong.coffee.yun.domain.order.menu.Menu;
 import sejong.coffee.yun.domain.order.menu.MenuReview;
+import sejong.coffee.yun.domain.user.Money;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -74,8 +76,9 @@ public class MysqlJdbcRepository implements JdbcRepository {
 
     private void batchMenusInsert(List<Menu> menus) {
         final int DUMMY_DATA = 1;
+        final Money DUMMY_MONEY = Money.initialPrice(new BigDecimal(4000));
         jdbcTemplate.batchUpdate(
-                "INSERT INTO menu(dtype, id, carbohydrates, fats, kcal, proteins, order_count, score, view_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO menu(dtype, id, carbohydrates, fats, kcal, proteins, order_count, score, view_count, stock, title, total_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 menus, batchSize,
                 (ps, menu) -> {
                     ps.setString(1, menu.getClass().getSimpleName());
@@ -87,6 +90,9 @@ public class MysqlJdbcRepository implements JdbcRepository {
                     ps.setInt(7, DUMMY_DATA);
                     ps.setDouble(8, DUMMY_DATA);
                     ps.setInt(9, DUMMY_DATA);
+                    ps.setInt(10, menu.getStock());
+                    ps.setString(11, menu.getTitle());
+                    ps.setBigDecimal(12, DUMMY_MONEY.getTotalPrice());
                 }
         );
     }
