@@ -1,5 +1,6 @@
 package sejong.coffee.yun.dto.menu;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import sejong.coffee.yun.domain.order.menu.Menu;
 import sejong.coffee.yun.domain.order.menu.MenuSize;
 import sejong.coffee.yun.domain.order.menu.MenuType;
@@ -18,6 +19,7 @@ public class MenuDto {
             MenuType menuType
     ){}
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record Response(Long menuId, String title, String description, Money price, Nutrients nutrients,
                            MenuSize menuSize, int stock, int viewCount, int orderCount) {
         public Response(Menu menu) {

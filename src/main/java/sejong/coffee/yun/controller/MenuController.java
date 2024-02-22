@@ -1,11 +1,12 @@
 package sejong.coffee.yun.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -14,11 +15,10 @@ import sejong.coffee.yun.domain.order.menu.Menu;
 import sejong.coffee.yun.dto.menu.MenuDto;
 import sejong.coffee.yun.dto.menu.MenuPageDto;
 import sejong.coffee.yun.dto.menu.MenuRankingDto;
-import sejong.coffee.yun.mapper.CustomMapper;
 import sejong.coffee.yun.service.MenuService;
 
 import javax.validation.Valid;
-import java.util.List;
+import java.util.*;
 
 import static sejong.coffee.yun.dto.menu.MenuDto.Request;
 import static sejong.coffee.yun.dto.menu.MenuDto.Response;
@@ -31,8 +31,8 @@ import static sejong.coffee.yun.dto.menu.MenuDto.Response;
 public class MenuController {
 
     private final MenuService menuService;
-    private final CustomMapper customMapper;
-    private final ObjectMapper objectMapper;
+    private final CacheManager cacheManager;
+    private final RedisTemplate redisTemplate;
 
     @PostMapping("")
     ResponseEntity<Response> createMenu(@RequestBody @Valid Request request) {
@@ -82,4 +82,23 @@ public class MenuController {
 
         return ResponseEntity.ok(responses);
     }
+
+    @GetMapping("/redis")
+    public Object findAll() {
+        List<Map<String, String>> result = new ArrayList<>();
+
+        for (String cacheName : cacheManager.getCacheNames()) {
+            Set<String> keys = redisTemplate.keys(cacheName + "*");
+            for (String key : keys) {
+                Object value = redisTemplate.opsForValue().get(key);
+                Map<String, String> entry = new HashMap<>();
+                entry.put("Key", key);
+                entry.put("Value", value != null ? value.toString() : null);
+                result.add(entry);
+            }
+        }
+
+        return result;
+    }
+
 }
