@@ -207,7 +207,7 @@
 <img width="1089" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/0bcb2f4e-e83f-4de3-82b0-e14d99678325"><br>
  Caching 적용 후
 <img width="1085" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/37fd5ace-0d7d-42ec-abf0-03709894c9b5">
-*아래 값은 작업 시작 시간 에서 종료 시간까지의 평균 값으로 산출*
+*아래 값은 작업 시작 시간 에서 종료 시간까지의 평균 값으로 산출 (nGrinder 1분 측정)*
 
 | 구분             | TPS    | 응답시간(ms) |
 |----------------|--------|----------|
