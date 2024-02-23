@@ -23,6 +23,7 @@ import sejong.coffee.yun.util.wrapper.RestPage;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import static sejong.coffee.yun.dto.menu.MenuRankingDto.Response;
 
@@ -35,6 +36,7 @@ public class MenuService {
     private final RedissonLockFacade redissonLockFacade;
     private final RedisTemplate<String, String> redisTemplate;
     private final RedisTemplate<String, Object> objectRedisTemplate;
+    private final ThreadPoolExecutor threadPoolExecutor;
 
     @CacheEvict(value = {"Menu", "AllMenus"}, allEntries = true)
     public Menu create(MenuDto.Request request) {
@@ -117,26 +119,28 @@ public class MenuService {
     public void refreshPopularMenusInRedis() {
         Set<String> keys = Optional.ofNullable(redisTemplate.keys("menu::*")).orElse(Collections.emptySet());
 
-        // CompletableFuture를 사용한 비동기 처리
         List<CompletableFuture<Void>> futures = keys.stream()
                 .map(key -> CompletableFuture.runAsync(() -> {
-                    Optional.ofNullable((Menu) objectRedisTemplate.opsForValue().get(key))
-                            .ifPresent(popularMenu -> {
-                                Optional.ofNullable(menuRepository.findByTitle(popularMenu.getTitle()))
-                                        .ifPresent(findMenu -> {
-                                            Double score = redisTemplate.opsForZSet().score("ranking", popularMenu.getTitle());
-                                            Optional.ofNullable(score)
-                                                    .ifPresent(sc -> updateMenu(findMenu, popularMenu.getOrderCount(), popularMenu.getViewCount(), sc));
-                                        });
-                            });
-                })).toList();
+                            Optional.ofNullable((Menu) objectRedisTemplate.opsForValue().get(key))
+                                    .ifPresent(popularMenu -> {
+                                        Optional.ofNullable(menuRepository.findByTitle(popularMenu.getTitle()))
+                                                .ifPresent(findMenu -> {
+                                                    Double score = redisTemplate.opsForZSet().score("ranking", popularMenu.getTitle());
+                                                    Optional.ofNullable(score)
+                                                            .ifPresent(sc -> updateMenu(findMenu, popularMenu.getOrderCount(), popularMenu.getViewCount(), sc));
+                                                });
+                                    });
+                        }, threadPoolExecutor)
+                        .exceptionally(ex -> {
+                            log.error("Failed to process key: {}", key, ex);
+                            return null;
+                        })).toList();
 
         // 모든 비동기 작업이 완료되면 redisTemplate.delete("menu::*") 작업을 실행
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
                 .thenRunAsync(() -> redisTemplate.delete("menu::"));
     }
 
-    // 각 작업이 별도의 트랜잭션에서 실행되며, 하나의 작업이 실패하더라도 다른 작업에는 영향을 주지 않는다.
     @Transactional
     public void updateMenu(Menu menu, int orderCount, int viewCount, double score) {
         menu.updatePopularScoreByWritingBack(orderCount, viewCount, score);
