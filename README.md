@@ -276,13 +276,24 @@ public void refreshPopularMenusInRedis() {
     Set<String> keys = Optional.ofNullable(redisTemplate.keys("menu::*")).orElse(Collections.emptySet());    
     List<CompletableFuture<Void>> futures = keys.stream() 
         .map(key -> CompletableFuture.runAsync(() -> {
-        ...
+                    ...
+        }, threadPoolExecutor)
+        .exceptionally(ex -> {
+            log.error("Failed to process key: {}", key, ex);
+            return null;
+        })).toList();
 } // 동기식: (keys -> keys.stream() ...)
 ```
->**Synchronized Stream → Asynchronized Stream<br><br>**
+>**Synchronized Stream → Asynchronized Stream<br>**
 I/O 작업을 동기적으로 처리하면, 작업이 완료될 때까지 쓰레드가 대기 상태가 되어야 하므로, 쓰레드의 CPU 사용률이 낮아진다.<br>
-`CompletableFuture` 비동기 처리를 사용하면 메인 쓰레드가 별도의 작업 쓰레드의 완료를 기다리지 않고 다음 작업을 계속 진행하여 쓰레드의 CPU 사용률을 높일 수 있다고 판단하여 적용했다.
-> <br>_`parallelStream()`을 사용하더라도 병렬 쓰레드는 I/O 작업 대기시간을 없앨 수 없기에 사용 X_
+> - `CompletableFuture` 비동기 처리 사용 이유
+>   1. **효율성**: 메인 쓰레드가 별도의 작업 쓰레드의 완료를 기다리지 않고 다음 작업을 계속 진행하여 쓰레드의 CPU 사용률을 높일 수 있다고 판단하여 적용
+>   2. **에러 처리**: 비동기 처리가 실패한 경우 감지할 수 있게 예외처리 가능<br>
+> - `ThreadPoolExecutor` 사용 이유
+>   1. **커스텀 설정**: ThreadPoolExecutor의 설정을 직접 관리함으로써, 어플리케이션의 특성에 맞게 ThreadPool의 동작 제어
+>   2. **공유 리소스 관리**: commonPool에서 쓰레드를 과도하게 사용하여 시스템 전체의 성능이 저하되는 것을 방지하기 위해 특정 작업에 대해 별도의 ThreadPool을 사용
+>
+> _`parallelStream()`을 사용하더라도 병렬 쓰레드는 I/O 작업 대기시간을 없앨 수 없기에 사용 X_
 
 #### RDB
 1. 매일 자정이 되면, Redis에서 `menu::`로 시작하는 모든 키를 찾는다. 이 키들은 인기 메뉴 데이터를 나타낸다.
