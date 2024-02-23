@@ -203,9 +203,9 @@
   - 단순히 데이터를 조회하는 경우 (예: 메뉴 조회)와 같이 데이터의 변경이 없는 상황에서는 DB Lock 없이 Redis Caching만으로도 충분히 빠른 응답 시간과 효율적인 서버 운영
 
 #### 적용 결과
- Caching 적용 전
+ _Caching 적용 전_
 <img width="1089" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/0bcb2f4e-e83f-4de3-82b0-e14d99678325"><br>
- Caching 적용 후
+ _Caching 적용 후_
 <img width="1085" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/37fd5ace-0d7d-42ec-abf0-03709894c9b5">
 *아래 값은 작업 시작 시간 에서 종료 시간까지의 평균 값으로 산출 (nGrinder 1분 측정)*
 
@@ -232,23 +232,24 @@
   - 실시간 처리: Redis는 실시간으로 데이터를 처리한다. 메뉴의 조회수가 변경될 때마다 즉시 ZSET의 스코어를 업데이트할 수 있다.
   - 정렬 기능: zSet은 스코어에 따라 자동으로 메뉴를 정렬한다. 조회수를 Score로 사용하면, 인기 메뉴를 스코어가 높은 순서로 쉽게 조회할 수 있다고 판단했다.
   - 동시성 처리: Redis는 단일 쓰레드 모델을 사용하며, atomic operations를 지원한다. 따라서, 여러 사용자가 동시에 인기 메뉴를 조회하거나, 조회수를 업데이트하더라도 데이터의 일관성을 유지할 수 있다.
-  
 
 #### 생각해 보아야 할 점
 - Redis zSet은 하나의 스코어를 기준으로 정렬하는 것이 일반적이다. 하지만 주문량과 조회수와 같은 두 가지 지표를 모두 고려하는 것이 메뉴의 인기도를 판단하는 데 더욱 정확할 것이라 판단했다.
 - 여러 지표를 조합하면, 단일 지표를 사용할 때보다 성능이 저하될 수 있다. 그러나 이런 성능 저하는 레디스를 통해 메뉴 정보를 캐싱함으로써 최소화할 수 있다.
 - 성능 저하는 Redis에 메뉴의 주문량과 조회수를 모두 캐싱해 인기도를 계산했다.
 
-#### 인기메뉴 조회 (상위 3개 메뉴)
+#### 인기메뉴 조회 시 RDB
 >  *총 4개의 메뉴 중 조회수, 주문량을 종합해 인기메뉴 3개를 조회한다.*
 > <img width="639" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/7a725c55-9382-4637-aa68-f01b658584b9">
 
-<img width="300" height="300" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/174bc528-6ba0-4a23-851b-2c40f50233c7"/>
+#### 인기메뉴 조회 시 Response Body
+
+<img width="298" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/15cfcb0d-65b5-4d31-a620-7fb037282737">
 
 - 가장 높은 조회수(*5*)를 기록한 `빵1` 최상위 1번에 위치
 - 조회수 동점을 이룬 `빵2`와 `빵3`중 주문량이 높은 `빵3`이 2번 위치
 - 전체 메뉴 중 상위 2개를 제외한 `빵2`가 그 다음 3번 위치
-
+#### 인기메뉴 조회 시 Redis (score만 반영)
 <img width="403" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/8d5b3889-2e7e-4aa1-b29c-b4f324aec544"/>
 
 redis-cli → ranking 이름의 Sorted Set(ZSET)에서, Score(조회수)가 0에서 10 사이인 요소들을 내림차순 조회
