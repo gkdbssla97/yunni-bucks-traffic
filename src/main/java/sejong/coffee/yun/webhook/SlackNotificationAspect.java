@@ -1,6 +1,7 @@
 package sejong.coffee.yun.webhook;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.gpedro.integrations.slack.SlackApi;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
@@ -17,12 +18,14 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Aspect
 @Component
 @RequiredArgsConstructor
 @Profile(value = {"local", "dev"})
+@Slf4j
 public class SlackNotificationAspect {
 
     private final SlackApi slackApi;
@@ -34,7 +37,11 @@ public class SlackNotificationAspect {
         HttpServletRequest request = ((ServletRequestAttributes)
                 RequestContextHolder.currentRequestAttributes()).getRequest();
 
-        threadPoolExecutor.execute(() -> sendSlackMessage(proceedingJoinPoint, request));
+        CompletableFuture.runAsync(() -> sendSlackMessage(proceedingJoinPoint, request), threadPoolExecutor)
+                .exceptionally(ex -> {
+                    log.error("Failed to send Slack message for request {}: ", request, ex);
+                    return null;
+                });
 
         return proceedingJoinPoint.proceed();
     }
