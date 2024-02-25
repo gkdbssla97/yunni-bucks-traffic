@@ -15,6 +15,7 @@ import sejong.coffee.yun.domain.order.menu.Menu;
 import sejong.coffee.yun.dto.menu.MenuDto;
 import sejong.coffee.yun.dto.menu.MenuPageDto;
 import sejong.coffee.yun.dto.menu.MenuRankingDto;
+import sejong.coffee.yun.repository.menu.MenuRepository;
 import sejong.coffee.yun.service.MenuService;
 
 import javax.validation.Valid;
@@ -31,8 +32,10 @@ import static sejong.coffee.yun.dto.menu.MenuDto.Response;
 public class MenuController {
 
     private final MenuService menuService;
+    private final MenuRepository menuRepository;
     private final CacheManager cacheManager;
-    private final RedisTemplate redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> objectRedisTemplate;
 
     @PostMapping("")
     ResponseEntity<Response> createMenu(@RequestBody @Valid Request request) {
@@ -50,7 +53,6 @@ public class MenuController {
         Page<Response> allMenu = menuService.findAll(pageRequest);
         List<Response> responses = allMenu.stream().toList();
 
-
         MenuPageDto.Response response = new MenuPageDto.Response(pageNum, responses);
         return ResponseEntity.ok(response);
     }
@@ -58,7 +60,6 @@ public class MenuController {
     @GetMapping("/caching/page/{pageNum}")
     ResponseEntity<MenuPageDto.Response> findAllByCaching(@PathVariable int pageNum) {
         PageRequest pageRequest = PageRequest.of(pageNum, 5, Sort.by("id"));
-
         Page<Response> allMenu = menuService.findAllByCaching(pageRequest);
         List<Response> responses = allMenu.stream().toList();
 
@@ -99,6 +100,37 @@ public class MenuController {
         }
 
         return result;
+    }
+
+    @GetMapping("/async-redis")
+    public void asyncWriteBack() {
+        menuService.refreshPopularMenusInRedis();
+    }
+
+    @GetMapping("/sync-redis")
+    public void syncWriteBack() {
+        Set<String> keys = Optional.ofNullable(redisTemplate.keys("menu::*")).orElse(Collections.emptySet());
+
+        for(String key : keys){
+            try {
+                Menu popularMenu = (Menu) objectRedisTemplate.opsForValue().get(key);
+                if (popularMenu != null) {
+                    Menu findMenu = menuRepository.findByTitle(popularMenu.getTitle());
+                    if (findMenu != null) {
+                        Double score = redisTemplate.opsForZSet().score("ranking", popularMenu.getTitle());
+                        if (score != null) {
+                            menuService.updateMenu(findMenu, popularMenu.getOrderCount(), popularMenu.getViewCount(), score);
+                        }
+                    }
+                }
+            } catch(Exception ex) {
+                log.error("Failed to process key: {}", key, ex);
+            }
+        }
+
+        // 모든 동기 작업이 완료되면 redisTemplate.delete("menu::*") 작업을 실행
+        redisTemplate.delete("menu::*");
+
     }
 
 }

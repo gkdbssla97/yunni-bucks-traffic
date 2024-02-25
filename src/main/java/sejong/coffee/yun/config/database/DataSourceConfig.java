@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
@@ -121,5 +124,16 @@ public class DataSourceConfig {
     public JdbcTemplate postgresJdbcTemplate(DatabaseProperties databaseProperties) {
         DataSource postgresDataSource = createDataSource(databaseProperties.getPostgres());
         return new JdbcTemplate(postgresDataSource);
+    }
+
+    @Bean
+    public ThreadPoolExecutor threadPoolExecutor() {
+        int corePoolSize = 8;
+        int maxPoolSize = 16;
+        long keepAliveTime = 60L;
+        TimeUnit unit = TimeUnit.SECONDS;
+        return new ThreadPoolExecutor(
+                corePoolSize, maxPoolSize, keepAliveTime, unit, new LinkedBlockingQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy()
+        );
     }
 }
