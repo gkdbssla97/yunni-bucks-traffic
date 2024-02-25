@@ -1,5 +1,6 @@
 package sejong.coffee.yun.domain.order.menu;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,7 @@ import static sejong.coffee.yun.domain.order.menu.MenuStatus.SOLD_OUT;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @DiscriminatorColumn
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class Menu {
 
     @Id

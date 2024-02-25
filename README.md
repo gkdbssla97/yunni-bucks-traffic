@@ -282,9 +282,12 @@ public void refreshPopularMenusInRedis() {
             log.error("Failed to process key: {}", key, ex);
             return null;
         })).toList();
-} // 동기식: (keys -> keys.stream() ...)
+} // 동기식: for-each loop {...})
 ```
->**Synchronized Stream → Asynchronized Stream<br>**
+응답시간: 3.73s → 263.16ms (**_14.2_** 배 단축) <br>
+<img width="507" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/879bbc44-872c-4dd6-b0cd-7fc63e512e01">
+
+>**Synchronized → Asynchronized<br>**
 I/O 작업을 동기적으로 처리하면, 작업이 완료될 때까지 쓰레드가 대기 상태가 되어야 하므로, 쓰레드의 CPU 사용률이 낮아진다.<br>
 > - `CompletableFuture` 비동기 처리 사용 이유
 >   1. **효율성**: 메인 쓰레드가 별도의 작업 쓰레드의 완료를 기다리지 않고 다음 작업을 계속 진행하여 쓰레드의 CPU 사용률을 높일 수 있다고 판단하여 적용
