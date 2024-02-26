@@ -6,7 +6,10 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -107,20 +110,17 @@ public class MenuService {
                 .toList();
     }
 
-    /**
-     * 1. keys.stream().map(key -> ...)): 각 키에 대해 비동기 작업을 생성하고, 그 결과를 futures라는 리스트에 저장한다. CompletableFuture.runAsync()를 사용하여 각 작업을 별도의 스레드에서 비동기로 실행
-     * 2. Optional.ofNullable((Menu) objectRedisTemplate.opsForValue().get(key)): 주어진 키에 대한 값(메뉴)를 Redis에서 반환한다. 가져온 메뉴가 null이 아닌 경우에만 이후의 코드 실행
-     * 3. Optional.ofNullable(menuRepository.findByTitle(popularMenu.getTitle())): 가져온 메뉴의 제목과 일치하는 메뉴를 데이터베이스에서 조회한다. 찾은 메뉴가 null이 아닌 경우에만 이후의 코드 실행
-     * 4. Double score = redisTemplate.opsForZSet().score("ranking", popularMenu.getTitle()): Redis의 "ranking" ZSet에서 가져온 메뉴의 제목에 해당하는 점수를 반환
-     * 5. Optional.ofNullable(score).ifPresent(sc -> ...)): 가져온 점수가 null이 아닌 경우에만 updateMenu 메서드를 호출
-     * 6. CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenRunAsync(() -> redisTemplate.delete("menu::*")): 모든 비동기 작업이 완료되면 Redis의 "menu::*" 패턴에 매칭되는 모든 키를 삭제한다. 이 작업도 별도의 스레드에서 비동기로 실행
-     */
     @Scheduled(cron = "0 0 0 * * *") // 매일 00시 00분에 실행
     public void refreshPopularMenusInRedis() {
-        Set<String> keys = Optional.ofNullable(redisTemplate.keys("menu::*")).orElse(Collections.emptySet());
+        ScanOptions options = ScanOptions.scanOptions().match("menu::*").count(500).build();
+        RedisConnection connection = redisTemplate.getConnectionFactory().getConnection();
 
-        List<CompletableFuture<Void>> futures = keys.stream()
-                .map(key -> CompletableFuture.runAsync(() -> {
+        try {
+            Cursor<byte[]> cursor = connection.scan(options);
+
+            while (cursor.hasNext()) {
+                String key = new String(cursor.next());
+                CompletableFuture.runAsync(() -> {
                             Optional.ofNullable((Menu) objectRedisTemplate.opsForValue().get(key))
                                     .ifPresent(popularMenu -> {
                                         Optional.ofNullable(menuRepository.findByTitle(popularMenu.getTitle()))
@@ -134,11 +134,15 @@ public class MenuService {
                         .exceptionally(ex -> {
                             log.error("Failed to process key: {}", key, ex);
                             return null;
-                        })).toList();
+                        });
+            }
 
-        // 모든 비동기 작업이 완료되면 redisTemplate.delete("menu::*") 작업을 실행
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                .thenRunAsync(() -> redisTemplate.delete("menu::"));
+            cursor.close();
+        } catch (Exception e) {
+            log.error("Error occurred while scanning keys", e);
+        } finally {
+            connection.close();
+        }
     }
 
     @Transactional

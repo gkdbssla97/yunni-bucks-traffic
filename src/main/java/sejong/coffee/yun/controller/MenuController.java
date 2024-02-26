@@ -130,7 +130,5 @@ public class MenuController {
 
         // 모든 동기 작업이 완료되면 redisTemplate.delete("menu::*") 작업을 실행
         redisTemplate.delete("menu::*");
-
     }
-
 }
