@@ -273,19 +273,28 @@ redis-cli → ranking 이름의 Sorted Set(ZSET)에서, Score(조회수)가 0에
 ```java
 @Scheduled(cron = "0 0 0 * * *")
 public void refreshPopularMenusInRedis() {
-    Set<String> keys = Optional.ofNullable(redisTemplate.keys("menu::*")).orElse(Collections.emptySet());    
-    List<CompletableFuture<Void>> futures = keys.stream() 
-        .map(key -> CompletableFuture.runAsync(() -> {
-                    ...
-        }, threadPoolExecutor)
-        .exceptionally(ex -> {
-            log.error("Failed to process key: {}", key, ex);
-            return null;
-        })).toList();
+    ScanOptions options = ScanOptions.scanOptions().match("menu::*").count(500).build();
+    RedisConnection connection = redisTemplate.getConnectionFactory().getConnection();
+    
+    try {
+        Cursor<byte[]> cursor = connection.scan(options);
+    
+      while (cursor.hasNext()) {
+          String key=new String(cursor.next());
+          CompletableFuture.runAsync(()-> {
+          ...
+        }, threadPoolExecutor).exceptionally(ex -> 
+             log.error("Failed to process key: {}", key, ex); ...)
+      } cursor.close();
+    }
 } // 동기식: for-each loop {...})
 ```
-응답시간: 3.73s → 263.16ms (**_14.2_** 배 단축) <br>
-<img width="507" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/879bbc44-872c-4dd6-b0cd-7fc63e512e01">
+![image](https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/5d336b7e-e9e1-4223-9311-e0577e4e6b34)
+
+|     구 분      |  Sync |   Async  | Async+Scan |
+|:------------:|:-----:|:--------:|:----------:|
+|    응답 시간     | 3.73s | 263.16ms |   88.75ms  |
+| 성능개선(Sync대비) |   -   |  14.2배  |   42.0배   |
 
 >**Synchronized → Asynchronized<br>**
 I/O 작업을 동기적으로 처리하면, 작업이 완료될 때까지 쓰레드가 대기 상태가 되어야 하므로, 쓰레드의 CPU 사용률이 낮아진다.<br>
