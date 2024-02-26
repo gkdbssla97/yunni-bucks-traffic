@@ -279,14 +279,14 @@ public void refreshPopularMenusInRedis() {
     try {
         Cursor<byte[]> cursor = connection.scan(options);
     
-      while (cursor.hasNext()) {
-          String key = new String(cursor.next());
-          CompletableFuture.runAsync(() -> {
-                Optional.ofNullable((Menu) objectRedisTemplate.opsForValue().get(key))
-                    ...
-        }, threadPoolExecutor).exceptionally(ex -> 
-             log.error("Failed to process key: {}", key, ex); ...)
-      } cursor.close();
+        while (cursor.hasNext()) {
+            String key = new String(cursor.next());
+            CompletableFuture.runAsync(() -> {
+                  Optional.ofNullable((Menu) objectRedisTemplate.opsForValue().get(key))
+                      ...
+          }, threadPoolExecutor).exceptionally(ex -> 
+               log.error("Failed to process key: {}", key, ex); ...)
+        } cursor.close();
     }
 } // 동기식: for-each loop {...})
 ```
