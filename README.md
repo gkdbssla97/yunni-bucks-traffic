@@ -76,7 +76,7 @@
   1. **LIKE 연산자를 사용한 검색**: 가장 기본적인 문자열 검색 방식으로 와일드카드 검색 수행. <br>Full Table Scan은 테이블의 모든 행을 검사하기 때문에 데이터 양이 증가함에 따라 성능이 선형적으로 감소
   2. **ts_vector와 plainto_tsquery를 사용한 Full Text Search**: tsvector는 텍스트를 '단어'로 분할하고, 이를 정규화시킴. 이 단어들은 GIN 인덱스에 포인터를 저장하여 쿼리 시 각 단어를 효율적으로 검색 to_tsquery는 검색 쿼리를 tsvector 형식으로 변환하여, 인덱스에서 빠르게 검색
   
-  | 구분(Menu Review)            | 100,000개  |  1,000,000개  |
+  | 구분 (MenuReview)            | 100,000개  |  1,000,000개  |
   |:---------:|:------------:|:---------:|
   | Full Table Scan |  726 ms	  |  11.927 sec  |
   | Full Text Search |  493 ms   |  4.264 sec   |
@@ -145,7 +145,7 @@
 - Distributed Lock, Redisson 활용
    lettuce는 계속 락 획득을 시도하는 반면에 redisson은 락 해제가 되었을 때 최소한의 시도를 하기 때문에 Redis의 부하를 줄여주게 된다.
   
-    | 구분(Users)            |     100명     |    1000명     |
+    | 구분 (Users)            |     100명     |    1000명     |
     |:------------:|:------------:|:---------:|
     | Optimistic Lock |  6.105 sec   |  24.529 sec  |
     | Pessimistic Lock |  1.417 sec	  |  7.526 sec   |
@@ -179,7 +179,7 @@
 - 이 방식은 동시성 문제를 방지할 수 있지만, 대기 시간이 길어질 수 있다는 단점
 - 최대 사용자는 몇 명까지인지 부하테스트 필요 (사용자가 늘어날수록 시간도 기하급수적 증가)
     
-  | 구분 |    응답시간     |
+  | Users |    응답시간     |
   |:-----------:|:-----------:|
     | 10명 |   564 ms    |
     | 100명 |  1.417 sec  | 
@@ -209,7 +209,7 @@
 <img width="1085" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/37fd5ace-0d7d-42ec-abf0-03709894c9b5">
 *아래 값은 작업 시작 시간 에서 종료 시간까지의 평균 값으로 산출 (nGrinder 1분 측정)*
 
-|        구분        |   TPS    |  응답시간(ms)  |
+|        구 분        |   TPS    |  응답시간(ms)  |
 |:----------------:|:--------:|:----------:|
 |  레디스 캐싱 전략 사용 전  |  171.4	  |   55.67    |
 |  레디스 캐싱 전략 사용 후  |  339.2   |   28.15    |
@@ -290,12 +290,13 @@ public void refreshPopularMenusInRedis() {
     }
 } // 동기식: for-each loop {...})
 ```
+#### 성능 측정 (_Postman_)
 ![image](https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/5d336b7e-e9e1-4223-9311-e0577e4e6b34)
 
-|     구 분      |  Sync |   Async  | Async+Scan |
-|:------------:|:-----:|:--------:|:----------:|
-|    응답 시간     | 3.73s | 263.16ms |   88.75ms  |
-| 성능개선(Sync대비) |   -   |  14.2배  |   42.0배   |
+|      구 분      |  Sync |  Async   | Async+Scan |
+|:-------------:|:-----:|:--------:|:----------:|
+|     응답시간      | 3.73s | 263.16ms |  88.75ms   |
+| 성능개선 (Sync대비) |   -   |  14.2 배  |   42.0 배   |
 
 >**Synchronized → Asynchronized<br>**
 I/O 작업을 동기적으로 처리하면, 작업이 완료될 때까지 쓰레드가 대기 상태가 되어야 하므로, 쓰레드의 CPU 사용률이 낮아진다.<br>
@@ -305,6 +306,8 @@ I/O 작업을 동기적으로 처리하면, 작업이 완료될 때까지 쓰레
 > - `ThreadPoolExecutor` 사용 이유
 >   1. **커스텀 설정**: ThreadPoolExecutor의 설정을 직접 관리함으로써, 어플리케이션의 특성에 맞게 ThreadPool의 동작 제어
 >   2. **공유 리소스 관리**: commonPool에서 쓰레드를 과도하게 사용하여 시스템 전체의 성능이 저하되는 것을 방지하기 위해 특정 작업에 대해 별도의 ThreadPool을 사용
+> - `scan 명령어` 사용 이유
+>   1. **Blocking 최소화**: Redis는 Single Thread 구조로 동작하고, keys 명령어는 모든 키를 찾을 때까지 Redis를 Blocking 한다. 이는 다른 클라이언트의 요청 처리가 지연될 수 있다.<br>`scan 명령어`는 일정량(count)의 키만 반환하여 Timeout 발생 할 확률 낮춤 
 >
 > _`parallelStream()`을 사용하더라도 병렬 쓰레드는 I/O 작업 대기시간을 없앨 수 없기에 사용 X_
 
