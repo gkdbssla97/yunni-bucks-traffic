@@ -280,9 +280,10 @@ public void refreshPopularMenusInRedis() {
         Cursor<byte[]> cursor = connection.scan(options);
     
       while (cursor.hasNext()) {
-          String key=new String(cursor.next());
-          CompletableFuture.runAsync(()-> {
-          ...
+          String key = new String(cursor.next());
+          CompletableFuture.runAsync(() -> {
+                Optional.ofNullable((Menu) objectRedisTemplate.opsForValue().get(key))
+                    ...
         }, threadPoolExecutor).exceptionally(ex -> 
              log.error("Failed to process key: {}", key, ex); ...)
       } cursor.close();
