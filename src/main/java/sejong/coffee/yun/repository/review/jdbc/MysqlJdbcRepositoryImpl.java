@@ -15,12 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class MysqlJdbcRepository implements JdbcRepository {
+public class MysqlJdbcRepositoryImpl implements JdbcRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final int batchSize = 1000;
 
-    public MysqlJdbcRepository(@Qualifier("masterJdbcTemplate") JdbcTemplate jdbcTemplate) {
+    public MysqlJdbcRepositoryImpl(@Qualifier("masterJdbcTemplate") JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

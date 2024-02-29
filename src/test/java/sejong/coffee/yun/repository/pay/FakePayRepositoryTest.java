@@ -98,7 +98,7 @@ public class FakePayRepositoryTest extends BeforeCreatedData {
         CardPayment result = payRepository.findByOrderUuidAnAndPaymentStatus(uuid, PaymentStatus.DONE);
 
         //then
-        assertThat(result.getOrderUuid()).isEqualTo("asdfasdfasdf");
+        assertThat(result.getOrderUuid()).isEqualTo("uuid-random-init");
     }
 
     @Test

@@ -48,7 +48,7 @@ class CardPaymentTest extends BeforeCreatedData {
     void 카드결제_유효기간_검증_예외발생() {
         assertThatThrownBy(() -> Card.builder()
                 .number("123456789123")
-                .validThru("22/13")
+                .validThru("11/22")
                 .cardPassword("1234")
                 .member(member)
                 .build())

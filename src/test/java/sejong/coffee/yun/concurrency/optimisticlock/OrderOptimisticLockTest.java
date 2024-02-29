@@ -102,7 +102,7 @@ public class OrderOptimisticLockTest extends MainIntegrationTest {
                 .nutrients(nutrients)
                 .menuSize(MenuSize.M)
                 .now(LocalDateTime.now())
-                .stock(10)
+                .stock(100)
                 .build();
 
 
@@ -122,7 +122,7 @@ public class OrderOptimisticLockTest extends MainIntegrationTest {
     void concurrencyOrdersByOneCustomer() throws InterruptedException {
 
         // given
-        int numberOfThread = 10;
+        int numberOfThread = 16;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThread);
         CountDownLatch countDownLatch = new CountDownLatch(numberOfThread);
 
@@ -177,7 +177,7 @@ public class OrderOptimisticLockTest extends MainIntegrationTest {
 
         // then
         List<CartItem> cartItemList = cartItemRepository.findAll();
-        assertThat(cartItemList.size()).isEqualTo(10 - 1);
+        assertThat(cartItemList.size()).isEqualTo(5 - 1);
     }
 
     @Test

@@ -64,7 +64,7 @@ public class BeforeCreatedData {
                 .orderCount(0)
                 .build();
 
-        this.card = new Card("1234123443211239", "10/23", "1234", this.member);
+        this.card = new Card("1234123443211239", "10/24", "1234", this.member);
 
         CartItem c1 = CartItem.builder()
                 .menu(menu1)

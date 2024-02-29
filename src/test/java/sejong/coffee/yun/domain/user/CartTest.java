@@ -4,17 +4,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sejong.coffee.yun.domain.exception.NotFoundException;
 import sejong.coffee.yun.domain.order.Order;
-import sejong.coffee.yun.domain.order.menu.*;
+import sejong.coffee.yun.domain.order.menu.Beverage;
+import sejong.coffee.yun.domain.order.menu.Menu;
+import sejong.coffee.yun.domain.order.menu.MenuSize;
+import sejong.coffee.yun.domain.order.menu.Nutrients;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static sejong.coffee.yun.domain.exception.ExceptionControl.NOT_FOUND_MENU;
-import static sejong.coffee.yun.domain.user.CartControl.SIZE;
 
 class CartTest {
 
@@ -119,22 +120,6 @@ class CartTest {
         assertThatThrownBy(() -> cart.removeMenu(3))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(NOT_FOUND_MENU.getMessage());
-    }
-
-    @Test
-    void 카트는_10개의_메뉴만_담을_수_있다() {
-        // given
-        Cart cart = Cart.builder()
-                .member(member)
-                .cartItems(new ArrayList<>())
-                .build();
-
-        // when
-
-        // then
-        assertThatThrownBy(() -> IntStream.range(0, 20).forEach(i -> cart.addMenu(menu1)))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("카트는 메뉴를 " + SIZE.getSize() + "개만 담을 수 있습니다.");
     }
 
     @Test

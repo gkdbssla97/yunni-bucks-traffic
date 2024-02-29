@@ -1,12 +1,15 @@
-package sejong.coffee.yun.domain.order.menu;
+package sejong.coffee.yun.integration.order.menu;
 
 import net.datafaker.Faker;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.test.annotation.Rollback;
+import sejong.coffee.yun.domain.order.menu.Menu;
+import sejong.coffee.yun.domain.order.menu.MenuReview;
 import sejong.coffee.yun.domain.order.menu.postgre.PostgresMenuReviewRepository;
 import sejong.coffee.yun.domain.user.Member;
 import sejong.coffee.yun.integration.MainIntegrationTest;
@@ -42,18 +45,18 @@ public class MenuReviewTest extends MainIntegrationTest {
     JdbcRepository menuReviewJdbcPostgresRepository;
 
     @Autowired
-    @Qualifier("mysqlJdbcRepository")
+    @Qualifier("mysqlJdbcRepositoryImpl")
     JdbcRepository menuReviewJdbcMysqlRepository;
 
     private final List<MenuReview> menuReviews = new ArrayList<>();
     private Member member;
     private Menu menu;
 
-//    @AfterEach
-//    void initDB() {
-//        menuReviewRepository.clear();
-//        userRepository.clear();
-//    }
+    @AfterEach
+    void initDB() {
+        menuReviewRepository.clear();
+        userRepository.clear();
+    }
 
     @PostConstruct
     public void init() throws IOException {

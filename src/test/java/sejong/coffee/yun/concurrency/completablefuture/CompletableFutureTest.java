@@ -27,7 +27,7 @@ public class CompletableFutureTest extends MainIntegrationTest {
     @Autowired
     private MenuService menuService;
     @Autowired
-    @Qualifier("mysqlJdbcRepository")
+    @Qualifier("mysqlJdbcRepositoryImpl")
     JdbcRepository jdbcMysqlRepository;
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -35,12 +35,6 @@ public class CompletableFutureTest extends MainIntegrationTest {
     private RedisTemplate<String, Object> objectRedisTemplate;
 
     private final List<Menu> menus = new ArrayList<>();
-
-//    @AfterEach
-//    void initDB() {
-//        menuReviewRepository.clear();
-//        userRepository.clear();
-//    }
 
     @PostConstruct
     public void init() throws IOException {
@@ -57,11 +51,6 @@ public class CompletableFutureTest extends MainIntegrationTest {
     @AfterEach
     public void deleteAll() {
         menuRepository.clear();
-    }
-
-    @Test
-    void insertMenuBulkData() {
-        log.info("thread check:");
     }
 
     @Test
