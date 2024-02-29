@@ -106,8 +106,11 @@ ext {
 
 test {
 	outputs.dir snippetsDir
-	useJUnitPlatform()
+	useJUnitPlatform {
+		includeTags 'sejong.coffee.yun.unit'
+	}
 }
+
 
 asciidoctor {
 	inputs.dir snippetsDir
