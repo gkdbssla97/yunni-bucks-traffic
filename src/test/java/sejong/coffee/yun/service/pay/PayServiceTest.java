@@ -57,7 +57,7 @@ public class PayServiceTest extends CreatePaymentData {
 
         this.payService = PayService.builder()
                 .payRepository(payRepository)
-                .uuidHolder(new FakeUuidHolder("qwerqewrqwer"))
+                .uuidHolder(new FakeUuidHolder("uuid-random-init"))
                 .apiService(new ApiService(fakeTossApiService, null))
                 .orderRepository(orderRepository)
                 .cardRepository(cardRepository)

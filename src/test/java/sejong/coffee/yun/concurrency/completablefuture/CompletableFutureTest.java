@@ -1,5 +1,7 @@
 package sejong.coffee.yun.concurrency.completablefuture;
 
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 public class CompletableFutureTest extends MainIntegrationTest {
 
     @Autowired
@@ -25,7 +28,7 @@ public class CompletableFutureTest extends MainIntegrationTest {
     private MenuService menuService;
     @Autowired
     @Qualifier("mysqlJdbcRepository")
-    JdbcRepository menuReviewJdbcMysqlRepository;
+    JdbcRepository jdbcMysqlRepository;
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
     @Autowired
@@ -42,18 +45,23 @@ public class CompletableFutureTest extends MainIntegrationTest {
     @PostConstruct
     public void init() throws IOException {
 
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 1000; i++) {
             Menu menu = bread(i + 1);
 
             menus.add(menu);
         }
-        menuReviewJdbcMysqlRepository.saveMenusByJdbc(menus);
-//        cacheMenus(menus);
+        jdbcMysqlRepository.saveMenusByJdbc(menus);
+        cacheMenus(menus);
+    }
+
+    @AfterEach
+    public void deleteAll() {
+        menuRepository.clear();
     }
 
     @Test
     void insertMenuBulkData() {
-
+        log.info("thread check:");
     }
 
     @Test
@@ -61,13 +69,14 @@ public class CompletableFutureTest extends MainIntegrationTest {
         long start = System.nanoTime();
 
         // 비동기 코드 또는 동기 코드 실행
-        menuService.refreshPopularMenusInRedis();
-        synchronizedRefreshPopularMenusInRedis();
+        menuService.refreshPopularMenusInRedis(); // Execution time: 10.88125 ms
+
         long end = System.nanoTime();
 
-        double elapsedTime = (end - start) / 1000.0;
-        System.out.println("Execution time: " + elapsedTime + " seconds");
+        double elapsedTime = (end - start) / 1_000_000.0;  // 나노초를 밀리세컨드로 변환
+        System.out.println("Execution time: " + elapsedTime + " ms");
     }
+
 
     public void synchronizedRefreshPopularMenusInRedis() {
         Optional.ofNullable(redisTemplate.keys("menu::"))

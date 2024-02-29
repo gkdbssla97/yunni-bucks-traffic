@@ -14,6 +14,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest(showSql = true)
+@Deprecated
 public class CardJpaRepositoryTest extends BeforeCreatedData {
 
     @Autowired private JpaCardRepository jpaCardRepository;

@@ -29,7 +29,7 @@ public class PayJpaRepositoryTest extends BeforeCreatedData {
 
     @BeforeEach
     void init() {
-        uuid = new FakeUuidHolder("asdfasdfasdf").random();
+        uuid = new FakeUuidHolder("uuid-random-init").random();
 
         cardPayment = CardPayment.builder()
                 .cardExpirationYear(this.card.getValidThru())

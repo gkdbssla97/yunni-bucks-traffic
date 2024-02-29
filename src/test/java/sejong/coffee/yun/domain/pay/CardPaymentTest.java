@@ -32,7 +32,7 @@ class CardPaymentTest extends BeforeCreatedData {
         //given
 
         //when
-        CardPayment cardPayment = new CardPayment(card, order, new FakeUuidHolder("asdfasdf"));
+        CardPayment cardPayment = new CardPayment(card, order, new FakeUuidHolder("uuid-random-init"));
 
         //then
         assertThat(Integer.parseInt(cardPayment.getCardExpirationYear()))
