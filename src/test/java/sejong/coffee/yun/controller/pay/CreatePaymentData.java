@@ -1,7 +1,7 @@
 package sejong.coffee.yun.controller.pay;
 
 import sejong.coffee.yun.domain.order.Order;
-import sejong.coffee.yun.domain.pay.BeforeCreatedData;
+import sejong.coffee.yun.unit.domain.pay.BeforeCreatedData;
 import sejong.coffee.yun.domain.pay.CardPayment;
 import sejong.coffee.yun.domain.user.Card;
 import sejong.coffee.yun.service.mock.FakeUuidHolder;

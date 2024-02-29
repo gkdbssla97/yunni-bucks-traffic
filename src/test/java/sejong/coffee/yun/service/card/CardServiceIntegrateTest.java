@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import sejong.coffee.yun.domain.exception.ExceptionControl;
-import sejong.coffee.yun.domain.pay.BeforeCreatedData;
+import sejong.coffee.yun.unit.domain.pay.BeforeCreatedData;
 import sejong.coffee.yun.domain.user.Card;
 import sejong.coffee.yun.domain.user.Member;
 import sejong.coffee.yun.dto.card.CardDto;

@@ -3,7 +3,7 @@ package sejong.coffee.yun.service.card;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sejong.coffee.yun.domain.exception.ExceptionControl;
-import sejong.coffee.yun.domain.pay.BeforeCreatedData;
+import sejong.coffee.yun.unit.domain.pay.BeforeCreatedData;
 import sejong.coffee.yun.domain.user.Card;
 import sejong.coffee.yun.domain.user.Member;
 import sejong.coffee.yun.dto.card.CardDto;

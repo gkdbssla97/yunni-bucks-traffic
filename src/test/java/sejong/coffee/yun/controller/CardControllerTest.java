@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import sejong.coffee.yun.controller.mock.TestCardContainer;
 import sejong.coffee.yun.domain.exception.ExceptionControl;
-import sejong.coffee.yun.domain.pay.BeforeCreatedData;
+import sejong.coffee.yun.unit.domain.pay.BeforeCreatedData;
 import sejong.coffee.yun.domain.user.Card;
 import sejong.coffee.yun.dto.card.CardDto;
 import sejong.coffee.yun.mapper.CustomMapper;
