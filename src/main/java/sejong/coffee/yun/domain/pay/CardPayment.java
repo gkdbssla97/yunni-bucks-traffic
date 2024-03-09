@@ -1,6 +1,7 @@
 package sejong.coffee.yun.domain.pay;
 
 import lombok.*;
+import sejong.coffee.yun.domain.DateTimeEntity;
 import sejong.coffee.yun.domain.order.Order;
 import sejong.coffee.yun.domain.user.Card;
 import sejong.coffee.yun.dto.pay.CardPaymentDto;
@@ -19,7 +20,7 @@ import static sejong.coffee.yun.util.parse.ParsingUtil.parsingCardValidDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = "order")
 @Table(name = "card_payment")
-public class CardPayment extends PaymentDateTimeEntity implements Pay {
+public class CardPayment extends DateTimeEntity implements Pay {
 
     @Id
     @GeneratedValue
