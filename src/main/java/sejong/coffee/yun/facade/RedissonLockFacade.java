@@ -59,7 +59,7 @@ public class RedissonLockFacade {
             boolean available = lock.tryLock(10, 1, TimeUnit.SECONDS);
 
             if (!available) {
-                System.out.println("lock 획득 실패");
+                System.out.println("재고감소 위한 메뉴 접근 LOCK 획득 실패");
                 return;
             }
 
@@ -81,7 +81,7 @@ public class RedissonLockFacade {
             boolean available = lock.tryLock(10, 1, TimeUnit.SECONDS);
 
             if (!available) {
-                System.out.println("lock 획득 실패");
+                System.out.println("주문수 증가 위한 메뉴 접근 LOCK 획득 실패");
                 return;
             }
             orderService.increaseMenuOrderCountWithRedissonLock(menuId, quantity);
@@ -103,17 +103,24 @@ public class RedissonLockFacade {
 
         // 캐시에 메뉴가 없을 경우에만 RDB에서 메뉴를 조회하고 캐시에 저장
         if (cachedMenu == null) {
-            lock.lock();
             try {
+                boolean available = lock.tryLock(10, 1, TimeUnit.SECONDS);
+                if (!available) {
+                    System.out.println("메뉴 접근 LOCK 획득 실패");
+                    return null;
+                }
                 Menu findMenu = menuRepository.findByTitle(menuTitle);
                 cachedMenu = MenuDto.Response.fromMenu(findMenu);
                 Objects.requireNonNull(cacheManager.getCache("Menu")).put(menuTitle, cachedMenu);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             } finally {
-                lock.unlock();
+                if (lock.isHeldByCurrentThread()) {
+                    lock.unlock();
+                }
             }
         }
 
         return cachedMenu;
     }
-
 }
