@@ -3,6 +3,7 @@ package sejong.coffee.yun.domain.pay;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import sejong.coffee.yun.domain.DateTimeEntity;
 import sejong.coffee.yun.domain.order.Order;
 
 import javax.persistence.*;
@@ -10,7 +11,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PaymentDetails extends PaymentDateTimeEntity {
+public class PaymentDetails extends DateTimeEntity {
 
     @Id @GeneratedValue
     private Long id;
