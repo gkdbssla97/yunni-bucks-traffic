@@ -50,7 +50,6 @@ public class PaymentController {
         try {
             confirm = payService.initConfirm(orderId);
             cardPayment = payService.confirm(confirm);
-            return ResponseEntity.status(HttpStatus.CREATED).body(customMapper.map(cardPayment, Response.class));
         } catch (HttpTimeoutException e) {
             PaymentStatus status = payService.checkPaymentStatus(orderId);
             if (status.equals(PaymentStatus.READY)) {
