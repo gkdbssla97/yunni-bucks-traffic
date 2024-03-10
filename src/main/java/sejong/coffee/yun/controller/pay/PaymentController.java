@@ -54,7 +54,10 @@ public class PaymentController {
         } catch (HttpTimeoutException e) {
             PaymentStatus status = payService.checkPaymentStatus(orderId);
             if (status.equals(PaymentStatus.READY)) {
-                payService.cancelPayment(cardPayment.getPaymentKey(), NETWORK_CANCEL.getCode(), confirm.amount());
+                CardPayment cancelCardPayment = payService.cancelPayment(cardPayment.getPaymentKey(), NETWORK_CANCEL.getCode(), confirm.amount());
+                return ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(from(cancelCardPayment, cancelCardPayment.getOrder()));
             }
         }
 

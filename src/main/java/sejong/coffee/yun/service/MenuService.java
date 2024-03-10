@@ -135,7 +135,6 @@ public class MenuService {
                             return null;
                         });
             }
-
             cursor.close();
         } catch (Exception e) {
             log.error("Error occurred while scanning keys", e);
