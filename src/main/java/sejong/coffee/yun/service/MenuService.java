@@ -22,7 +22,6 @@ import sejong.coffee.yun.domain.order.menu.MenuType;
 import sejong.coffee.yun.dto.menu.MenuDto;
 import sejong.coffee.yun.facade.RedissonLockFacade;
 import sejong.coffee.yun.repository.menu.MenuRepository;
-import sejong.coffee.yun.util.wrapper.RestPage;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -41,7 +40,7 @@ public class MenuService {
     private final RedisTemplate<String, Object> objectRedisTemplate;
     private final ThreadPoolExecutor threadPoolExecutor;
 
-    @CacheEvict(value = {"Menu", "AllMenus"}, allEntries = true)
+    @CacheEvict(value = {"AllMenus"}, allEntries = true)
     public Menu create(MenuDto.Request request) {
         Menu menu = createMenu(request);
 
@@ -74,9 +73,9 @@ public class MenuService {
 
     @Cacheable(value = "AllMenus", key = "#pageable.pageNumber", cacheManager = "cacheManager", condition = "#pageable.pageNumber <= 5")
     @Transactional(readOnly = true)
-    public RestPage<MenuDto.Response> findAllByCaching(Pageable pageable) {
+    public Page<MenuDto.Response> findAllByCaching(Pageable pageable) {
         Page<Menu> allMenusPaged = menuRepository.findAllMenusPaged(pageable);
-        return new RestPage<>(allMenusPaged.map(MenuDto.Response::new));
+        return allMenusPaged.map(MenuDto.Response::new);
     }
 
     public Page<MenuDto.Response> findAll(Pageable pageable) {
@@ -112,7 +111,7 @@ public class MenuService {
 
     @Scheduled(cron = "0 0 0 * * *") // 매일 00시 00분에 실행
     public void refreshPopularMenusInRedis() {
-        ScanOptions options = ScanOptions.scanOptions().match("menu::*").count(500).build();
+        ScanOptions options = ScanOptions.scanOptions().match("AllMenus::*").count(500).build();
         RedisConnection connection = redisTemplate.getConnectionFactory().getConnection();
 
         try {
