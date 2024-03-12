@@ -74,7 +74,7 @@
   #### 검색 기법
   
   1. **LIKE 연산자를 사용한 검색**: 가장 기본적인 문자열 검색 방식으로 와일드카드 검색 수행. <br>Full Table Scan은 테이블의 모든 행을 검사하기 때문에 데이터 양이 증가함에 따라 성능이 선형적으로 감소
-  2. **ts_vector와 plainto_tsquery를 사용한 Full Text Search**: tsvector는 텍스트를 '단어'로 분할하고, 이를 정규화시킴. 이 단어들은 GIN 인덱스에 포인터를 저장하여 쿼리 시 각 단어를 효율적으로 검색 to_tsquery는 검색 쿼리를 tsvector 형식으로 변환하여, 인덱스에서 빠르게 검색
+  2. **ts_vector와 ts_query를 사용한 Full Text Search**: tsvector는 텍스트를 '단어'로 분할하고, 이를 정규화시킴. 이 단어들은 GIN 인덱스에 포인터를 저장하여 쿼리 시 각 단어를 효율적으로 검색 tsquery는 검색 쿼리를 tsvector 형식으로 변환하여, 인덱스에서 빠르게 검색
   
   | 구분 (MenuReview)            | 100,000개  |  1,000,000개  |
   |:---------:|:------------:|:---------:|
@@ -131,7 +131,7 @@
 #### 1. 한 사용자가 여러 개의 주문을 동시에 요청
 - Optimistic Lock 활용
     #### 구현 이유
-- Optimistic Locking 선택한 이유 
+- Optimistic Lock 선택한 이유 
   - 대부분의 상황에서 실제로 동일한 리소스에 대한 동시 요청이 드물게 발생하고, 이런 상황에서는 Optimistic Locking이 더 효율적
   - 낮은 비용으로 높은 동시성을 제공하며, 충돌 발생 시 재시도 로직을 통해 처리
 
@@ -143,7 +143,7 @@
   - Optimistic Lock과 성능 비교 시 비관적 락 우위
   - 사용자 수가 증가함에 따라 낙관적 락과 비관적 락 사이의 처리 속도 차이가 점점 더 벌어질 것으로 예상
 - Distributed Lock, Redisson 활용
-   lettuce는 계속 락 획득을 시도하는 반면에 redisson은 락 해제가 되었을 때 최소한의 시도를 하기 때문에 Redis의 부하를 줄여주게 된다.
+   Lettuce는 계속 락 획득을 시도하는 반면에 Redisson은 락 해제가 되었을 때 최소한의 시도를 하기 때문에 Redis의 부하를 줄여주게 된다.
   
     | 구분 (Users)            |     100명     |    1000명     |
     |:------------:|:------------:|:---------:|
@@ -154,13 +154,13 @@
 > #### 시나리오
 > 1. 100명의 사용자가 예기치 못하게 동시에 같은 Menu(Beverage)를 주문
 > 2. 주문 당 해당 메뉴 주문 수량만큼 재고 감소
-> 3. Pessimistic lock을 통해 주문 중 다른 사용자의 주문(Thread) 접근 제한
+> 3. Pessimistic Lock을 통해 주문 중 다른 사용자의 주문(Transaction) 접근 제한
 > 4. Thread 순차적으로 1번 ~ 100번 사용자 주문
 >    1. `재고 - 주문 수량 >= 0` 일 경우 주문 완료
->    2. `재고 - 주문 수량 < 0` 일 경우 ExceptionControl 예외처리
+>    2. `재고 - 주문 수량 < 0` 일 경우 `ExceptionHandler` 예외처리
 
   #### 구현 이유
-- Pessimistic Locking 선택한 이유
+- Pessimistic Lock 선택한 이유
   - 주문 시스템에서는 동시에 여러 사용자가 같은 메뉴를 주문하는 경우, 그 메뉴의 재고 수량을 동시에 변경해야 하는 상황이 발생할 수 있다.
   - 비관적 락을 사용하면 한 번에 하나의 트랜잭션만 해당 메뉴의 재고를 변경할 수 있기 때문에 충돌을 방지할 수 있다.
 
@@ -170,9 +170,9 @@
   - 주문 시스템의 경우 동시에 여러 사용자가 같은 메뉴를 주문하는 상황이 자주 발생하므로, 낙관적 락을 사용하면 충돌로 인한 롤백이 빈번하게 발생하여 오버헤드가 발생할거라 판단
 
 
-- Distributed Locking 선택한 이유
-  - redisson은 자신이 점유하고 있는 락을 해제할 때 pub/sub방식으로 채널에 메세지를 보내줌으로써 락을 획득해야 하는 쓰레드들에게 메세지를 전달
-  - 단일 DB 환경에서도 사용할 수 있지만 분산 락은 여러 노드에 걸쳐 있는 데이터에 대한 동시성을 제어할 수 있어 분산 DB에서의 확장성 고려하여 테스트
+- Distributed Lock 선택한 이유
+  - Redisson은 자신이 점유하고 있는 락을 해제할 때 Pub/Sub방식으로 채널에 메세지를 보내줌으로써 락을 획득해야 하는 쓰레드들에게 메세지를 전달
+  - 단일 DB 환경에서도 사용할 수 있지만 분산 락은 여러 노드에 걸쳐 있는 데이터에 대한 동시성을 제어할 수 있어 분산 환경 확장성 고려하여 테스트
   
 #### 생각해 보아야 할 점
 - 나머지 쓰레드(사용자 별 주문 요청)들은 락이 해제될 때까지 대기 상태에 머무른다.
@@ -267,13 +267,13 @@ redis-cli → ranking 이름의 Sorted Set(ZSET)에서, Score(조회수)가 0에
 > **당일 데이터 Redis 사용법**
 > 1. 매번 주문을 할 때마다 Redis에 zSetOperations의 `ZINCRBY` 명령어로 `score` 증가 _(Atomic Operation)_
 > 2. 오늘이 끝날 때(자정)에 RDB에 `Write-Back` 값 저장
-> 3. Redis Data 비우기, `redisTemplate.delete("menu::*");`
+> 3. Redis Data 비우기, `redisTemplate.delete("AllMenus::*");`
 
 **스케쥴러를 사용해 자정(00:00:00)이 됐을 때  Write-Back Caching**
 ```java
 @Scheduled(cron = "0 0 0 * * *")
 public void refreshPopularMenusInRedis() {
-    ScanOptions options = ScanOptions.scanOptions().match("menu::*").count(500).build();
+    ScanOptions options = ScanOptions.scanOptions().match("AllMenus::*").count(500).build();
     RedisConnection connection = redisTemplate.getConnectionFactory().getConnection();
     
     try {
@@ -312,14 +312,14 @@ I/O 작업을 동기적으로 처리하면, 작업이 완료될 때까지 쓰레
 > _`parallelStream()`을 사용하더라도 병렬 쓰레드는 I/O 작업 대기시간을 없앨 수 없기에 사용 X_
 
 #### RDB
-1. 매일 자정이 되면, Redis에서 `menu::`로 시작하는 모든 키를 찾는다. 이 키들은 인기 메뉴 데이터를 나타낸다.
+1. 매일 자정이 되면, Redis에서 `AllMenus::`로 시작하는 모든 키를 찾는다. 이 키들은 인기 메뉴 데이터를 나타낸다.
 2. 이 키들을 찾은 후, 각 키에 해당하는 값을 가져온다. 값은 메뉴 score로, 인기 메뉴의 정보를 담고 있다.
 3. 각 인기 메뉴에 대해 해당 메뉴의 제목을 기반으로 RDB에서 같은 메뉴를 찾는다. 동시에, Redis의 Sorted Set에서 해당 메뉴의 인기 점수(score)를 가져온다.
 4. 만약 RDB에서 메뉴를 찾고, 그 메뉴의 인기 점수를 Redis에서 성공적으로 가져왔다면, RDB의 메뉴 정보에 업데이트한다.
    1. RDB에서 해당 메뉴를 찾지 못하거나 인기 점수를 가져오지 못한 경우에는, Redis에서 가져온 인기 메뉴 정보를 그대로 RDB에 저장한다.
 
 #### Redis
-1. 매일 자정이 되면, Redis에서 `menu::`로 시작하는 모든 키를 찾아 삭제하여 새로운 일일 데이터를 위한 공간을 만든다.
+1. 매일 자정이 되면, Redis에서 `AllMenus::`로 시작하는 모든 키를 찾아 삭제하여 새로운 일일 데이터를 위한 공간을 만든다.
 2. 모든 메뉴의 score는 0으로 초기화된다.
 - 장점
   - 자주 접근되는 데이터나 실시간성이 중요한 데이터를 Redis에 저장하면 전반적인 시스템 성능을 크게 향상
