@@ -99,7 +99,7 @@ public class RedissonLockFacade {
         RLock lock = redissonClient.getLock(menuTitle);
 
         // 먼저 캐시에서 메뉴를 조회
-        cachedMenu = Objects.requireNonNull(cacheManager.getCache("Menu")).get(menuTitle, MenuDto.Response.class);
+        cachedMenu = Objects.requireNonNull(cacheManager.getCache(menuTitle)).get(menuTitle, MenuDto.Response.class);
 
         // 캐시에 메뉴가 없을 경우에만 RDB에서 메뉴를 조회하고 캐시에 저장
         if (cachedMenu == null) {
