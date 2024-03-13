@@ -96,7 +96,7 @@ public class RedissonLockFacade {
 
     public MenuDto.Response findMenuFromCache(String menuTitle) {
         MenuDto.Response cachedMenu = null;
-        RLock lock = redissonClient.getLock("MenuLock");
+        RLock lock = redissonClient.getLock(menuTitle);
 
         // 먼저 캐시에서 메뉴를 조회
         cachedMenu = Objects.requireNonNull(cacheManager.getCache("Menu")).get(menuTitle, MenuDto.Response.class);
