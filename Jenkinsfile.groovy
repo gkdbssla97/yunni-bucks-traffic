@@ -1,7 +1,6 @@
 pipeline {
     agent any
     tools {
-        gradle: 8.1.1
     }
     stages {
         stage('Clean') {
@@ -18,6 +17,7 @@ pipeline {
         }
         stage('JUnit') {
             steps {
+                sh './gradlew test'
                 echo "JUnit passed successfully!";
             }
         }
