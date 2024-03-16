@@ -3,24 +3,15 @@ pipeline {
     tools {
     }
     stages {
-        stage('Clean') {
+        stage('build') {
             steps {
-                sh './gradlew clean'
-                echo "Clean successfully!";
+                sh '''
+                    chmod 755 gradlew
+                    ./gradlew clean compileQuerydsl build -PskipAsciidoctor
+                    '''
             }
         }
-        stage('Compile QueryDSL') {
-            steps {
-                sh './gradlew compileQuerydsl'
-                echo "Compile query-dsl successfully!";
-            }
-        }
-        stage('Build') {
-            steps {
-                sh './gradlew build -PskipAsciidoctor'
-            }
-        }
-        stage('Deploy') {
+        stage('deploy') {
             steps {
                 deploy adapters: [tomcat9(credentialsId: 'deployer_user', path: '', url: 'http://3.39.230.26:8080')], contextPath: null, war: '**/*.war'
             }
