@@ -141,10 +141,10 @@ if (!project.hasProperty('skipAsciidoctor')) {
 		}
 	}
 }
-bootWar {
-	archiveBaseName="springproject"
-	archiveVersion="0.0.1-SNAPSHOT"
-}
+//bootWar {
+//	archiveBaseName="springproject"
+//	archiveVersion="0.0.1-SNAPSHOT"
+//}
 
 def querydslDir = "$buildDir/generated/querydsl"
 
