@@ -15,21 +15,14 @@ pipeline {
                 echo "Compile query-dsl successfully!";
             }
         }
-        stage('JUnit') {
-            steps {
-                sh './gradlew test'
-                echo "JUnit passed successfully!";
-            }
-        }
-
-        stage('Code Analysis') {
-            steps {
-                echo "Code Analysis completed successfully!";
-            }
-        }
         stage('Build') {
             steps {
                 sh './gradlew build -PskipAsciidoctor'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                deploy adapters: [tomcat9(credentialsId: 'deployer_user', path: '', url: 'http://3.39.230.26:8080')], contextPath: null, war: '**/*.war'
             }
         }
     }
