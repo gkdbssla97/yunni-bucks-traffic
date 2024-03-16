@@ -153,4 +153,9 @@ public class MenuReviewController {
         log.info("MASTER SEARCH SIZE: " + menuReviewList.size());
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/reviews/test")
+    ResponseEntity<String> test() {
+        return ResponseEntity.ok("auto-deploy");
+    }
 }
