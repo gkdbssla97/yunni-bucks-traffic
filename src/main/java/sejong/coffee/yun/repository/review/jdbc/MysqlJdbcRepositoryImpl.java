@@ -1,6 +1,7 @@
 package sejong.coffee.yun.repository.review.jdbc;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
+@Primary
 public class MysqlJdbcRepositoryImpl implements JdbcRepository {
 
     private final JdbcTemplate jdbcTemplate;
