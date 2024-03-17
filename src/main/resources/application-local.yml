@@ -22,7 +22,7 @@ spring:
   datasource:
     master:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://127.0.0.1:3306/yunni_bucks_traffic?rewriteBatchedStatements=true
+      url: jdbc:mysql://61.38.152.131:3306/yunni_bucks_traffic?rewriteBatchedStatements=true
       username: root
       password: 1234
       auto-commit: false
@@ -34,7 +34,7 @@ spring:
     slaves:
       - name: slave-1
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://127.0.0.1:3307/yunni_bucks_traffic?rewriteBatchedStatements=true
+        url: jdbc:mysql://61.38.152.131:3307/yunni_bucks_traffic?rewriteBatchedStatements=true
         username: root
         password: 1234
         hibernate:
@@ -42,7 +42,7 @@ spring:
 
       - name: slave-2
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://127.0.0.1:3308/yunni_bucks_traffic?rewriteBatchedStatements=true
+        url: jdbc:mysql://61.38.152.131:3308/yunni_bucks_traffic?rewriteBatchedStatements=true
         username: root
         password: 1234
         hibernate:
@@ -50,7 +50,7 @@ spring:
 
     postgres:
       driver-class-name: org.postgresql.Driver
-      url: jdbc:postgresql://127.0.0.1:5432/yunni_bucks_traffic
+      url: jdbc:postgresql://61.38.152.131:5432/yunni_bucks_traffic
       username: root
       password: 1234
       hikari:
@@ -65,7 +65,7 @@ spring:
     enabled: true
 
   redis:
-    host: localhost
+    host: 61.38.152.131
     port: 6379
 
 management:
