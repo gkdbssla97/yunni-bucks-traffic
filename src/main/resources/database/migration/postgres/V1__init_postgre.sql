@@ -1,4 +1,6 @@
-create table "orders"
+SET search_path TO public;
+CREATE SCHEMA IF NOT EXISTS public;
+create table orders
 (
     id         bigint not null
         primary key,
@@ -11,8 +13,8 @@ create table "orders"
     cart_id    bigint
 );
 
-alter table "orders"
-    owner to root;
+alter table orders
+    owner to mydb_user;
 
 create table coupon
 (
@@ -28,7 +30,7 @@ create table coupon
 );
 
 alter table coupon
-    owner to root;
+    owner to mydb_user;
 
 create table member
 (
@@ -53,7 +55,7 @@ create table member
 );
 
 alter table member
-    owner to root;
+    owner to mydb_user;
 
 create table card
 (
@@ -70,7 +72,7 @@ create table card
 );
 
 alter table card
-    owner to root;
+    owner to mydb_user;
 
 create table cart
 (
@@ -83,7 +85,7 @@ create table cart
 );
 
 alter table cart
-    owner to root;
+    owner to mydb_user;
 
 create table menu
 (
@@ -110,7 +112,7 @@ create table menu
 );
 
 alter table menu
-    owner to root;
+    owner to mydb_user;
 
 create table cartitem
 (
@@ -125,7 +127,7 @@ create table cartitem
 );
 
 alter table cartitem
-    owner to root;
+    owner to mydb_user;
 
 create table menu_review
 (
@@ -143,7 +145,7 @@ create table menu_review
 );
 
 alter table menu_review
-    owner to root;
+    owner to mydb_user;
 
 create index comments_idx
     on menu_review using gin (to_tsvector('english'::regconfig, comments));
@@ -162,5 +164,5 @@ create table menuthumbnail
 );
 
 alter table menuthumbnail
-    owner to root;
+    owner to mydb_user;
 
