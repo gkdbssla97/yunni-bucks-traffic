@@ -42,7 +42,7 @@ public class SSHConnection {
             int localPortSlave1 = 3307;
             int localPortSlave2 = 3308;
             int localPortPostgres = 5432;
-            int localRedis = 6379;
+            int localRedis = 6380;
 
             session.setPortForwardingL(localPortMaster, "localhost", 3306);// MySQL Master
             session.setPortForwardingL(localPortSlave1, "localhost", 3306);// MySQL Slave1
