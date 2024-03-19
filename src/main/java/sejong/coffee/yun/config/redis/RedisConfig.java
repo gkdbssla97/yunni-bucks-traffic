@@ -1,6 +1,9 @@
 package sejong.coffee.yun.config.redis;
 
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -62,12 +65,12 @@ public class RedisConfig {
         return redisTemplate;
     }
 
-//    @Bean
-//    public RedissonClient redissonClient() {
-//        Config config = new Config();
-//        config.useSingleServer()
-//                .setAddress("redis://" + this.host + ":" + this.port); // 로컬 포트 포워딩 주소로 변경
-//        log.info("Creating redissonClient source...");
-//        return Redisson.create(config);
-//    }
+    @Bean
+    public RedissonClient redissonClient() {
+        Config config = new Config();
+        config.useSingleServer()
+                .setAddress("redis://" + this.host + ":" + 6380); // 로컬 포트 포워딩 주소로 변경
+        log.info("Creating redissonClient source...");
+        return Redisson.create(config);
+    }
 }
