@@ -67,7 +67,7 @@ spring:
     cleanDisabled: true
 
   redis:
-    host: redis_boot
+    host: localhost
     port: 6379
 
 management:
@@ -79,7 +79,7 @@ management:
         include: '*'
 
 logging:
-  level: #띄어쓰기 없음
+  level:
     org.hibernate.SQL: debug
 #    org.hibernate.type: trace
   discord:
