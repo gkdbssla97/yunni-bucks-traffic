@@ -1,6 +1,7 @@
 package sejong.coffee.yun.config.database;
 
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -10,7 +11,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import sejong.coffee.yun.config.ssh.SSHConnection;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -26,11 +29,21 @@ import static sejong.coffee.yun.config.database.DatabaseProperties.DatabaseDetai
 
 @Configuration
 @Slf4j
+@RequiredArgsConstructor
 public class DataSourceConfig {
+
+    private final SSHConnection sshConnection;
+
+    @PostConstruct
+    public void initializeSshConnection() {
+        sshConnection.buildSshConnection();
+        log.info("SSH 접속이 초기화되었습니다.");
+    }
 
     @Bean
     public DataSource routingDataSource(@Qualifier("masterDataSource") DataSource masterDataSource,
                                         @Qualifier("slaveDataSources") List<DataSource> slaveDataSources) {
+
         Map<Object, Object> dataSources = new LinkedHashMap<>();
         dataSources.put("master", masterDataSource);
 
@@ -62,6 +75,7 @@ public class DataSourceConfig {
 
     @Bean("masterDataSource")
     public DataSource createMasterDataSource(DatabaseProperties databaseProperties) {
+        log.info("Creating master data sources...");
         return createDataSource(databaseProperties.getMaster());
     }
 
