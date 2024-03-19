@@ -97,6 +97,9 @@ dependencies {
 	implementation 'org.flywaydb:flyway-core:8.4.4'
 	implementation 'org.flywaydb:flyway-mysql:8.4.4'
 
+	// JSch
+	implementation 'com.jcraft:jsch:0.1.55'
+
 	testImplementation 'io.netty:netty-resolver-dns-native-macos'
 }
 

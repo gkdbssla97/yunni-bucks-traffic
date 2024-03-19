@@ -1,4 +1,4 @@
-# local environment (로컬)
+# stage environment (스테이지)
 secrets:
   clova:
     authorizeUri: https://zfusrxrk3k.apigw.ntruss.com/custom/v1/23890/2453eb775e796913aca6d68e93eb5c9d0eda8b9e8f224fe7413ac067ae57fc7b/document/credit-card
@@ -22,7 +22,7 @@ spring:
   datasource:
     master:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://127.0.0.1:3306/yunni_bucks_traffic?rewriteBatchedStatements=true
+      url: jdbc:mysql://localhost:3306/yunni_bucks_traffic?rewriteBatchedStatements=true
       username: root
       password: 1234
       auto-commit: false
@@ -34,7 +34,7 @@ spring:
     slaves:
       - name: slave-1
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://127.0.0.1:3307/yunni_bucks_traffic?rewriteBatchedStatements=true
+        url: jdbc:mysql://localhost:3307/yunni_bucks_traffic?rewriteBatchedStatements=true
         username: root
         password: 1234
         hibernate:
@@ -42,7 +42,7 @@ spring:
 
       - name: slave-2
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://127.0.0.1:3308/yunni_bucks_traffic?rewriteBatchedStatements=true
+        url: jdbc:mysql://localhost:3308/yunni_bucks_traffic?rewriteBatchedStatements=true
         username: root
         password: 1234
         hibernate:
@@ -50,8 +50,8 @@ spring:
 
     postgres:
       driver-class-name: org.postgresql.Driver
-      url: jdbc:postgresql://127.0.0.1:5432/yunni_bucks_traffic
-      username: root
+      url: jdbc:postgresql://localhost:5432/yunni_bucks_traffic
+      username: mydb_user
       password: 1234
       hikari:
         auto-commit: false
@@ -63,6 +63,8 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
     enabled: true
+    baselineOnMigrate: true
+    cleanDisabled: true
 
   redis:
     host: localhost
