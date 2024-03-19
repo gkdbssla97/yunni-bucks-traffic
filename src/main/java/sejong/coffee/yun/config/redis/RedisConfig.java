@@ -69,7 +69,7 @@ public class RedisConfig {
     public RedissonClient redissonClient() {
         Config config = new Config();
         config.useSingleServer()
-                .setAddress("redis://" + "172.19.0.6" + ":" + 6379); // 로컬 포트 포워딩 주소로 변경
+                .setAddress("redis://" + this.host + ":" + this.port); // 로컬 포트 포워딩 주소로 변경
         log.info("Creating redissonClient source...");
         return Redisson.create(config);
     }
