@@ -67,7 +67,7 @@ spring:
     cleanDisabled: true
 
   redis:
-    host: localhost
+    host: redis_boot
     port: 6379
 
 management:
