@@ -29,7 +29,7 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         log.info("Creating lettuce source...");
-        return new LettuceConnectionFactory(host, port);
+        return new LettuceConnectionFactory(host, 6379);
     }
 
     @Bean
@@ -43,10 +43,11 @@ public class RedisConfig {
     }
 
     @Bean
+    @Primary
     public RedissonClient redissonClient() {
         Config config = new Config();
         config.useSingleServer()
-                .setAddress("redis://" + this.host + ":" + this.port); // 로컬 포트 포워딩 주소로 변경
+                .setAddress("redis://" + this.host + ":" + 6379); // 로컬 포트 포워딩 주소로 변경
         log.info("Creating redissonClient source...");
         return Redisson.create(config);
     }
