@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -30,30 +28,9 @@ public class RedisConfig {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-
-        return new LettuceConnectionFactory(redisStandaloneConfiguration(), lettuceClientConfiguration());
+        log.info("Creating lettuce source...");
+        return new LettuceConnectionFactory(host, port);
     }
-
-    @Bean
-    LettuceClientConfiguration lettuceClientConfiguration() {
-        return LettuceClientConfiguration
-                .builder()
-                .build();
-    }
-    @Bean
-    RedisStandaloneConfiguration redisStandaloneConfiguration() {
-        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setHostName(this.host);
-        redisStandaloneConfiguration.setPort(this.port);
-
-        return redisStandaloneConfiguration;
-    }
-
-//    @Bean
-//    public RedisConnectionFactory redisConnectionFactory() {
-//        log.info("Creating lettuce source...");
-//        return new LettuceConnectionFactory(host, port);
-//    }
 
     @Bean
     @Primary
@@ -69,7 +46,7 @@ public class RedisConfig {
     public RedissonClient redissonClient() {
         Config config = new Config();
         config.useSingleServer()
-                .setAddress("redis://" + this.host + ":" + 6380); // 로컬 포트 포워딩 주소로 변경
+                .setAddress("redis://" + this.host + ":" + this.port); // 로컬 포트 포워딩 주소로 변경
         log.info("Creating redissonClient source...");
         return Redisson.create(config);
     }
