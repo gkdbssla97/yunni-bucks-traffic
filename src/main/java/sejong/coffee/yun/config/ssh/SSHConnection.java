@@ -42,13 +42,13 @@ public class SSHConnection {
             int localPortSlave1 = 3307;
             int localPortSlave2 = 3308;
             int localPortPostgres = 5432;
-            int localRedis = 6380;
+//            int localRedis = 6379;
 
             session.setPortForwardingL(localPortMaster, "localhost", 3306);// MySQL Master
             session.setPortForwardingL(localPortSlave1, "localhost", 3306);// MySQL Slave1
             session.setPortForwardingL(localPortSlave2, "localhost", 3306);// MySQL Slave2
             session.setPortForwardingL(localPortPostgres, "localhost", 5432);// PostgreSQL
-            session.setPortForwardingL(localRedis, "localhost", 6379);// Redis
+//            session.setPortForwardingL(localRedis, "localhost", 6379);// Redis
 
         } catch (JSchException e) {
             log.info("SSH 연결 실패: " + e.getMessage());
