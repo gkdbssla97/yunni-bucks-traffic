@@ -5,10 +5,7 @@ import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.*;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -25,6 +22,7 @@ public class RedisConfig {
     @Value("${spring.redis.port}")
     private int port;
 
+    private static final String REDISSON_HOST_PREFIX = "redis://";
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
@@ -44,14 +42,10 @@ public class RedisConfig {
     }
 
     @Bean
-    @Primary
-    @DependsOn("redisConnectionFactory")
     public RedissonClient redissonClient() {
         Config config = new Config();
-        config.useSingleServer()
-                .setAddress("redis://" + this.host + ":" + this.port); // 로컬 포트 포워딩 주소로 변경
-        RedissonClient redissonClient = Redisson.create(config);
-        log.info("Creating redissonClient source...");
-        return redissonClient;
+        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host + ":" + port);
+        log.info("Creating redisson source...");
+        return Redisson.create(config);
     }
 }
