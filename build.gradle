@@ -76,7 +76,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-cache'
-	implementation 'org.redisson:redisson-spring-boot-starter:3.23.2'
+	implementation 'org.redisson:redisson-spring-boot-starter'
 
 	// mock
 	testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.6.1'
