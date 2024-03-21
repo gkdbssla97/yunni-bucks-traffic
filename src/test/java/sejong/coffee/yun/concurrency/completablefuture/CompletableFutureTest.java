@@ -92,4 +92,9 @@ public class CompletableFutureTest extends MainIntegrationTest {
             redisTemplate.opsForZSet().add("ranking", menu.getTitle(), 1.0);
         }
     }
+
+    @Test
+    void initMenus() {
+        System.out.println("hi");
+    }
 }

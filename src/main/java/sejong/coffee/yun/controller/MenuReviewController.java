@@ -158,4 +158,9 @@ public class MenuReviewController {
     ResponseEntity<String> test() {
         return ResponseEntity.ok("auto-deploy");
     }
+
+    @GetMapping("/reviews/webhook-test")
+    ResponseEntity<String> webhookTest() {
+        return ResponseEntity.ok("Automatic deployment of Git webhook upon commit");
+    }
 }
