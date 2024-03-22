@@ -26,9 +26,9 @@ pipeline {
         stage('restart tomcat') {
             steps {
                 script {
-                    sshagent(['deployer_user']) {
+                    withCredentials([usernameColonPassword(credentialsId: 'deployer_user', variable: '')]) {
                         sh '''
-                            ssh -o StrictHostKeyChecking=no ec2-user@54.180.89.243 '
+                            
                                 TOMCAT_PID=$(ps -ef | grep tomcat | grep -v grep | awk '\''{print $2}'\'')
                                 if [[ -n $TOMCAT_PID ]]; then
                                     echo "Tomcat is running with PID $TOMCAT_PID, stopping..."
@@ -42,7 +42,7 @@ pipeline {
                                 cd /opt/apache-tomcat-9.0.86/
                                 sudo ./bin/startup.sh
                                 echo "Tomcat started."
-                            '
+                            
                         '''
                     }
                 }
