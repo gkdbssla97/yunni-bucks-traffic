@@ -26,7 +26,7 @@ pipeline {
         stage('restart tomcat') {
             steps {
                 script {
-                    sshagent(['beluga']) {
+                    sshagent(['beluga2']) {
                         sh '''
                             ssh -o StrictHostKeyChecking=no ec2-user@54.180.89.243 '
                                 TOMCAT_PID=$(ps -ef | grep tomcat | grep -v grep | awk '\'{print $2}'\')
