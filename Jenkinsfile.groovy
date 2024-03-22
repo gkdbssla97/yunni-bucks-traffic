@@ -63,7 +63,6 @@ pipeline {
         failure {
             echo "This will run if failed"
         }
-
         changed {
             echo "This will run when the state of the pipeline has changed"
         }
