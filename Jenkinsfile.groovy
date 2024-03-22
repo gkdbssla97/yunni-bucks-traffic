@@ -19,7 +19,7 @@ pipeline {
 
         stage('deploy') {
             steps {
-                deploy adapters: [tomcat9(credentialsId: 'deployer_user', path: '', url: 'http://43.201.27.85:8080/')], contextPath: null, war: '**/*.war'
+                deploy adapters: [tomcat9(credentialsId: 'deployer_user', path: '', url: 'http://54.180.89.243:8080/')], contextPath: null, war: '**/*.war'
             }
         }
 
@@ -28,7 +28,7 @@ pipeline {
                 script {
                     sshagent(['deployer_user']) {
                         sh '''
-                            ssh ec2-user@43.201.27.85 '
+                            ssh ec2-user@54.180.89.243 '
                                 TOMCAT_PID=$(ps -ef | grep tomcat | grep -v grep | awk '\''{print $2}'\'')
                                 if [[ -n $TOMCAT_PID ]]; then
                                     echo "Tomcat is running with PID $TOMCAT_PID, stopping..."
