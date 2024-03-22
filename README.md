@@ -24,14 +24,14 @@
 - 소스코드 관리 및 변경 감지
   - Git Webhook
 - 자동화된 빌드 및 테스트
-  - Jenkins (AWS)
+  - Jenkins (AWS EC2)
     - Build (.WAR file)
     - Unit Test
 - 자동 배포
-  - Tomcat (AWS)
+  - Tomcat (AWS EC2)
   - Nginx 무중단 배포 (예정)
 - 데이터베이스 관리
-  - Docker (NCP) 
+  - Docker (NCP Ubuntu) 
 ---
 ### Traffic 개요
 #### 대용량 데이터 검색 성능 개선
@@ -89,7 +89,7 @@
      1. Trigger: Git Webhook이 Jenkins에 Push 알림
   2. **Pipeline**: Jenkins의 파이프라인은 Groovy 기반의 스크립트로 정의될 수 있으며, 빌드, 테스트, 배포 등의 작업을 세밀하게 제어할 수 있다.
   #### Trouble Shooting
-  1. **메모리 부족 오류**: Jenkins는 빌드 프로세스 중에 복잡한 프로젝트나 동시에 여러 빌드를 실행할 경우, 메모리 부족으로 인해 빌드 실패 (Free Tier → t2.small Scale-Up)
+  1. **메모리 부족 오류**: Jenkins는 빌드 프로세스 중에 복잡한 프로젝트나 동시에 여러 빌드를 실행할 경우, 메모리 부족으로 인해 빌드 실패 <br>(Free Tier → t2.small Scale-Up)
 #### Continuous Deployment
 - Tomcat 활용
   #### 사용 이유

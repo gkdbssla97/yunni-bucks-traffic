@@ -19,17 +19,17 @@ pipeline {
 
         stage('deploy') {
             steps {
-                deploy adapters: [tomcat9(credentialsId: 'deployer_user', path: '', url: 'http://54.180.79.228:8080/')], contextPath: null, war: '**/*.war'
+                deploy adapters: [tomcat9(credentialsId: 'deployer_user', path: '', url: 'http://43.201.27.85:8080/')], contextPath: null, war: '**/*.war'
             }
         }
 
         stage('restart tomcat') {
             steps {
                 script {
-                    sshagent(['ssh-credential-id']) {
+                    sshagent(['deployer_user']) {
                         sh '''
-                            ssh username@54.180.79.228 '
-                                TOMCAT_PID=$(ps -ef | grep tomcat | grep -v grep | awk '"'"'{print $2}'"'"')
+                            ssh ec2-user@43.201.27.85 '
+                                TOMCAT_PID=$(ps -ef | grep tomcat | grep -v grep | awk '\''{print $2}'\'')
                                 if [[ -n $TOMCAT_PID ]]; then
                                     echo "Tomcat is running with PID $TOMCAT_PID, stopping..."
                                     sudo kill -15 $TOMCAT_PID
@@ -39,7 +39,8 @@ pipeline {
                                     echo "Tomcat is not running."
                                 fi
                                 echo "Starting Tomcat..."
-                                sudo systemctl start tomcat
+                                cd /opt/apache-tomcat-9.0.86/
+                                sudo ./bin/startup.sh
                                 echo "Tomcat started."
                             '
                         '''
@@ -50,11 +51,7 @@ pipeline {
 
         stage('notification') {
             steps {
-                emailext (
-                        subject: "Job Completed",
-                        body: "Jenkins pipeline job for gradle build job completed",
-                        to: "hy97@sju.ac.kr"
-                )
+                emailext body: 'Jenkins pipeline job for gradle build job completed', subject: 'Job Completed', to: 'hy97@sju.ac.kr'
             }
         }
     }
