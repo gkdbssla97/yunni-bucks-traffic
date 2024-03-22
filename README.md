@@ -6,18 +6,33 @@
 2. 개발 기간 : 2023-10 ~ *(트래픽 상황 대처 프로젝트 고도화)*
 --- 
 ### Architecture
-<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/d3a9049e-b005-4c48-a925-aeb0b3a2882d">
+<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/6b549854-5534-4fbb-8608-a14a49eeaed1">
 
+[//]: # (<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/d3a9049e-b005-4c48-a925-aeb0b3a2882d">)
 [//]: # (<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/b626e81c-e074-441d-9005-8b911df5d803">)
 
-| Local Server            |       Docker        |       Utility       |
-  |:-------------------:|:-------------------:|:---:|
-  | SpringBoot 2.7.14 |  MySQL 8.2.0 (M)	   | MySQL Exporter (M)  |
-  | Java 17 |   MySQL 8.2.0 (S)   | MySQL Exporter (S)  |
-  |        |   PostgreSQL 16.1   | Prometheus, Grafana 
-  |        |     Redis 7.2.3     |    Flyway 8.4.4     |
+#### System Infrastructure Details
+| Local Server | NCP(Docker) | AWS EC2 | Utility |
+|:---:|:---:|:---:|:---:|
+| SpringBoot 2.7.14 | MySQL 8.2.0 (M) | Jenkins 2.440.1 | MySQL Exporter (M) |
+| Java 17 | MySQL 8.2.0 (S) | Tomcat 9.0.87 | MySQL Exporter (S) |
+|  | PostgreSQL 16.1 |  | Prometheus, Grafana |
+|  | Redis 7.2.3 |  | Flyway 8.4.4 |
 ---
-
+### CI / CD 
+#### Pipeline
+- 소스코드 관리 및 변경 감지
+  - Git Webhook
+- 자동화된 빌드 및 테스트
+  - Jenkins (AWS)
+    - Build (.WAR file)
+    - Unit Test
+- 자동 배포
+  - Tomcat (AWS)
+  - Nginx 무중단 배포 (예정)
+- 데이터베이스 관리
+  - Docker (NCP) 
+---
 ### Traffic 개요
 #### 대용량 데이터 검색 성능 개선
 - PostgreSQL 검색 전용 DB로 역할 분배
@@ -62,6 +77,32 @@
   - 인기 메뉴
     - Redis zSet 활용
   
+---
+### Integration & Deployment 
+| **GitHub** | **Git Webhook** | **Jenkins**  | **WAR Deployment** |     **Tomcat**      |     **Monitoring**     |
+|:---:|:---:|:------------:|:---:|:-------------------:|:----------------------:|
+| Code Push | Webhook Trigger | Build & Test | Deploy WAR via HTTP | Unzip & Compile WAR | Grafana,<br>Prometheus |
+#### Continuous Integration   
+- Jenkins 활용
+  #### 사용 이유
+  1. **확장성**: Jenkins는 Plugin을 통해 대부분 종류의 개발, 테스트, 배포 작업을 자동화할 수 있다. GitHub, GitLab과 같은 다양한 소스 코드 관리 도구와 통합할 수 있으며, Slack, 이메일 등을 통한 알림 설정 가능
+     1. Trigger: Git Webhook이 Jenkins에 Push 알림
+  2. **Pipeline**: Jenkins의 파이프라인은 Groovy 기반의 스크립트로 정의될 수 있으며, 빌드, 테스트, 배포 등의 작업을 세밀하게 제어할 수 있다.
+  #### Trouble Shooting
+  1. **메모리 부족 오류**: Jenkins는 빌드 프로세스 중에 복잡한 프로젝트나 동시에 여러 빌드를 실행할 경우, 메모리 부족으로 인해 빌드 실패 (Free Tier → t2.small Scale-Up)
+#### Continuous Deployment
+- Tomcat 활용
+  #### 사용 이유
+  1. **분리된 환경**: WAR 파일을 외장 Tomcat에 배포하여 App과 서버 환경을 분리
+     1. **자원 할당 최적화**: 외장 Tomcat을 사용하면, 서버의 자원(CPU, 메모리 등) 할당과 관리 자유도 높음 (내장 Tomcat은 JVM 설정에 의존적)
+     2. **로드 밸런싱** : 여러 외장 Tomcat 인스턴스를 운영함으로써 트래픽이 급증하는 상황에서도 안정적인 서비스를 제공하는 데 기여
+  2. **보안**: 외장 Tomcat 서버를 사용하면, 서버의 보안 설정을 App과 독립적으로 관리할 수 있다. (접근 제어, SSH/SSL 등을 App 변경 없이 수행가능)
+  #### Trouble Shooting
+  1. **AWS → NCP에 설치된 Docker 안의 DB Container 접근 문제**
+     - JSch를 이용한 SSH 터널링: Spring Boot에서 JSch 라이브러리를 사용하여 NCP 서버에 SSH 접속 설정
+     - 포트 포워딩 설정: NCP 서버에서 Docker 컨테이너로 포트 포워딩을 설정하여, 특정 포트를 통해 DB 컨테이너에 접근
+  2. **Tomcat WAR 파일 최대 업로드 크기 문제**
+     - server.xml 수정: conf/server.xml 수정하여 \<Connector> 태그 내의 maxPostSize 속성 값을 _52428800(50MB)_ 에서 _157286400(150MB)_ 로 변경 (배포 WAR file 80.1MB 용량 초과)
 ---
 ### 메뉴 리뷰
 #### 1. 메뉴 리뷰 대용량 데이터(10만, 100만)일 경우 검색

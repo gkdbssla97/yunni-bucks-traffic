@@ -10,25 +10,63 @@ pipeline {
                     '''
             }
         }
+
+        stage('test') {
+            steps {
+                sh './gradlew test'
+            }
+        }
+
         stage('deploy') {
             steps {
                 deploy adapters: [tomcat9(credentialsId: 'deployer_user', path: '', url: 'http://54.180.79.228:8080/')], contextPath: null, war: '**/*.war'
             }
         }
-    }
-    post {
-        always {
-            echo "This will always run"
+
+        stage('restart tomcat') {
+            steps {
+                script {
+                    sshagent(['ssh-credential-id']) {
+                        sh '''
+                            ssh username@54.180.79.228 '
+                                TOMCAT_PID=$(ps -ef | grep tomcat | grep -v grep | awk '"'"'{print $2}'"'"')
+                                if [[ -n $TOMCAT_PID ]]; then
+                                    echo "Tomcat is running with PID $TOMCAT_PID, stopping..."
+                                    sudo kill -15 $TOMCAT_PID
+                                    while ps -p $TOMCAT_PID > /dev/null; do sleep 1; done
+                                    echo "Tomcat stopped."
+                                else
+                                    echo "Tomcat is not running."
+                                fi
+                                echo "Starting Tomcat..."
+                                sudo systemctl start tomcat
+                                echo "Tomcat started."
+                            '
+                        '''
+                    }
+                }
+            }
         }
+
+        stage('notification') {
+            steps {
+                emailext (
+                        subject: "Job Completed",
+                        body: "Jenkins pipeline job for gradle build job completed",
+                        to: "hy97@sju.ac.kr"
+                )
+            }
+        }
+    }
+
+    post {
         success {
             echo "This will run when the run finished successfully"
         }
         failure {
             echo "This will run if failed"
         }
-        unstable {
-            echo "This will run when the run was marked as unstable"
-        }
+
         changed {
             echo "This will run when the state of the pipeline has changed"
         }
