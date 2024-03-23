@@ -161,6 +161,6 @@ public class MenuReviewController {
 
     @GetMapping("/reviews/webhook-test/{param}")
     ResponseEntity<String> webhookTest(@PathVariable int param) {
-        return ResponseEntity.ok(param + "번째 \nAutomatic deployment of Git webhook upon commit.");
+        return ResponseEntity.ok(param + " 번째 \nAutomatic deployment of Git webhook upon commit.");
     }
 }
