@@ -26,10 +26,10 @@ pipeline {
         stage('restart tomcat') {
             steps {
                 script {
-                    sshagent(['beluga2']) {
+                    sshagent(['deployer_user']) {
                         sh '''
-                            ssh -o StrictHostKeyChecking=no ec2-user@172.31.41.40 '
-                                TOMCAT_PID=$(ps -ef | grep tomcat | grep -v grep | awk \'{print $2}\')
+                            ssh ec2-user@172.31.41.40 '
+                                TOMCAT_PID=$(ps -ef | grep tomcat | grep -v grep | awk "{print \$2}")
                                 if [[ -n $TOMCAT_PID ]]; then
                                     echo "Tomcat is running with PID $TOMCAT_PID, stopping..."
                                     sudo kill -15 $TOMCAT_PID
