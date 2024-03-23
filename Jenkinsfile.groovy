@@ -19,7 +19,7 @@ pipeline {
 
         stage('deploy') {
             steps {
-                deploy adapters: [tomcat9(credentialsId: 'deployer_user', path: '', url: 'http://54.180.89.243:8080/')], contextPath: null, war: '**/*.war'
+                deploy adapters: [tomcat9(credentialsId: 'deployer_user', path: '', url: 'http://13.125.254.101:8080/')], contextPath: null, war: '**/*.war'
             }
         }
 
@@ -28,8 +28,8 @@ pipeline {
                 script {
                     sshagent(['beluga2']) {
                         sh '''
-                            ssh -o StrictHostKeyChecking=no ec2-user@54.180.89.243 '
-                                TOMCAT_PID=$(ps -ef | grep tomcat | grep -v grep | awk '\'{print $2}'\')
+                            ssh -o StrictHostKeyChecking=no ec2-user@172.31.41.40 '
+                                TOMCAT_PID=$(ps -ef | grep tomcat | grep -v grep | awk \'{print $2}\')
                                 if [[ -n $TOMCAT_PID ]]; then
                                     echo "Tomcat is running with PID $TOMCAT_PID, stopping..."
                                     sudo kill -15 $TOMCAT_PID
