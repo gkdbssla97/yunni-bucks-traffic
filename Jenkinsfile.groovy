@@ -28,7 +28,7 @@ pipeline {
                 script {
                     sshagent (credentials: ['tomcat']) {
                         sh '''
-                            ssh -o StrictHostKeyChecking=no ec2-user@172.31.41.40 '
+                            ssh ec2-user@172.31.41.40 '
                                 TOMCAT_PID=$(ps -ef | grep tomcat | grep -v grep | awk "{print \$2}")
                                 if [[ -n $TOMCAT_PID ]]; then
                                     echo "Tomcat is running with PID $TOMCAT_PID, stopping..."
