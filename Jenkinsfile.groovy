@@ -26,9 +26,9 @@ pipeline {
         stage('restart tomcat') {
             steps {
                 script {
-                    sshagent (credentials: ['tomcat']) {
+                    sshagent(credentials: ['tomcat']) {
                         sh '''
-                            ssh -o StrictHostKeyChecking=no ec2-user@172.31.41.40 '
+                            ssh ec2-user@172.31.41.40 '
                             TOMCAT_PID=$(ps -ef | grep tomcat | grep -v grep | awk '"'"'{print $2}'"'"')
                             if [[ -n $TOMCAT_PID ]]; then
                                 echo "Tomcat is running with PID $TOMCAT_PID, stopping..."
@@ -53,8 +53,8 @@ pipeline {
     post {
         success {
             script {
-                emailext (
-                        to: 'hy97@sju.ac.kr',
+                emailext(
+                        to: 'gkdbssla97@gmail.com',
                         subject: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
                         body: """<p>STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
              <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>"""

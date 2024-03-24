@@ -23,6 +23,7 @@
 #### Pipeline
 - 소스코드 관리 및 변경 감지
   - Git Webhook
+  - SonarQube
 - 자동화된 빌드 및 테스트
   - Jenkins (AWS EC2)
     - Build (.WAR file)
@@ -89,7 +90,10 @@
      1. Trigger: Git Webhook이 Jenkins에 Push 알림
   2. **Pipeline**: Jenkins의 파이프라인은 Groovy 기반의 스크립트로 정의될 수 있으며, 빌드, 테스트, 배포 등의 작업을 세밀하게 제어할 수 있다.
   #### Trouble Shooting
-  1. **메모리 부족 오류**: Jenkins는 빌드 프로세스 중에 복잡한 프로젝트나 동시에 여러 빌드를 실행할 경우, 메모리 부족으로 인해 빌드 실패 <br>(Free Tier → t2.small Scale-Up)
+  1. **메모리 부족 오류**: Jenkins는 빌드 프로세스 중에 복잡한 프로젝트나 동시에 여러 빌드를 실행할 경우, 메모리 부족으로 인해 빌드 실패 <br>(Free Tier → t2.small scale-up)
+  2. **Jenkins Pipeline에서 Tomcat 서버에 접속하기 위한 쉘 스크립트 실행 시도 시, `Permission denied` 오류 발생**:
+     Tomcat 서버의 `~/.ssh/authorized_keys`에 Tomcat rsa.pub 공개키 추가,
+     Jenkins에 Tomcat 서버용 RSA 개인키를 Credential로 추가하고, 해당 CredentialID를 Pipeline에서 사용
 #### Continuous Deployment
 - Tomcat 활용
   #### 사용 이유
@@ -98,11 +102,21 @@
      2. **로드 밸런싱** : 여러 외장 Tomcat 인스턴스를 운영함으로써 트래픽이 급증하는 상황에서도 안정적인 서비스를 제공하는 데 기여
   2. **보안**: 외장 Tomcat 서버를 사용하면, 서버의 보안 설정을 App과 독립적으로 관리할 수 있다. (접근 제어, SSH/SSL 등을 App 변경 없이 수행가능)
   #### Trouble Shooting
-  1. **AWS → NCP에 설치된 Docker 안의 DB Container 접근 문제**
-     - JSch를 이용한 SSH 터널링: Spring Boot에서 JSch 라이브러리를 사용하여 NCP 서버에 SSH 접속 설정
-     - 포트 포워딩 설정: NCP 서버에서 Docker 컨테이너로 포트 포워딩을 설정하여, 특정 포트를 통해 DB 컨테이너에 접근
-  2. **Tomcat WAR 파일 최대 업로드 크기 문제**
-     - server.xml 수정: conf/server.xml 수정하여 \<Connector> 태그 내의 maxPostSize 속성 값을 _52428800(50MB)_ 에서 _157286400(150MB)_ 로 변경 (배포 WAR file 80.1MB 용량 초과)
+     1. **AWS → NCP에 설치된 Docker 안의 DB Container 접근 문제**
+        - JSch를 이용한 SSH 터널링: Spring Boot에서 JSch 라이브러리를 사용하여 NCP 서버에 SSH 접속 설정
+        - 포트 포워딩 설정: NCP 서버에서 Docker 컨테이너로 포트 포워딩을 설정하여, 특정 포트를 통해 DB 컨테이너에 접근
+
+          |  | MySQL(Master) | MySQL(Slave-1) | MySQL(Slave-2) | PostgreSQL | Redis |
+          |---|:---:|:---:|:---:|:---:|:---:|
+          | Host:Internal | 3306:3306 | 3307:3306 | 3308:3306 | 5432:5432 | 6379:6379 |
+     2. **Tomcat WAR 파일 최대 업로드 크기 문제**
+        - server.xml 수정: conf/server.xml 수정하여 \<Connector> 태그 내의 maxPostSize 속성 값을 _52428800(50MB)_ 에서 _157286400(150MB)_ 로 변경 (배포 WAR file 80.1MB 용량 초과)
+     3. **Tomcat App 실행 중 자동 배포**
+        > #### 시나리오
+        > 1. **Tomcat 프로세스 확인**: 배포 script는 실행 중인 Tomcat App의 PID 확인 (`TOMCAT_PID=$(ps -ef | grep tomcat | grep -v grep | awk '{print $2}')`)
+        > 2. **프로세스 종료**: 실행 중인 Tomcat이 있을 경우 `kill -15 $TOMCAT_PID`로 프로세스에게 종료 요청 후 프로세스가 완전히 종료될 때까지 대기 <br>(`kill -9`는 프로세스가 SIGTERM에 반응하지 않거나 강제 종료가 필요한 경우에만 사용)
+        > 3. **Tomcat 재시작**: 프로세스 종료 후, `./bin/startup.sh`를 실행하여 Tomcat를 재시작하여 새로운 배포 적용
+        
 ---
 ### 메뉴 리뷰
 #### 1. 메뉴 리뷰 대용량 데이터(10만, 100만)일 경우 검색
