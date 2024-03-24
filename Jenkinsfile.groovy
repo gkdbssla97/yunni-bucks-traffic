@@ -43,17 +43,9 @@ pipeline {
                             sudo ./bin/startup.sh
                             echo "Tomcat started."
                         '
-
-
                         '''
                     }
                 }
-            }
-        }
-
-        stage('notification') {
-            steps {
-                emailext body: 'Jenkins pipeline job for gradle build job completed', subject: 'Job Completed', to: 'hy97@sju.ac.kr'
             }
         }
     }
@@ -61,9 +53,11 @@ pipeline {
     post {
         success {
             echo "This will run when the run finished successfully"
+            emailext body: 'Jenkins pipeline job for gradle build successfully completed.', subject: 'Build Success', to: 'hy97@sju.ac.kr'
         }
         failure {
             echo "This will run if failed"
+            emailext body: 'Jenkins pipeline job for gradle build failed.', subject: 'Build Failure', to: 'hy97@sju.ac.kr'
         }
         changed {
             echo "This will run when the state of the pipeline has changed"
