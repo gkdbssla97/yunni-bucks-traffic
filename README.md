@@ -18,6 +18,7 @@
 | Java 17 | MySQL 8.2.0 (S) | Tomcat 9.0.87 | MySQL Exporter (S) |
 |  | PostgreSQL 16.1 |  | Prometheus, Grafana |
 |  | Redis 7.2.3 |  | Flyway 8.4.4 |
+
 ---
 ### CI / CD 
 #### Pipeline
