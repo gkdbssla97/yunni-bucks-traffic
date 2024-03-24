@@ -28,21 +28,22 @@ pipeline {
                 script {
                     sshagent (credentials: ['tomcat']) {
                         sh '''
-                            ssh -o StrictHostKeyChecking=no ec2-user@172.31.41.40 "
-                                TOMCAT_PID=\$(ps -ef | grep tomcat | grep -v grep | awk '{print \$2}')
-                                if [[ -n \$TOMCAT_PID ]]; then
-                                    echo \"Tomcat is running with PID \\$TOMCAT_PID, stopping...\"
-                                    sudo kill -15 \$TOMCAT_PID
-                                    while ps -p \$TOMCAT_PID > /dev/null; do sleep 1; done
-                                    echo \"Tomcat stopped.\"
-                                else
-                                    echo \"Tomcat is not running.\"
-                                fi
-                                echo \"Starting Tomcat...\"
-                                cd /opt/apache-tomcat-9.0.86/
-                                sudo ./bin/startup.sh
-                                echo \"Tomcat started.\"
-                            "
+                            ssh -o StrictHostKeyChecking=no ec2-user@172.31.41.40 '
+                            TOMCAT_PID=$(ps -ef | grep tomcat | grep -v grep | awk '"'"'{print $2}'"'"')
+                            if [[ -n $TOMCAT_PID ]]; then
+                                echo "Tomcat is running with PID $TOMCAT_PID, stopping..."
+                                sudo kill -15 $TOMCAT_PID
+                                while ps -p $TOMCAT_PID > /dev/null; do sleep 1; done
+                                echo "Tomcat stopped."
+                            else
+                                echo "Tomcat is not running."
+                            fi
+                            echo "Starting Tomcat..."
+                            cd /opt/apache-tomcat-9.0.86/
+                            sudo ./bin/startup.sh
+                            echo "Tomcat started."
+                        '
+
 
                         '''
                     }
