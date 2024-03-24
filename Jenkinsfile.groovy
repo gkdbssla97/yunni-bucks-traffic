@@ -52,7 +52,6 @@ pipeline {
 
     post {
         success {
-            echo "This will run when the run finished successfully"
             script {
                 emailext (
                         to: 'hy97@sju.ac.kr',
