@@ -53,11 +53,19 @@ pipeline {
     post {
         success {
             echo "This will run when the run finished successfully"
-            emailext body: 'Jenkins pipeline job for gradle build successfully completed.', subject: 'Build Success', to: 'hy97@sju.ac.kr'
+            emailext (
+                    to: 'hy97@sju.ac.kr',
+                    subject: 'Build Success',
+                    body: 'Jenkins pipeline job for gradle build successfully completed.'
+            )
         }
         failure {
             echo "This will run if failed"
-            emailext body: 'Jenkins pipeline job for gradle build failed.', subject: 'Build Failure', to: 'hy97@sju.ac.kr'
+            emailext (
+                    to: 'hy97@sju.ac.kr',
+                    subject: 'Build Failure',
+                    body: 'Jenkins pipeline job for gradle build failed.'
+            )
         }
         changed {
             echo "This will run when the state of the pipeline has changed"
