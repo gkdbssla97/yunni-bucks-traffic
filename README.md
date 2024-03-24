@@ -106,9 +106,9 @@
         - JSch를 이용한 SSH 터널링: Spring Boot에서 JSch 라이브러리를 사용하여 NCP 서버에 SSH 접속 설정
         - 포트 포워딩 설정: NCP 서버에서 Docker 컨테이너로 포트 포워딩을 설정하여, 특정 포트를 통해 DB 컨테이너에 접근
 
-          |  | MySQL(Master) | MySQL(Slave-1) | MySQL(Slave-2) | PostgreSQL | Redis |
-          |---|:---:|:---:|:---:|:---:|:---:|
-          | Host:Internal | 3306:3306 | 3307:3306 | 3308:3306 | 5432:5432 | 6379:6379 |
+          | MySQL(Master) | MySQL(Slave1) | MySQL(Slave2) | PostgreSQL | Redis |
+          |:-------------:|:-------------:|:---:|:---:|:---:|
+          | 3306:3306 |   3307:3306   |   3308:3306   | 5432:5432 | 6379:6379 |
      2. **Tomcat WAR 파일 최대 업로드 크기 문제**
         - server.xml 수정: conf/server.xml 수정하여 \<Connector> 태그 내의 maxPostSize 속성 값을 _52428800(50MB)_ 에서 _157286400(150MB)_ 로 변경 (배포 WAR file 80.1MB 용량 초과)
      3. **Tomcat App 실행 중 자동 배포**
