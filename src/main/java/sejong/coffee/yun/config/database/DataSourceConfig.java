@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -30,6 +31,7 @@ import static sejong.coffee.yun.config.database.DatabaseProperties.DatabaseDetai
 @Configuration
 @Slf4j
 @RequiredArgsConstructor
+@EnableConfigurationProperties(DatabaseProperties.class)
 public class DataSourceConfig {
 
     private final SSHConnection sshConnection;
@@ -75,7 +77,7 @@ public class DataSourceConfig {
 
     @Bean("masterDataSource")
     public DataSource createMasterDataSource(DatabaseProperties databaseProperties) {
-        log.info("Creating master data sources...");
+        log.info("Master DB detail: {}", databaseProperties.getMaster());
         return createDataSource(databaseProperties.getMaster());
     }
 
