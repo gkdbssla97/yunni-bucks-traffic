@@ -1,11 +1,8 @@
-# local environment (로컬)
+# stage environment (스테이지)
+
 secrets:
-  clova:
-    authorizeUri: https://zfusrxrk3k.apigw.ntruss.com/custom/v1/23890/2453eb775e796913aca6d68e93eb5c9d0eda8b9e8f224fe7413ac067ae57fc7b/document/credit-card
-    secret-key: bHdFSFJGTklOVVJzUFBNeEx3UmhFU3dZdXVtakxUY3U=
   toss:
     apiUri: https://api.tosspayments.com/v1/payments/key-in
-    secret-key: Basic dGVzdF9za183WFpZa0tMNE1yakFsYUJ5MGExVjB6SndsRVdSOg==
 
 spring:
   application:
@@ -22,9 +19,6 @@ spring:
   datasource:
     master:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://127.0.0.1:3306/yunni_bucks_traffic?rewriteBatchedStatements=true
-      username: root
-      password: 1234
       auto-commit: false
       connection-test-query: SELECT 1
       maximum-pool-size: 40
@@ -34,25 +28,15 @@ spring:
     slaves:
       - name: slave-1
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://127.0.0.1:3307/yunni_bucks_traffic?rewriteBatchedStatements=true
-        username: root
-        password: 1234
         hibernate:
           ddl-auto: validate
-
       - name: slave-2
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://127.0.0.1:3308/yunni_bucks_traffic?rewriteBatchedStatements=true
-        username: root
-        password: 1234
         hibernate:
           ddl-auto: validate
 
     postgres:
       driver-class-name: org.postgresql.Driver
-      url: jdbc:postgresql://127.0.0.1:5432/yunni_bucks_traffic
-      username: root
-      password: 1234
       hikari:
         auto-commit: false
         connection-test-query: SELECT 1
@@ -61,33 +45,29 @@ spring:
       hibernate:
         ddl-auto: validate
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
   flyway:
     enabled: true
+    baselineOnMigrate: true
+    cleanDisabled: true
 
   redis:
     host: localhost
     port: 6379
 
-management:
-  server:
-    port: 8082
-  endpoints:
-    web:
-      exposure:
-        include: '*'
+  cloud:
+    vault:
+      uri: http://3.35.52.88:8200
+      token: ${VAULT_TOKEN}
+      kv:
+        backend: kv-v2
+        default-context: application
+  config:
+    import: ${VAULT_IMPORT}
 
 logging:
-  level: #띄어쓰기 없음
+  level:
     org.hibernate.SQL: debug
-#    org.hibernate.type: trace
-  discord:
-    webhook-uri: https://discord.com/api/webhooks/1150073801967677612/8eV2tDl39S6yHq_QW81ZV7mGKZPeypsi0uXFsGwj0hSP1NjlsMH07-d7oDWgAytZxzu1
-  config: classpath:logback-spring.xml
-  slack:
-    token: T05S4KA8C9F/B05S4L85NAV/jW3SWBKcl8kThXBY3tvlRyYz
-
-origin:
-  address: http://localhost:8080
 
 jwt:
   key: applicationKey

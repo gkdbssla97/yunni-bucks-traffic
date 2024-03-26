@@ -69,9 +69,6 @@ logging:
   level:
     org.hibernate.SQL: debug
 
-origin:
-  address: http://localhost:8080
-
 jwt:
   key: applicationKey
   blackList: blackList
