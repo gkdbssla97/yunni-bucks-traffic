@@ -34,7 +34,10 @@
   - Tomcat (AWS EC2)
   - Nginx 무중단 배포 (예정)
 - 데이터베이스 관리
-  - Docker (NCP Ubuntu) 
+  - Docker (NCP Ubuntu)
+#### Credentials
+- HashiCorp Vault
+
 ---
 ### Traffic 개요
 #### 대용량 데이터 검색 성능 개선
@@ -118,7 +121,12 @@
         > 1. **Tomcat 프로세스 확인**: 배포 script는 실행 중인 Tomcat App의 PID 확인 (`TOMCAT_PID=$(ps -ef | grep tomcat | grep -v grep | awk '{print $2}')`)
         > 2. **프로세스 종료**: 실행 중인 Tomcat이 있을 경우 `kill -15 $TOMCAT_PID`로 프로세스에게 종료 요청 후 프로세스가 완전히 종료될 때까지 대기 <br>(`kill -9`는 프로세스가 SIGTERM에 반응하지 않거나 강제 종료가 필요한 경우에만 사용)
         > 3. **Tomcat 재시작**: 프로세스 종료 후, `./bin/startup.sh`를 실행하여 Tomcat를 재시작하여 새로운 배포 적용
-        
+#### Credential
+- Vault
+  #### 사용 이유
+  1. **안전한 비밀 관리**: 민감한 정보 (API 토큰, DB 접속 정보, 비밀 키 등)를 암호화하여 저장하고, 권한에 따라 안전하게 접근 제어할 수 있다.<br>Vault로 `.yml`에 공개된 정보의 노출 리스크를 줄일 수 있다고 판단
+  2. **중앙화된 비밀 관리**: 모든 정보를 한 곳에서 관리함으로써, 설정 변경이 필요할 때마다 애플리케이션을 재배포해야 하는 불편함 해소 가능
+
 ---
 ### 메뉴 리뷰
 #### 1. 메뉴 리뷰 대용량 데이터(10만, 100만)일 경우 검색

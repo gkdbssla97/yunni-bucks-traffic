@@ -1,7 +1,6 @@
 package sejong.coffee.yun.integration.order.menu;
 
 import net.datafaker.Faker;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +51,7 @@ public class MenuReviewTest extends MainIntegrationTest {
     private Member member;
     private Menu menu;
 
-    @AfterEach
+//    @AfterEach
     void initDB() {
         menuReviewRepository.clear();
         userRepository.clear();
@@ -68,7 +67,7 @@ public class MenuReviewTest extends MainIntegrationTest {
 
         Faker faker = new Faker(new Locale("ko"));
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             String comments = faker.lorem().sentence();  // 랜덤한 문장 생성
             String s = faker.food().ingredient() + " " +
                     faker.food().ingredient() + " " +

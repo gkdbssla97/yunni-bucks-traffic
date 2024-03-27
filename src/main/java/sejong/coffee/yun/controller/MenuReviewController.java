@@ -57,7 +57,7 @@ public class MenuReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/reviews/find/{reviewId}")
+    @GetMapping("/reviews/{reviewId}")
     ResponseEntity<MenuReviewDto.Response> findMenuReview(@PathVariable Long reviewId) {
 
         MenuReview menuReview = menuReviewService.findReview(reviewId);
@@ -162,5 +162,12 @@ public class MenuReviewController {
     @GetMapping("/reviews/webhook-test/{param}")
     ResponseEntity<String> webhookTest(@PathVariable int param) {
         return ResponseEntity.ok(param + " 번째 \nAutomatic deployment of Git webhook upon commit.");
+    }
+
+    @GetMapping("/reviews/find/{reviewId}")
+    ResponseEntity<String> findMenuReviewByTest(@PathVariable Long reviewId) {
+
+        MenuReview menuReview = menuReviewService.findReview(reviewId);
+        return ResponseEntity.ok(menuReview.getComments());
     }
 }
