@@ -21,6 +21,7 @@ import static sejong.coffee.yun.domain.order.menu.QMenu.menu;
 @Repository
 @Primary
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MenuRepositoryImpl implements MenuRepository {
 
     private final JpaMenuRepository jpaMenuRepository;
