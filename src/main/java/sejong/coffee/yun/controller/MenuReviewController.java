@@ -57,7 +57,7 @@ public class MenuReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/reviews/{reviewId}")
+    @GetMapping("/reviews/find/{reviewId}")
     ResponseEntity<MenuReviewDto.Response> findMenuReview(@PathVariable Long reviewId) {
 
         MenuReview menuReview = menuReviewService.findReview(reviewId);
