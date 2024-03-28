@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import sejong.coffee.yun.domain.order.menu.Menu;
-import sejong.coffee.yun.dto.menu.MenuDto;
 import sejong.coffee.yun.dto.menu.MenuPageDto;
 import sejong.coffee.yun.dto.menu.MenuRankingDto;
 import sejong.coffee.yun.repository.menu.MenuRepository;
@@ -60,16 +59,14 @@ public class MenuController {
     @GetMapping("/caching/page/{pageNum}")
     ResponseEntity<MenuPageDto.Response> findAllByCaching(@PathVariable int pageNum) {
         PageRequest pageRequest = PageRequest.of(pageNum, 5, Sort.by("id"));
-        Page<Response> allMenu = menuService.findAllByCaching(pageRequest);
-        List<Response> responses = allMenu.stream().toList();
 
+        MenuPageDto.Response allByCaching = menuService.findAllByCaching(pageRequest);
 
-        MenuPageDto.Response response = new MenuPageDto.Response(pageNum, responses);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(allByCaching);
     }
 
     @GetMapping("/search/menu")
-    ResponseEntity<MenuDto.Response> searchMenu(@RequestParam("title") String menuTitle) {
+    ResponseEntity<Response> searchMenu(@RequestParam("title") String menuTitle) {
 
         Response response = menuService.menuSearch(menuTitle);
 

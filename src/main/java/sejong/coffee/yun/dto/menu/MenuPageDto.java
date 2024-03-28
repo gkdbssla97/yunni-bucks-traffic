@@ -16,5 +16,14 @@ public class MenuPageDto {
                             .toList()
             );
         }
+
+        public static Response fromPage(Page<Menu> menuPage) {
+            return new Response(
+                    menuPage.getNumber(),
+                    menuPage.stream()
+                            .map(MenuDto.Response::new)
+                            .toList()
+            );
+        }
     }
 }

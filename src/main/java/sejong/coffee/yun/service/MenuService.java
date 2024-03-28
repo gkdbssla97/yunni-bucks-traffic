@@ -20,6 +20,7 @@ import sejong.coffee.yun.domain.order.menu.Bread;
 import sejong.coffee.yun.domain.order.menu.Menu;
 import sejong.coffee.yun.domain.order.menu.MenuType;
 import sejong.coffee.yun.dto.menu.MenuDto;
+import sejong.coffee.yun.dto.menu.MenuPageDto;
 import sejong.coffee.yun.facade.RedissonLockFacade;
 import sejong.coffee.yun.repository.menu.MenuRepository;
 
@@ -73,9 +74,9 @@ public class MenuService {
 
     @Cacheable(value = "AllMenus", key = "#pageable.pageNumber", cacheManager = "cacheManager", condition = "#pageable.pageNumber <= 5")
     @Transactional(readOnly = true)
-    public Page<MenuDto.Response> findAllByCaching(Pageable pageable) {
+    public MenuPageDto.Response findAllByCaching(Pageable pageable) {
         Page<Menu> allMenusPaged = menuRepository.findAllMenusPaged(pageable);
-        return allMenusPaged.map(MenuDto.Response::new);
+        return MenuPageDto.Response.fromPage(allMenusPaged);
     }
 
     public Page<MenuDto.Response> findAll(Pageable pageable) {
