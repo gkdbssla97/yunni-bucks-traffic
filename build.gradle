@@ -39,6 +39,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.json:json:20230618'
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
 	// lombok
@@ -81,7 +82,6 @@ dependencies {
 	// mock
 	testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.6.1'
 
-	implementation 'com.github.napstr:logback-discord-appender:1.0.0'
 	implementation("net.gpedro.integrations.slack:slack-webhook:1.4.0")
 
 	implementation 'net.datafaker:datafaker:2.0.2'
