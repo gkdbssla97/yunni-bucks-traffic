@@ -79,9 +79,9 @@ public class MenuService {
         return MenuPageDto.Response.fromPage(allMenusPaged);
     }
 
-    public Page<MenuDto.Response> findAll(Pageable pageable) {
+    public MenuPageDto.Response findAll(Pageable pageable) {
         Page<Menu> allMenusPaged = menuRepository.findAllMenusPaged(pageable);
-        return allMenusPaged.map(MenuDto.Response::new);
+        return MenuPageDto.Response.fromPage(allMenusPaged);
     }
 
     public MenuDto.Response menuSearch(String menuTitle) {

@@ -3,7 +3,6 @@ package sejong.coffee.yun.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -49,10 +48,8 @@ public class MenuController {
     ResponseEntity<MenuPageDto.Response> findAll(@PathVariable int pageNum) {
         PageRequest pageRequest = PageRequest.of(pageNum, 5);
 
-        Page<Response> allMenu = menuService.findAll(pageRequest);
-        List<Response> responses = allMenu.stream().toList();
+        MenuPageDto.Response response = menuService.findAllByCaching(pageRequest);
 
-        MenuPageDto.Response response = new MenuPageDto.Response(pageNum, responses);
         return ResponseEntity.ok(response);
     }
 
