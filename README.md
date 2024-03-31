@@ -138,16 +138,16 @@
     #### Scale-Up & Scale-Out
   1. **목표**: 최대 1000명까지 안정적인 서버 운영
   2. **과정**: nGrinder로 vUser 수 점진적으로 올리면서 Scale-Up과 Scale-Out의 스케일 조정 
-     1. t2.micro(1vCPU 1G) 단일 톰캣 100명 Test 실행, Read Time Out 발생 → t2.small(1vCPU 2G) Scale-Up
-     2. t2.small 단일 톰캣 400명 Test 실행, nGrinder CPU 70%, Tomcat CPU 65% 사용 → 1000명 Test 실행, nGrinder/Tomcat CPU 100% 초과 Read Time Out 발생
-     3. t2.medium(2vCPU 4G) 단일 톰캣 1000명 Test 실행, Nginx의 CPU 사용량은 62%, Tomcat CPU는 130~140% 유지, 200% 모두 사용하지 못 함
+     1. t2.micro(1vCPU 1G) 단일 Tomcat 100명 Test 실행, Read Time Out 발생 → t2.small(1vCPU 2G) Scale-Up
+     2. t2.small 단일 톰캣 400명 Test 실행, nGrinder CPU 70%, Tomcat CPU 65% 사용 → 1000명 Test 실행, nGrinder/Tomcat CPU Usage 100% 초과 Read Time Out 발생
+     3. t2.medium(2vCPU 4G) 단일 Tomcat 1000명 Test 실행, Nginx의 CPU 사용량은 62%, Tomcat CPU 사용량은 130~140% 유지, 200% 모두 사용하지 못 함
         1. nGrinder가 WAS에 트래픽 부하를 걸지 못한다고 판단 → 사용자 수 2천명 고려하여 nGrinder 4vCPU 8G Scale-Up
       
         <img width="600" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/a066ff5c-3cf7-47b7-b618-c6856f0a896f">
-     4. tomcat-2 (t2.small) 증설하여 로드 밸런싱 설정 (weight=2:1비율)<br> Tomcat 서버 2대 모두 CPU 사용량이 191%, 98%로 최대 사용량에 근접했고, Nginx의 CPU 사용량 역시 85%로 Nginx의 높은 사용량을 보이고 있다.<br>
+     4. tomcat-2 (t2.small) 증설하여 로드 밸런싱 설정 (weight=2:1비율)<br> Tomcat 서버 2대 모두 CPU 사용량이 191%, 98%로 최대 사용량에 근접했고, Nginx CPU 사용량 역시 85%로 높은 사용량을 보이고 있다.<br>
         <img width="600" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/53923e30-423d-42c9-89b2-fb42660bf534">
      5. Scale 유지하여 2000명 Test 실행, vUser 대비 TPS가 기대치만큼 나오지 않음
-        1. nGrinder CPU 사용량이 약 70%로, Tomcat 서버를 3대로 증설 또는 Tomcat-2의 Scale-Up 시 2000명도 충분히 트래픽을 버틸거라 판단
+        1. nGrinder CPU 사용량이 약 70%로, WAS 서버를 3대로 증설 또는 Tomcat-2의 Scale-Up 시 2000명도 충분히 트래픽을 버틸거라 판단
     #### vUser별 WAS 서버 스펙 및 TPS 결과
     |   vUser   | 40 | 400 | 1000 | 1000 |   2000    |
    |:--------:|:---:|:---:|:---:|:---------:|:---:|
