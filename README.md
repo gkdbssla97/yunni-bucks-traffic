@@ -6,19 +6,20 @@
 2. 개발 기간 : 2023-10 ~ *(트래픽 상황 대처 프로젝트 고도화)*
 --- 
 ### Architecture
-<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/a2cdb608-eb14-4a6c-b10e-620abb49f499">
+<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/77f364b3-985f-4094-96ef-c96170b3c482">
 
+[//]: # (<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/a2cdb608-eb14-4a6c-b10e-620abb49f499">)
 [//]: # (<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/6b549854-5534-4fbb-8608-a14a49eeaed1">)
 [//]: # (<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/d3a9049e-b005-4c48-a925-aeb0b3a2882d">)
 [//]: # (<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/b626e81c-e074-441d-9005-8b911df5d803">)
 
 #### System Infrastructure Details
-| Local Server | NCP(Docker) |     AWS EC2     | Utility |
-|:---:|:---:|:---------------:|:---:|
-| SpringBoot 2.7.14 | MySQL 8.2.0 (M) | Jenkins 2.440.1 | MySQL Exporter (M) |
-| Java 17 | MySQL 8.2.0 (S) |  Tomcat 9.0.87  | MySQL Exporter (S) |
-|  | PostgreSQL 16.1 |  Vault 1.15.6   | Prometheus, Grafana |
-|  | Redis 7.2.3 | nGrinder 3.5.9  | Flyway 8.4.4 |
+| Local Server |  NCP (Docker)   |     AWS EC2     | Utility | Monitoring & Testing |
+|:---:|:---------------:|:---------------:|:---:|:--------------------:|
+| SpringBoot 2.7.14 | MySQL 8.2.0 (M) | Jenkins 2.440.1 | MySQL Exporter (M) | Prometheus Grafana  
+| Java 17 | MySQL 8.2.0 (S) |  Tomcat 9.0.87  | MySQL Exporter (S) | nGrinder |
+|  | PostgreSQL 16.1 |  Vault 1.15.6   | Flyway 8.4.4 | VisualVM |
+|  |   Redis 7.2.3   |  Nginx 1.24.0   |  | AWS Cloud Watch |
 
 ---
 ### CI / CD 
@@ -34,10 +35,14 @@
   - Tomcat (AWS EC2)
   - Nginx 무중단 배포 (예정)
 - 데이터베이스 관리
-  - Docker (NCP Ubuntu)
+  - Docker (NCP)
+#### Nginx
+ - 외부 Tomcat 서버 2대
+   - Load Balancing
+   - Caching
+   - Scale-Up & Scale-Out
 #### Credentials
 - HashiCorp Vault
-
 ---
 ### Traffic 개요
 #### 대용량 데이터 검색 성능 개선
@@ -121,6 +126,42 @@
         > 1. **Tomcat 프로세스 확인**: 배포 script는 실행 중인 Tomcat App의 PID 확인 (`TOMCAT_PID=$(ps -ef | grep tomcat | grep -v grep | awk '{print $2}')`)
         > 2. **프로세스 종료**: 실행 중인 Tomcat이 있을 경우 `kill -15 $TOMCAT_PID`로 프로세스에게 종료 요청 후 프로세스가 완전히 종료될 때까지 대기 <br>(`kill -9`는 프로세스가 SIGTERM에 반응하지 않거나 강제 종료가 필요한 경우에만 사용)
         > 3. **Tomcat 재시작**: 프로세스 종료 후, `./bin/startup.sh`를 실행하여 Tomcat를 재시작하여 새로운 배포 적용
+#### Nginx 
+- Reverse Proxy 활용
+    #### 구현 이유
+  1. **Load Balancing**: Nginx의 로드 밸런싱 알고리즘을 활용하여 톰캣 서버 간에 트래픽을 효율적으로 분산시켜 성능을 최적화할 수 있다고 판단
+      - Weighted Round Robin
+          1. Tomcat-1 : t2.medium(2vCPU 4GB) weight=2
+          2. Tomcat-2 : t1.small(1vCPU 2GB) weight=1
+  2. **Caching**: 정적 또는 동적 컨텐츠의 일부를 Nginx에서 캐싱함으로써, 반복적인 요청에 대해 빠른 응답 제공, 백엔드 서버의 부하 감소 및 응답 시간 단축
+
+    #### Scale-Up & Scale-Out
+  1. **목표**: 최대 1000명까지 안정적인 서버 운영
+  2. **과정**: nGrinder로 vUser 수 점진적으로 올리면서 Scale-Up과 Scale-Out의 스케일 조정 
+     1. t2.micro(1vCPU 1G) 단일 톰캣 100명 Test 실행, Read Time Out 발생 → t2.small(1vCPU 2G) Scale-Up
+     2. t2.small 단일 톰캣 400명 Test 실행, nGrinder CPU 70%, Tomcat CPU 65% 사용 → 1000명 Test 실행, nGrinder/Tomcat CPU 100% 초과 Read Time Out 발생
+     3. t2.medium(2vCPU 4G) 단일 톰캣 1000명 Test 실행, Nginx의 CPU 사용량은 62%, Tomcat CPU는 130~140% 유지, 200% 모두 사용하지 못 함
+        1. nGrinder가 WAS에 트래픽 부하를 걸지 못한다고 판단 -> 사용자 수 2천명 고려하여 nGrinder 4vCPU 8G Scale-Up
+      
+        <img width="600" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/a066ff5c-3cf7-47b7-b618-c6856f0a896f">
+     4. tomcat-2 (t2.small) 증설하여 로드 밸런싱 설정 (weight=2:1비율)<br> Tomcat 서버 2대 모두 CPU 사용량이 191%, 98%로 최대 사용량에 근접했고, Nginx의 CPU 사용량 역시 85%로 Nginx의 높은 사용량을 보이고 있다.<br>
+        <img width="600" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/53923e30-423d-42c9-89b2-fb42660bf534">
+     5. Scale 유지하여 2000명 Test 실행, vUser 대비 TPS가 기대치만큼 나오지 않음
+        1. nGrinder의 CPU 사용량이 약 70%로, Tomcat 서버를 3대로 증설 또는 Tomcat-2의 Scale-Up 시 2000명도 충분히 트래픽을 버틸거라 판단
+    #### vUser별 WAS 서버 스펙 및 TPS 결과
+    |   USER   | 40 | 400 | 1000 | 1000 |   2000    |
+   |:--------:|:---:|:---:|:---:|:---------:|:---:|
+   | Tomcat-1 | t2.micro | t2.small | t2.medium | t2.medium | t2.medium |
+   | Tomcat-2 | X | X | X | t2.small | t2.small  |
+   |   TPS    | 84.3 | 1637.4 | 2678.1 | 4116.6 |  3838.2   |
+    #### VisualVM CPU, Thread Metric
+    <img width="516" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/e60918e5-a867-4a8e-9769-1c21c9875190">
+    <br>로드 밸런싱을 적용한 후, 빨간선을 기준으로 병목 현상이 감소하였으며, 이는 CPU의 최대 사용률 지속 시간이 늘어난 것으로 확인된다. </br>또한, 최대치까지 활용된 live thread 수치는 시스템이 높은 요청 처리량을 효율적으로 소화할 수 있음을 시사한다. Heap Size의 증감률과 낮은 GC 활동은 현재 메모리 관리가 비교적 잘 이루어지고 있다고 판단
+
+    #### 고민할 점
+  - Weighted Round Robin 대신 Least Response Time Method 사용 시 성능 비교
+  - 지속적 Scale-Up의 한계
+
 #### Credential
 - Vault
   #### 사용 이유
