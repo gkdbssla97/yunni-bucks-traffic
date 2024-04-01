@@ -6,7 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
+import sejong.coffee.yun.domain.order.menu.Bread;
 import sejong.coffee.yun.domain.order.menu.Menu;
+import sejong.coffee.yun.domain.order.menu.MenuSize;
+import sejong.coffee.yun.domain.order.menu.Nutrients;
+import sejong.coffee.yun.domain.user.Money;
 import sejong.coffee.yun.integration.MainIntegrationTest;
 import sejong.coffee.yun.repository.menu.MenuRepository;
 import sejong.coffee.yun.repository.review.jdbc.JdbcRepository;
@@ -14,6 +18,8 @@ import sejong.coffee.yun.service.MenuService;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -39,12 +45,22 @@ public class CompletableFutureTest extends MainIntegrationTest {
     @PostConstruct
     public void init() throws IOException {
 
-        for (int i = 0; i < 1000; i++) {
-            Menu menu = bread(i + 1);
+        for (int num = 1; num <= 100; num++) {
+            Menu menu = Bread.builder()
+                    .id((long) (num))
+                    .title("빵" + num)
+                    .description("성심당과 콜라보한 빵")
+                    .nutrients(new Nutrients(num, num, num, num))
+                    .now(LocalDateTime.now())
+                    .menuSize(MenuSize.M)
+                    .price(Money.initialPrice(new BigDecimal(4000)))
+                    .stock(100)
+                    .build();
 
             menus.add(menu);
+            menuRepository.save(menu);
         }
-        jdbcMysqlRepository.saveMenusByJdbc(menus);
+//        jdbcMysqlRepository.saveMenusByJdbc(menus);
         cacheMenus(menus);
     }
 
