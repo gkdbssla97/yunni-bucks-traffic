@@ -145,7 +145,7 @@
       
         <img width="600" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/a066ff5c-3cf7-47b7-b618-c6856f0a896f">
      4. tomcat-2 (t2.small) 증설하여 로드 밸런싱 설정 (weight=2:1비율)<br> Tomcat 서버 2대 모두 CPU 사용량이 191%, 98%로 최대 사용량에 근접했고, Nginx CPU 사용량 역시 85%로 높은 사용량을 보이고 있다.<br>
-        <img width="600" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/c387344a-4944-47d6-8049-0ef7ae6c9898">
+        <img width="600" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/0a42fff5-f3bf-4762-9a57-3b44bed9d7d5">
      5. Scale 유지하여 2000명 Test 실행, vUser 대비 TPS가 기대치만큼 나오지 않음
         1. nGrinder CPU 사용량이 약 70%로, WAS 서버를 3대로 증설 또는 Tomcat-2의 Scale-Up 시 2000명도 충분히 트래픽을 버틸거라 판단
     #### vUser별 WAS 서버 스펙 및 TPS 결과
@@ -156,7 +156,7 @@
    |   TPS    | 84.3 | 1637.4 | 2678.1 | 4116.6 |  3838.2   |
     #### VisualVM CPU, Thread Metric
     <img width="516" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/e60918e5-a867-4a8e-9769-1c21c9875190">
-    <br>로드 밸런싱을 적용한 후, 빨간선을 기준으로 병목 현상이 감소하였으며, 이는 CPU의 최대 사용률 지속 시간이 늘어난 것으로 확인된다. </br>또한, 최대치까지 활용된 live thread 수치는 시스템이 높은 요청 처리량을 효율적으로 소화할 수 있음을 시사한다. Heap Size의 증감률과 낮은 GC activity는 현재 메모리 관리가 비교적 잘 이루어지고 있다고 판단
+    <br>로드 밸런싱을 적용한 후, 빨간선을 기준으로 병목 현상이 감소하였으며, 이는 CPU의 최대 사용률 지속 시간이 늘어난 것으로 확인된다. </br> 또한, 최대치까지 활용된 live thread 수치는 시스템이 높은 요청 처리량을 효율적으로 소화할 수 있음을 시사한다. Heap Size의 증감률과 낮은 GC activity는 현재 메모리 관리가 비교적 잘 이루어지고 있다고 판단
 
     #### 고민할 점
   - Weighted Round Robin 대신 Least Response Time Method 사용 시 성능 비교
