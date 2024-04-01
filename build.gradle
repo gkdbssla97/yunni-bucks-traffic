@@ -116,8 +116,10 @@ dependencyManagement {
 }
 
 test {
-	outputs.dir snippetsDir
-	include '**/sejong/coffee/yun/unit/**/*.java'
+	useJUnitPlatform()
+	filter {
+		includeTestsMatching "sejong.coffee.yun.unit.*"
+	}
 }
 
 if (!project.hasProperty('skipAsciidoctor')) {
