@@ -17,10 +17,17 @@ pipeline {
             }
         }
 
+        stage('SonarQube analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube-server') {
+                    sh './gradlew sonarqube'
+                }
+            }
+        }
         stage('deploy') {
             steps {
 //                deploy adapters: [tomcat9(credentialsId: 'deployer_user', path: '', url: 'http://43.201.8.89:8080/')], contextPath: null, war: '**/*.war'
-                deploy adapters: [tomcat9(credentialsId: 'deployer_user', path: '', url: 'http://15.164.164.182:8080/')], contextPath: null, war: '**/*.war'
+                deploy adapters: [tomcat9(credentialsId: 'deployer_user', path: '', url: 'http://13.124.157.68:8080/')], contextPath: null, war: '**/*.war'
             }
         }
 

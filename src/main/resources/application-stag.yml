@@ -57,7 +57,7 @@ spring:
 
   cloud:
     vault:
-      uri: http://3.34.122.50:8200
+      uri: http://3.37.89.28:8200
       token: ${VAULT_TOKEN}
       kv:
         backend: kv-v2
