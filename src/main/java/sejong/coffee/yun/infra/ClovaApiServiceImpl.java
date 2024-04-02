@@ -55,7 +55,6 @@ public class ClovaApiServiceImpl implements ClovaApiService {
             try (FileInputStream inputStream = new FileInputStream(request.path())) {
                 byte[] buffer = new byte[inputStream.available()];
                 inputStream.read(buffer);
-                inputStream.close();
                 image.put("data", buffer);
                 image.put("name", parsingDataTimePattern());
                 JSONArray images = new JSONArray();
