@@ -129,14 +129,14 @@ public class DataSourceConfig {
     }
 
     @Bean
-    @Qualifier("masterJdbcTemplate")
+//    @Qualifier("masterJdbcTemplate")
     public JdbcTemplate masterJdbcTemplate(DatabaseProperties databaseProperties) {
         DataSource masterDataSource = createDataSource(databaseProperties.getMaster());
         return new JdbcTemplate(masterDataSource);
     }
 
     @Bean
-    @Qualifier("postgresJdbcTemplate")
+//    @Qualifier("postgresJdbcTemplate")
     public JdbcTemplate postgresJdbcTemplate(DatabaseProperties databaseProperties) {
         DataSource postgresDataSource = createDataSource(databaseProperties.getPostgres());
         return new JdbcTemplate(postgresDataSource);

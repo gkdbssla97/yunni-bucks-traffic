@@ -6,8 +6,9 @@
 2. 개발 기간 : 2023-10 ~ *(트래픽 상황 대처 프로젝트 고도화)*
 --- 
 ### Architecture
-<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/77f364b3-985f-4094-96ef-c96170b3c482">
+<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/89814746-866b-4dff-81d9-92468357888c">
 
+[//]: # (<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/77f364b3-985f-4094-96ef-c96170b3c482">)
 [//]: # (<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/a2cdb608-eb14-4a6c-b10e-620abb49f499">)
 [//]: # (<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/6b549854-5534-4fbb-8608-a14a49eeaed1">)
 [//]: # (<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/d3a9049e-b005-4c48-a925-aeb0b3a2882d">)
@@ -15,11 +16,11 @@
 
 #### System Infrastructure Details
 | Local Server |  NCP (Docker)   |     AWS EC2     | Utility | Monitoring & Testing |
-|:---:|:---------------:|:---------------:|:---:|:--------------------:|
-| SpringBoot 2.7.14 | MySQL 8.2.0 (M) | Jenkins 2.440.1 | MySQL Exporter (M) | Prometheus Grafana  
-| Java 17 | MySQL 8.2.0 (S) |  Tomcat 9.0.87  | MySQL Exporter (S) | nGrinder |
-|  | PostgreSQL 16.1 |  Vault 1.15.6   | Flyway 8.4.4 | VisualVM |
-|  |   Redis 7.2.3   |  Nginx 1.24.0   |  | AWS Cloud Watch |
+|:---:|:---------------:|:---------------:|:---:|:-------------------:|
+| SpringBoot 2.7.14 | MySQL 8.2.0 (M) | Jenkins 2.440.1 | MySQL Exporter (M) | Prometheus, Grafana 
+| Java 17 | MySQL 8.2.0 (S) |  Tomcat 9.0.87  | MySQL Exporter (S) | VisualVM |
+|  | PostgreSQL 16.1 |  Vault 1.15.6   | Flyway 8.4.4 | nGrinder |
+|  |   Redis 7.2.3   |  Nginx 1.24.0   |  | |
 
 ---
 ### CI / CD 
@@ -90,9 +91,9 @@
   
 ---
 ### Integration & Deployment 
-| **GitHub** | **Git Webhook** | **Jenkins**  | **WAR Deployment** |     **Tomcat**      |   **Monitoring**    |
-|:---:|:---:|:------------:|:---:|:-------------------:|:-------------------:|
-| Code Push | Webhook Trigger | Build & Test | Deploy WAR via HTTP | Unzip & Compile WAR | Grafana, Prometheus |
+| **GitHub** | **Git Webhook** | **Jenkins**  |        **SonarQube**         | **WAR Deployment**  |     **Tomcat**      |  **Monitoring**   |
+|:---:|:---:|:------------:|:----------------------------:|:-------------------:|:-------------------:|:-----------------:|
+| Code Push | Webhook Trigger | Build & Test | Code Quality Analysis Report | Deploy WAR via HTTP | Unzip & Compile WAR | Grafana, VisualVM |
 #### Continuous Integration   
 - Jenkins 활용
   #### 사용 이유
@@ -161,7 +162,11 @@
     #### 고민할 점
   - Weighted Round Robin 대신 Least Response Time Method 사용 시 성능 비교
   - 지속적 Scale-Up의 한계
-
+#### Code Quality Analysis
+- SonarQube
+  #### 사용 이유
+  1. **코드 품질 개선**: 개발 과정에서 자동으로 코드 스멜(Code Smells), 버그, 취약점 등을 식별하여 코드의 문제점을 인식하고 개선하여 리포팅할 수 있다.
+  2. **팀워크와 코드 품질 문화 증진**: 팀 내에서 코드 리뷰를 촉진하고, 모든 팀원이 코드 리포트를 볼 수 있어 코드 품질에 대한 인식을 높여 협업 증진
 #### Credential
 - Vault
   #### 사용 이유

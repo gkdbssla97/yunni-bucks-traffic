@@ -52,22 +52,22 @@ public class ClovaApiServiceImpl implements ClovaApiService {
             json.put("timestamp", System.currentTimeMillis());
             JSONObject image = new JSONObject();
             image.put("format", request.format());
-            FileInputStream inputStream = new FileInputStream(request.path());
-            byte[] buffer = new byte[inputStream.available()];
-            inputStream.read(buffer);
-            inputStream.close();
-            image.put("data", buffer);
-            image.put("name", parsingDataTimePattern());
-            JSONArray images = new JSONArray();
-            images.put(image);
-            json.put("images", images);
-            String postParams = json.toString();
+            try (FileInputStream inputStream = new FileInputStream(request.path())) {
+                byte[] buffer = new byte[inputStream.available()];
+                inputStream.read(buffer);
+                inputStream.close();
+                image.put("data", buffer);
+                image.put("name", parsingDataTimePattern());
+                JSONArray images = new JSONArray();
+                images.put(image);
+                json.put("images", images);
+                String postParams = json.toString();
 
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(postParams);
-            wr.flush();
-            wr.close();
-
+                DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+                wr.writeBytes(postParams);
+                wr.flush();
+                wr.close();
+            }
             int responseCode = con.getResponseCode();
             BufferedReader br;
             if (responseCode == 200) {
