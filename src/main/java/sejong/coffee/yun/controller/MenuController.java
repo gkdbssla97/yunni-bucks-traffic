@@ -48,7 +48,7 @@ public class MenuController {
     ResponseEntity<MenuPageDto.Response> findAll(@PathVariable int pageNum) {
         PageRequest pageRequest = PageRequest.of(pageNum, 5);
 
-        MenuPageDto.Response response = menuService.findAllByCaching(pageRequest);
+        MenuPageDto.Response response = menuService.findAll(pageRequest);
 
         return ResponseEntity.ok(response);
     }
