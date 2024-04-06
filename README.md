@@ -15,12 +15,12 @@
 [//]: # (<img width="864" alt="image" src="https://github.com/gkdbssla97/yunni-bucks-traffic/assets/55674664/b626e81c-e074-441d-9005-8b911df5d803">)
 
 #### System Infrastructure Details
-| Local Server |  NCP (Docker)   |     AWS EC2     | Utility | Monitoring & Testing |
-|:---:|:---------------:|:---------------:|:---:|:-------------------:|
-| SpringBoot 2.7.14 | MySQL 8.2.0 (M) | Jenkins 2.440.1 | MySQL Exporter (M) | Prometheus, Grafana 
-| Java 17 | MySQL 8.2.0 (S) |  Tomcat 9.0.87  | MySQL Exporter (S) | VisualVM |
-|  | PostgreSQL 16.1 |  Vault 1.15.6   | Flyway 8.4.4 | nGrinder |
-|  |   Redis 7.2.3   |  Nginx 1.24.0   |  | |
+| Local Server |  NCP (Docker)   |     AWS EC2     |      Utility       | Monitoring & Testing |
+|:---:|:---------------:|:---------------:|:------------------:|:--------------------:|
+| SpringBoot 2.7.14 | MySQL 8.2.0 (M) | Jenkins 2.440.1 | MySQL Exporter (M) | Prometheus, Grafana  
+| Java 17 | MySQL 8.2.0 (S) |  Tomcat 9.0.87  | MySQL Exporter (S) |       VisualVM       |
+|  | PostgreSQL 16.1 |  Vault 1.15.6   |    Flyway 8.4.4    |       nGrinder       |
+|  |   Redis 7.2.3   |  Nginx 1.24.0   |             |      SonarQube       |
 
 ---
 ### CI / CD 
