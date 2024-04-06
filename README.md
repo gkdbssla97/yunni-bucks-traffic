@@ -56,7 +56,7 @@
     - Round-Robin 
     - MHA Failover (예정) 
   - Prometheus로 Metric 수집
-    - Mysql Exporter
+    - MySQL Exporter
     - Spring Actuator
   - Grafana 활용하여 Prometheus Metric 시각화 처리
   
@@ -70,25 +70,6 @@
   - Write-Behind Caching
   - Time-To-Live (TTL) Caching
 - Redis zSet
----
-### 기능 개선 및 정합성 관리
-- 메뉴 리뷰
-  - PostgreSQL Full Text Search
-  - Master-Slave Replication MySQL 이중화
-- 메뉴 주문
-  - Optimistic Lock
-  - Pessimistic Lock
-  - Distributed Lock
-- 선착순 쿠폰 발급
-  - .
-- 조회
-  - 전체 메뉴
-    - Redis Cache 활용
-      - Write-Behind Caching
-      - Time-To-Live (TTL) Caching
-  - 인기 메뉴
-    - Redis zSet 활용
-  
 ---
 ### Integration & Deployment 
 | **GitHub** | **Git Webhook** | **Jenkins**  |        **SonarQube**         | **WAR Deployment**  |     **Tomcat**      |  **Monitoring**   |
