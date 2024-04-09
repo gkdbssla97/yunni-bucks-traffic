@@ -27,36 +27,36 @@ pipeline {
 
         stage('deploy') {
             steps {
-//                deploy adapters: [tomcat9(credentialsId: 'deployer_user', path: '', url: 'http://43.201.8.89:8080/')], contextPath: null, war: '**/*.war'
-                deploy adapters: [tomcat9(credentialsId: 'deployer_user', path: '', url: 'http://3.36.75.119:8080/')], contextPath: null, war: '**/*.war'
+                deploy adapters: [tomcat9(credentialsId: 'deployer_user', path: '', url: 'http://54.180.103.46:8080/')], contextPath: null, war: '**/*.war'
+                deploy adapters: [tomcat9(credentialsId: 'deployer_user', path: '', url: 'http://52.79.234.122:8080/')], contextPath: null, war: '**/*.war'
             }
         }
 
-        stage('restart tomcat') {
-            steps {
-                script {
-                    sshagent(credentials: ['tomcat']) {
-                        sh '''
-                            ssh ec2-user@172.31.41.40 '
-                            TOMCAT_PID=$(ps -ef | grep tomcat | grep -v grep | awk '"'"'{print $2}'"'"')
-                            if [[ -n $TOMCAT_PID ]]; then
-                                echo "Tomcat is running with PID $TOMCAT_PID, stopping..."
-                                sudo kill -15 $TOMCAT_PID
-                                while ps -p $TOMCAT_PID > /dev/null; do sleep 1; done
-                                echo "Tomcat stopped."
-                            else
-                                echo "Tomcat is not running."
-                            fi
-                            echo "Starting Tomcat..."
-                            cd /opt/apache-tomcat-9.0.86/
-                            sudo ./bin/startup.sh
-                            echo "Tomcat started."
-                        '
-                        '''
-                    }
-                }
-            }
-        }
+//        stage('restart tomcat') {
+//            steps {
+//                script {
+//                    sshagent(credentials: ['tomcat']) {
+//                        sh '''
+//                            ssh ec2-user@172.31.41.40 '
+//                            TOMCAT_PID=$(ps -ef | grep tomcat | grep -v grep | awk '"'"'{print $2}'"'"')
+//                            if [[ -n $TOMCAT_PID ]]; then
+//                                echo "Tomcat is running with PID $TOMCAT_PID, stopping..."
+//                                sudo kill -15 $TOMCAT_PID
+//                                while ps -p $TOMCAT_PID > /dev/null; do sleep 1; done
+//                                echo "Tomcat stopped."
+//                            else
+//                                echo "Tomcat is not running."
+//                            fi
+//                            echo "Starting Tomcat..."
+//                            cd /opt/apache-tomcat-9.0.86/
+//                            sudo ./bin/startup.sh
+//                            echo "Tomcat started."
+//                        '
+//                        '''
+//                    }
+//                }
+//            }
+//        }
     }
 
     post {
